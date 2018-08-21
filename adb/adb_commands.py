@@ -127,7 +127,7 @@ class AdbCommands(object):
         # If there isnt a handle override (used by tests), build one here
         if 'handle' in kwargs:
             self._handle = kwargs.pop('handle')
-        elif serial and b':' in serial:
+        elif serial and ':' in serial:
             self._handle = common.TcpHandle(serial, timeout_ms=default_timeout_ms)
         else:
             self._handle = common.UsbHandle.FindAndOpen(

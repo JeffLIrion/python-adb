@@ -298,8 +298,8 @@ class TcpHandle(object):
 
         Host may be an IP address or a host name.
         """
-        if b':' in serial:
-            (host, port) = serial.split(b':')
+        if ':' in serial:
+            host, port = serial.split(':')
         else:
             host = serial
             port = 5555

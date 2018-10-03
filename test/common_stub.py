@@ -5,9 +5,10 @@ import signal
 import string
 import sys
 import time
+from mock import mock
+
 from adb.common import TcpHandle, UsbHandle
 from adb.usb_exceptions import TcpTimeoutException
-from adb.adb_commands import AdbCommands
 
 PRINTABLE_DATA = set(string.printable) - set(string.whitespace)
 
@@ -101,6 +102,8 @@ class StubUsb(UsbHandle):
 class StubTcp(TcpHandle):
   def __init__(self, serial, timeout_ms=None):
     """TcpHandle stub."""
+    self._connect = mock.MagicMock(return_value=None)
+
     super(StubTcp, self).__init__(serial, timeout_ms)
     self.stub_base = StubHandleBase(0, is_tcp=True)
 
@@ -118,10 +121,3 @@ class StubTcp(TcpHandle):
 
   def Timeout(self, timeout_ms):
     return self.stub_base.Timeout(timeout_ms)
-
-
-class StubAdbCommands(AdbCommands):
-  """AdbCommands stub"""
-  def _Connect(self, banner=None, **kwargs):
-    """Simply let Connect pass, so we can test param parsing"""
-    pass

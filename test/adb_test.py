@@ -17,7 +17,10 @@
 from io import BytesIO
 import struct
 import unittest
+from mock import mock
 
+
+from adb import common
 from adb import adb_commands
 from adb import adb_protocol
 from adb.usb_exceptions import TcpTimeoutException, DeviceNotFoundError
@@ -97,10 +100,11 @@ class AdbTest(BaseAdbTest):
     dev.ConnectDevice(handle=usb, banner=BANNER)
 
   def testConnectSerialString(self):
-    dev = common_stub.StubAdbCommands()
+    dev = adb_commands.AdbCommands()
 
-    with self.assertRaises(DeviceNotFoundError):
-      dev.ConnectDevice(serial='/dev/ttyS99')
+    with mock.patch.object(common.UsbHandle, 'FindAndOpen', return_value=None):
+      with mock.patch.object(adb_commands.AdbCommands, '_Connect', return_value=None):
+        dev.ConnectDevice(serial='/dev/invalidHandle')
 
   def testSmallResponseShell(self):
     command = b'keepin it real'

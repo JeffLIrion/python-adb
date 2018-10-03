@@ -5,7 +5,8 @@ import signal
 import string
 import sys
 import time
-from adb.usb_exceptions import TcpTimeoutException 
+from adb.usb_exceptions import TcpTimeoutException
+from adb.adb_commands import AdbCommands
 
 PRINTABLE_DATA = set(string.printable) - set(string.whitespace)
 
@@ -94,5 +95,11 @@ class StubTcp(StubUsb):
     if b'i_need_a_timeout' in data:
       self._alarm_sounder(timeout_ms)  
       time.sleep(2*self._return_seconds(timeout_ms))
-    return bytearray(data)  
+    return bytearray(data)
 
+
+class StubAdbCommands(AdbCommands):
+  """AdbCommands stub"""
+  def _Connect(self, banner=None, **kwargs):
+    """Simply let Connect pass, so we can test param parsing"""
+    pass

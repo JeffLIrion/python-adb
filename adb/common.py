@@ -303,14 +303,21 @@ class TcpHandle(object):
             serial = serial.decode('utf-8')
 
         if ':' in serial:
-            host, port = serial.split(':')
+            self.host, self.port = serial.split(':')
         else:
-            host = serial
-            port = 5555
-        self._serial_number = '%s:%s' % (host, port)
+            self.host = serial
+            self.port = 5555
+
+        self._connection = None
+        self._serial_number = '%s:%s' % (self.host, self.port)
         self._timeout_ms = float(timeout_ms) if timeout_ms else None
+
+        self._connect()
+
+    def _connect(self):
         timeout = self.TimeoutSeconds(self._timeout_ms)
-        self._connection = socket.create_connection((host, port), timeout=timeout)
+        self._connection = socket.create_connection((self.host, self.port),
+                                                    timeout=timeout)
         if timeout:
             self._connection.setblocking(0)
 

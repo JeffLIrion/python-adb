@@ -14,27 +14,11 @@
 
 from setuptools import setup
 
-# Figure out if the system already has a supported Crypto library
-rsa_signer_library = 'cryptography'
-try:
-  import rsa
-
-  rsa_signer_library = 'rsa'
-except ImportError:
-    try:
-        from Crypto.Hash import SHA256
-        from Crypto.PublicKey import RSA
-        from Crypto.Signature import pkcs1_15
-
-        rsa_signer_library = 'pycryptodome'
-    except ImportError:
-        pass
-
 
 setup(
-    name = 'adb',
+    name = 'adb-homeassistant',
     packages = ['adb'],
-    version = '1.3.0',
+    version = '1.3.1',
     author = 'Fahrzin Hemmati',
     author_email = 'fahhem@gmail.com',
     maintainer = 'Fahrzin Hemmati',
@@ -60,10 +44,7 @@ Android project's ADB.
 
     keywords = ['android', 'adb', 'fastboot'],
 
-    install_requires = [
-        'libusb1>=1.0.16',
-        rsa_signer_library
-    ],
+    install_requires = ['libusb1>=1.0.16', 'rsa', 'pycryptodome'],
 
     extra_requires = {
         'fastboot': 'progressbar>=2.3'

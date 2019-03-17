@@ -129,7 +129,7 @@ class _AdbConnection(object):
             self.usb, expected_cmds, self.timeout_ms)
         if local_id != 0 and self.local_id != local_id:
             raise InterleavedDataError("We don't support multiple streams...")
-        if remote_id != 0 and self.remote_id != remote_id:
+        if remote_id != 0 and self.remote_id != remote_id and cmd != b'CLSE':
             raise InvalidResponseError(
                 'Incorrect remote id, expected %s got %s' % (
                     self.remote_id, remote_id))
@@ -185,6 +185,7 @@ class AdbMessage(object):
     format = b'<6I'
 
     connections = 0
+    _local_id = 1
 
     def __init__(self, command=None, arg0=None, arg1=None, data=b''):
         self.command = self.commands[command]
@@ -348,6 +349,18 @@ class AdbMessage(object):
         return banner
 
     @classmethod
+    def _NextLocalId(cls):
+        next_id = cls._local_id
+        cls._local_id += 1
+        # ADB message arguments are 32-bit words
+        # Not very likely to reach this point but wrap back around to 1
+        # just in case:
+        if cls._local_id >= 2**32:
+            cls._local_id = 1
+
+        return next_id
+
+    @classmethod
     def Open(cls, usb, destination, timeout_ms=None):
         """Opens a new connection to the device via an OPEN message.
 
@@ -365,23 +378,26 @@ class AdbMessage(object):
         Returns:
           The local connection id.
         """
-        local_id = 1
+        local_id = cls._NextLocalId()
         msg = cls(
             command=b'OPEN', arg0=local_id, arg1=0,
             data=destination + b'\0')
         msg.Send(usb, timeout_ms)
-        cmd, remote_id, their_local_id, _ = cls.Read(usb, [b'CLSE', b'OKAY'],
-                                                     timeout_ms=timeout_ms)
-        if local_id != their_local_id:
-            raise InvalidResponseError(
-                'Expected the local_id to be {}, got {}'.format(local_id, their_local_id))
-        if cmd == b'CLSE':
-            # Some devices seem to be sending CLSE once more after a request, this *should* handle it
+        while True:
             cmd, remote_id, their_local_id, _ = cls.Read(usb, [b'CLSE', b'OKAY'],
                                                          timeout_ms=timeout_ms)
-            # Device doesn't support this service.
-            if cmd == b'CLSE':
-                return None
+            if local_id != their_local_id:
+                if cmd != b'CLSE':
+                    raise InvalidResponseError(
+                        'Expected the local_id to be {}, got {}'.format(local_id, their_local_id))
+                continue
+
+            break
+
+        # Device doesn't support this service.
+        if cmd == b'CLSE':
+            return None
+
         if cmd != b'OKAY':
             raise InvalidCommandError('Expected a ready response, got {}'.format(cmd),
                                       cmd, (remote_id, their_local_id))
@@ -436,6 +452,9 @@ class AdbMessage(object):
         connection = cls.Open(
             usb, destination=b'%s:%s' % (service, command),
             timeout_ms=timeout_ms)
+        if connection is None:
+            raise usb_exceptions.AdbCommandFailureException(
+                    'Command failed: Device immediately closed the stream.')
         for data in connection.ReadUntilClose():
             yield data.decode('utf8')
 

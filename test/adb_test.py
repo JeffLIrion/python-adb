@@ -33,6 +33,11 @@ REMOTE_ID = 2
 
 
 class BaseAdbTest(unittest.TestCase):
+  def setUp(self):
+    # Ensure that the next local-id used by the AdbMessage class
+    # is reset back to LOCAL_ID to account for the changes in
+    # https://github.com/google/python-adb/pull/151
+    adb_protocol.AdbMessage._local_id = LOCAL_ID
 
   @classmethod
   def _ExpectWrite(cls, usb, command, arg0, arg1, data):

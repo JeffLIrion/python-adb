@@ -18,7 +18,7 @@ from setuptools import setup
 setup(
     name = 'adb-homeassistant',
     packages = ['adb'],
-    version = '1.3.1',
+    version = '1.3.2',
     author = 'Fahrzin Hemmati',
     author_email = 'fahhem@gmail.com',
     maintainer = 'Fahrzin Hemmati',
@@ -44,7 +44,7 @@ Android project's ADB.
 
     keywords = ['android', 'adb', 'fastboot'],
 
-    install_requires = ['libusb1>=1.0.16', 'rsa', 'pycryptodome'],
+    install_requires = ['libusb1>=1.0.16', 'rsa'],
 
     extra_requires = {
         'fastboot': 'progressbar>=2.3'

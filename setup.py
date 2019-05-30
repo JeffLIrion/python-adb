@@ -18,7 +18,7 @@ from setuptools import setup
 setup(
     name = 'adb-homeassistant',
     packages = ['adb'],
-    version = '1.3.2',
+    version = '1.3.3',
     author = 'Fahrzin Hemmati',
     author_email = 'fahhem@gmail.com',
     maintainer = 'Fahrzin Hemmati',

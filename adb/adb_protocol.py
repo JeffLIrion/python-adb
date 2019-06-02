@@ -258,7 +258,7 @@ class AdbMessage(object):
             data = bytearray()
             while data_length > 0:
                 temp = usb.BulkRead(data_length, timeout_ms)
-                if len(temp) != data_length:
+                if len(temp) != data_length and command != b'CLSE':
                     print(
                         "Data_length {} does not match actual number of bytes read: {}".format(data_length, len(temp)))
                 data += temp

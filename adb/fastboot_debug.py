@@ -34,18 +34,18 @@ except ImportError:
     progressbar = None
 
 
-def Devices(args):
+def devices(args):
     """Lists the available devices.
 
     List of devices attached
     015DB7591102001A        device
     """
-    for device in fastboot.FastbootCommands.Devices():
+    for device in fastboot.FastbootCommands.devices():
         print('%s\tdevice' % device.serial_number)
     return 0
 
 
-def _InfoCb(message):
+def _info_cb(message):
     # Use an unbuffered version of stdout.
     if not message.message:
         return
@@ -54,8 +54,8 @@ def _InfoCb(message):
 
 
 def main():
-    common = common_cli.GetCommonArguments()
-    device = common_cli.GetDeviceArguments()
+    common = common_cli.get_common_arguments()
+    device = common_cli.get_device_arguments()
     device.add_argument(
         '--chunk_kb', type=int, default=1024, metavar='1024',
         help='Size of packets to write in Kb. For older devices, it may be '
@@ -70,22 +70,22 @@ def main():
         name='help', help='Prints the commands available')
     subparser = subparsers.add_parser(
         name='devices', help='Lists the available devices', parents=[common])
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Continue)
+    common_cli.make_subparser(
+        subparsers, parents, fastboot.FastbootCommands._continue)
 
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Download,
+    common_cli.make_subparser(
+        subparsers, parents, fastboot.FastbootCommands.download,
         {'source_file': 'Filename on the host to push'})
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Erase)
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Flash)
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Getvar)
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Oem)
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Reboot)
+    common_cli.make_subparser(
+        subparsers, parents, fastboot.FastbootCommands.erase)
+    common_cli.make_subparser(
+        subparsers, parents, fastboot.FastbootCommands.flash)
+    common_cli.make_subparser(
+        subparsers, parents, fastboot.FastbootCommands.get_var)
+    common_cli.make_subparser(
+        subparsers, parents, fastboot.FastbootCommands.oem)
+    common_cli.make_subparser(
+        subparsers, parents, fastboot.FastbootCommands.reboot)
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -95,7 +95,7 @@ def main():
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
     if args.command_name == 'devices':
-        return Devices(args)
+        return devices(args)
     if args.command_name == 'help':
         parser.print_help()
         return 0
@@ -103,7 +103,7 @@ def main():
     kwargs = {}
     argspec = inspect.getargspec(args.method)
     if 'info_cb' in argspec.args:
-        kwargs['info_cb'] = _InfoCb
+        kwargs['info_cb'] = _info_cb
     if 'progress_callback' in argspec.args and progressbar:
         bar = progressbar.ProgessBar(
             widgets=[progressbar.Bar(), progressbar.Percentage()])
@@ -116,7 +116,7 @@ def main():
 
         kwargs['progress_callback'] = SetProgress
 
-    return common_cli.StartCli(
+    return common_cli.start_cli(
         args,
         fastboot.FastbootCommands,
         chunk_kb=args.chunk_kb,

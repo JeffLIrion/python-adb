@@ -44,14 +44,19 @@ except ImportError:
             rsa_signer = None
 
 
-def Devices(args):
+def devices(args):
     """Lists the available devices.
 
-    Mimics 'adb devices' output:
+    Mimics the output of ``adb devices``:
+
+
+    ::
+
       List of devices attached
       015DB7591102001A        device        1,2
+
     """
-    for d in adb_commands.AdbCommands.Devices():
+    for d in adb_commands.AdbCommands.devices():
         if args.output_port_path:
             print('%s\tdevice\t%s' % (
                 d.serial_number, ','.join(str(p) for p in d.port_path)))
@@ -60,13 +65,20 @@ def Devices(args):
     return 0
 
 
-def List(device, device_path):
+def ls(device, device_path):
     """Prints a directory listing.
 
-    Args:
-      device_path: Directory to list.
+    Parameters
+    ----------
+    device_path : TODO
+        Directory to list.
+
+    Yields
+    ------
+    TODO
+        TODO
     """
-    files = device.List(device_path)
+    files = device.ls(device_path)
     files.sort(key=lambda x: x.filename)
     maxname = max(len(f.filename) for f in files)
     maxsize = max(len(str(f.size)) for f in files)
@@ -89,23 +101,26 @@ def List(device, device_path):
             maxname, f.filename)
 
 
-@functools.wraps(adb_commands.AdbCommands.Logcat)
-def Logcat(device, *options):
-    return device.Logcat(
+@functools.wraps(adb_commands.AdbCommands.logcat)
+def logcat(device, *options):
+    return device.logcat(
         device, ' '.join(options), timeout_ms=0)
 
 
-def Shell(device, *command):
+def shell(device, *command):
     """Runs a command on the device and prints the stdout.
 
-    Args:
-      command: Command to run on the target.
+    Parameters
+    ----------
+    command : TODO
+        Command to run on the target.
+
     """
     if command:
-        return device.StreamingShell(' '.join(command))
+        return device.streaming_shell(' '.join(command))
     else:
         # Retrieve the initial terminal prompt to use as a delimiter for future reads
-        terminal_prompt = device.InteractiveShell()
+        terminal_prompt = device.interactive_shell()
         print(terminal_prompt.decode('utf-8'))
 
         # Accept user input in a loop and write that into the interactive shells stdin, then print output
@@ -116,17 +131,17 @@ def Shell(device, *command):
             elif cmd == 'exit':
                 break
             else:
-                stdout = device.InteractiveShell(cmd, strip_cmd=True, delim=terminal_prompt, strip_delim=True)
+                stdout = device.interactive_shell(cmd, strip_cmd=True, delim=terminal_prompt, strip_delim=True)
                 if stdout:
                     if isinstance(stdout, bytes):
                         stdout = stdout.decode('utf-8')
                         print(stdout)
 
-        device.Close()
+        device.close()
 
 
 def main():
-    common = common_cli.GetCommonArguments()
+    common = common_cli.get_common_arguments()
     common.add_argument(
         '--rsa_key_path', action='append', default=[],
         metavar='~/.android/adbkey',
@@ -135,7 +150,7 @@ def main():
         '--auth_timeout_s', default=60., metavar='60', type=int,
         help='Seconds to wait for the dialog to be accepted when using '
              'authenticated ADB.')
-    device = common_cli.GetDeviceArguments()
+    device = common_cli.get_device_arguments()
     parents = [common, device]
 
     parser = argparse.ArgumentParser(
@@ -150,30 +165,30 @@ def main():
         '--output_port_path', action='store_true',
         help='Outputs the port_path alongside the serial')
 
-    common_cli.MakeSubparser(
-        subparsers, parents, adb_commands.AdbCommands.Install)
-    common_cli.MakeSubparser(subparsers, parents, adb_commands.AdbCommands.Uninstall)
-    common_cli.MakeSubparser(subparsers, parents, List)
-    common_cli.MakeSubparser(subparsers, parents, Logcat)
-    common_cli.MakeSubparser(
-        subparsers, parents, adb_commands.AdbCommands.Push,
+    common_cli.make_subparser(
+        subparsers, parents, adb_commands.AdbCommands.install)
+    common_cli.make_subparser(subparsers, parents, adb_commands.AdbCommands.uninstall)
+    common_cli.make_subparser(subparsers, parents, ls)
+    common_cli.make_subparser(subparsers, parents, logcat)
+    common_cli.make_subparser(
+        subparsers, parents, adb_commands.AdbCommands.push,
         {'source_file': 'Filename or directory to push to the device.'})
-    common_cli.MakeSubparser(
-        subparsers, parents, adb_commands.AdbCommands.Pull,
+    common_cli.make_subparser(
+        subparsers, parents, adb_commands.AdbCommands.pull,
         {
             'dest_file': 'Filename to write to on the host, if not specified, '
                          'prints the content to stdout.',
         })
-    common_cli.MakeSubparser(
-        subparsers, parents, adb_commands.AdbCommands.Reboot)
-    common_cli.MakeSubparser(
-        subparsers, parents, adb_commands.AdbCommands.RebootBootloader)
-    common_cli.MakeSubparser(
-        subparsers, parents, adb_commands.AdbCommands.Remount)
-    common_cli.MakeSubparser(subparsers, parents, adb_commands.AdbCommands.Root)
-    common_cli.MakeSubparser(subparsers, parents, adb_commands.AdbCommands.EnableVerity)
-    common_cli.MakeSubparser(subparsers, parents, adb_commands.AdbCommands.DisableVerity)
-    common_cli.MakeSubparser(subparsers, parents, Shell)
+    common_cli.make_subparser(
+        subparsers, parents, adb_commands.AdbCommands.reboot)
+    common_cli.make_subparser(
+        subparsers, parents, adb_commands.AdbCommands.reboot_bootloader)
+    common_cli.make_subparser(
+        subparsers, parents, adb_commands.AdbCommands.remount)
+    common_cli.make_subparser(subparsers, parents, adb_commands.AdbCommands.root)
+    common_cli.make_subparser(subparsers, parents, adb_commands.AdbCommands.enable_verity)
+    common_cli.make_subparser(subparsers, parents, adb_commands.AdbCommands.disable_verity)
+    common_cli.make_subparser(subparsers, parents, shell)
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -191,7 +206,7 @@ def main():
 
     # Hacks so that the generated doc is nicer.
     if args.command_name == 'devices':
-        return Devices(args)
+        return devices(args)
     if args.command_name == 'help':
         parser.print_help()
         return 0
@@ -200,7 +215,7 @@ def main():
     elif args.command_name == 'shell':
         args.positional = args.command
 
-    return common_cli.StartCli(
+    return common_cli.start_cli(
         args,
         adb_commands.AdbCommands,
         auth_timeout_ms=int(args.auth_timeout_s * 1000),

@@ -7,3 +7,10 @@ adb.egg-info/
 /fastboot.zip
 .idea/
 *.DS_Store*
+
+# Build files
+build/
+dist/
+
+# Documentation
+docs/build/

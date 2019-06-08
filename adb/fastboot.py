@@ -36,7 +36,7 @@ CLASS = 0xFF
 SUBCLASS = 0x42
 PROTOCOL = 0x03
 # pylint: disable=invalid-name
-DeviceIsAvailable = common.InterfaceMatcher(CLASS, SUBCLASS, PROTOCOL)
+DeviceIsAvailable = common.interface_matcher(CLASS, SUBCLASS, PROTOCOL)
 
 
 # pylint doesn't understand cross-module exception baseclasses.
@@ -65,7 +65,8 @@ class FastbootProtocol(object):
     def __init__(self, usb, chunk_kb=1024):
         """Constructs a FastbootProtocol instance.
 
-        Args:
+        Parameters
+        ----------
           usb: UsbHandle instance.
           chunk_kb: Packet size. For older devices, 4 may be required.
         """
@@ -76,10 +77,11 @@ class FastbootProtocol(object):
     def usb_handle(self):
         return self.usb
 
-    def SendCommand(self, command, arg=None):
+    def send_command(self, command, arg=None):
         """Sends a command to the device.
 
-        Args:
+        Parameters
+        ----------
           command: The command to send.
           arg: Optional argument to the command.
         """
@@ -88,27 +90,29 @@ class FastbootProtocol(object):
                 arg = arg.encode('utf8')
             command = b'%s:%s' % (command, arg)
 
-        self._Write(io.BytesIO(command), len(command))
+        self._write(io.BytesIO(command), len(command))
 
-    def HandleSimpleResponses(
+    def handle_simple_responses(
             self, timeout_ms=None, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Accepts normal responses from the device.
 
-        Args:
+        Parameters
+        ----------
           timeout_ms: Timeout in milliseconds to wait for each response.
           info_cb: Optional callback for text sent from the bootloader.
 
         Returns:
           OKAY packet's message.
         """
-        return self._AcceptResponses(b'OKAY', info_cb, timeout_ms=timeout_ms)
+        return self._accept_responses(b'OKAY', info_cb, timeout_ms=timeout_ms)
 
-    def HandleDataSending(self, source_file, source_len,
-                          info_cb=DEFAULT_MESSAGE_CALLBACK,
-                          progress_callback=None, timeout_ms=None):
+    def handle_data_sending(self, source_file, source_len,
+                            info_cb=DEFAULT_MESSAGE_CALLBACK,
+                            progress_callback=None, timeout_ms=None):
         """Handles the protocol for sending data to the device.
 
-        Args:
+        Parameters
+        ----------
           source_file: File-object to read from for the device.
           source_len: Amount of data, in bytes, to send to the device.
           info_cb: Optional callback for text sent from the bootloader.
@@ -125,7 +129,7 @@ class FastbootProtocol(object):
         Returns:
           OKAY packet's message.
         """
-        accepted_size = self._AcceptResponses(
+        accepted_size = self._accept_responses(
             b'DATA', info_cb, timeout_ms=timeout_ms)
 
         accepted_size = binascii.unhexlify(accepted_size[:8])
@@ -134,13 +138,14 @@ class FastbootProtocol(object):
             raise FastbootTransferError(
                 'Device refused to download %s bytes of data (accepts %s bytes)',
                 source_len, accepted_size)
-        self._Write(source_file, accepted_size, progress_callback)
-        return self._AcceptResponses(b'OKAY', info_cb, timeout_ms=timeout_ms)
+        self._write(source_file, accepted_size, progress_callback)
+        return self._accept_responses(b'OKAY', info_cb, timeout_ms=timeout_ms)
 
-    def _AcceptResponses(self, expected_header, info_cb, timeout_ms=None):
+    def _accept_responses(self, expected_header, info_cb, timeout_ms=None):
         """Accepts responses until the expected header or a FAIL.
 
-        Args:
+        Parameters
+        ----------
           expected_header: OKAY or DATA
           info_cb: Optional callback for text sent from the bootloader.
           timeout_ms: Timeout in milliseconds to wait for each response.
@@ -154,7 +159,7 @@ class FastbootProtocol(object):
           OKAY packet's message.
         """
         while True:
-            response = self.usb.BulkRead(64, timeout_ms=timeout_ms)
+            response = self.usb.bulk_read(64, timeout_ms=timeout_ms)
             header = bytes(response[:4])
             remaining = bytes(response[4:])
 
@@ -174,7 +179,7 @@ class FastbootProtocol(object):
                 raise FastbootInvalidResponse(
                     'Got unknown header %s and response %s', header, remaining)
 
-    def _HandleProgress(self, total, progress_callback):
+    def _handle_progress(self, total, progress_callback):
         """Calls the callback with the current progress and total ."""
         current = 0
         while True:
@@ -186,15 +191,15 @@ class FastbootProtocol(object):
                                progress_callback)
                 continue
 
-    def _Write(self, data, length, progress_callback=None):
+    def _write(self, data, length, progress_callback=None):
         """Sends the data to the device, tracking progress with the callback."""
         if progress_callback:
-            progress = self._HandleProgress(length, progress_callback)
+            progress = self._handle_progress(length, progress_callback)
             next(progress)
         while length:
             tmp = data.read(self.chunk_kb * 1024)
             length -= len(tmp)
-            self.usb.BulkWrite(tmp)
+            self.usb.bulk_write(tmp)
 
             if progress_callback and progress:
                 progress.send(len(tmp))
@@ -206,53 +211,68 @@ class FastbootCommands(object):
     def __init__(self):
         """Constructs a FastbootCommands instance.
 
-        Args:
-          usb: UsbHandle instance.
-        """
-        self.__reset()
+        Parameters
+        ----------
+        usb: UsbHandle instance.
 
-    def __reset(self):
+        """
         self._handle = None
         self._protocol = None
+
+    def _reset(self):
+        self.__init__()
 
     @property
     def usb_handle(self):
         return self._handle
 
-    def Close(self):
-        self._handle.Close()
+    def close(self):
+        self._handle.close()
 
-    def ConnectDevice(self, port_path=None, serial=None, default_timeout_ms=None, chunk_kb=1024, **kwargs):
+    def connect_device(self, port_path=None, serial=None, default_timeout_ms=None, chunk_kb=1024, **kwargs):
         """Convenience function to get an adb device from usb path or serial.
 
-        Args:
-          port_path: The filename of usb port to use.
-          serial: The serial number of the device to use.
-          default_timeout_ms: The default timeout in milliseconds to use.
-          chunk_kb: Amount of data, in kilobytes, to break fastboot packets up into
-          kwargs: handle: Device handle to use (instance of common.TcpHandle or common.UsbHandle)
-                  banner: Connection banner to pass to the remote device
-                  rsa_keys: List of AuthSigner subclass instances to be used for
-                      authentication. The device can either accept one of these via the Sign
-                      method, or we will send the result of GetPublicKey from the first one
-                      if the device doesn't accept any of them.
-                  auth_timeout_ms: Timeout to wait for when sending a new public key. This
-                      is only relevant when we send a new public key. The device shows a
-                      dialog and this timeout is how long to wait for that dialog. If used
-                      in automation, this should be low to catch such a case as a failure
-                      quickly; while in interactive settings it should be high to allow
-                      users to accept the dialog. We default to automation here, so it's low
-                      by default.
+        Parameters
+        ----------
+        port_path : TODO, None
+            The filename of usb port to use.
+        serial : TODO, None
+            The serial number of the device to use.  If serial specifies a TCP address:port, then a TCP connection is
+            used instead of a USB connection.
+        default_timeout_ms : TODO, None
+            The default timeout in milliseconds to use.
+        chunk_kb : int
+            Amount of data, in kilobytes, to break fastboot packets up into
+        handle : TODO
+            Device handle to use (instance of common.TcpHandle or common.UsbHandle)
+        banner : TODO
+            Connection banner to pass to the remote device
+        rsa_keys : list
+            List of AuthSigner subclass instances to be used for
+              authentication. The device can either accept one of these via the Sign
+              method, or we will send the result of GetPublicKey from the first one
+              if the device doesn't accept any of them.
+        auth_timeout_ms : TODO
+            Timeout to wait for when sending a new public key. This
+              is only relevant when we send a new public key. The device shows a
+              dialog and this timeout is how long to wait for that dialog. If used
+              in automation, this should be low to catch such a case as a failure
+              quickly; while in interactive settings it should be high to allow
+              users to accept the dialog. We default to automation here, so it's low
+              by default.
 
-        If serial specifies a TCP address:port, then a TCP connection is
-        used instead of a USB connection.
+        Returns
+        -------
+        self : FastbootCommands
+            TODO
+
         """
 
         if 'handle' in kwargs:
             self._handle = kwargs['handle']
 
         else:
-            self._handle = common.UsbHandle.FindAndOpen(
+            self._handle = common.UsbHandle.find_and_open(
                 DeviceIsAvailable, port_path=port_path, serial=serial,
                 timeout_ms=default_timeout_ms)
 
@@ -261,19 +281,20 @@ class FastbootCommands(object):
         return self
 
     @classmethod
-    def Devices(cls):
+    def devices(cls):
         """Get a generator of UsbHandle for devices available."""
-        return common.UsbHandle.FindDevices(DeviceIsAvailable)
+        return common.UsbHandle.find_devices(DeviceIsAvailable)
 
-    def _SimpleCommand(self, command, arg=None, **kwargs):
-        self._protocol.SendCommand(command, arg)
-        return self._protocol.HandleSimpleResponses(**kwargs)
+    def _simple_command(self, command, arg=None, **kwargs):
+        self._protocol.send_command(command, arg)
+        return self._protocol.handle_simple_responses(**kwargs)
 
-    def FlashFromFile(self, partition, source_file, source_len=0,
-                      info_cb=DEFAULT_MESSAGE_CALLBACK, progress_callback=None):
+    def flash_from_file(self, partition, source_file, source_len=0,
+                        info_cb=DEFAULT_MESSAGE_CALLBACK, progress_callback=None):
         """Flashes a partition from the file on disk.
 
-        Args:
+        Parameters
+        ----------
           partition: Partition name to flash to.
           source_file: Filename to download to the device.
           source_len: Optional length of source_file, uses os.stat if not provided.
@@ -286,17 +307,18 @@ class FastbootCommands(object):
         if source_len == 0:
             # Fall back to stat.
             source_len = os.stat(source_file).st_size
-        download_response = self.Download(
+        download_response = self.download(
             source_file, source_len=source_len, info_cb=info_cb,
             progress_callback=progress_callback)
-        flash_response = self.Flash(partition, info_cb=info_cb)
+        flash_response = self.flash(partition, info_cb=info_cb)
         return download_response + flash_response
 
-    def Download(self, source_file, source_len=0,
+    def download(self, source_file, source_len=0,
                  info_cb=DEFAULT_MESSAGE_CALLBACK, progress_callback=None):
         """Downloads a file to the device.
 
-        Args:
+        Parameters
+        ----------
           source_file: A filename or file-like object to download to the device.
           source_len: Optional length of source_file. If source_file is a file-like
               object and source_len is not provided, source_file is read into
@@ -321,14 +343,15 @@ class FastbootCommands(object):
                 source_file = io.BytesIO(data.encode('utf8'))
                 source_len = len(data)
 
-            self._protocol.SendCommand(b'download', b'%08x' % source_len)
-            return self._protocol.HandleDataSending(
+            self._protocol.send_command(b'download', b'%08x' % source_len)
+            return self._protocol.handle_data_sending(
                 source_file, source_len, info_cb, progress_callback=progress_callback)
 
-    def Flash(self, partition, timeout_ms=0, info_cb=DEFAULT_MESSAGE_CALLBACK):
+    def flash(self, partition, timeout_ms=0, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Flashes the last downloaded file to the given partition.
 
-        Args:
+        Parameters
+        ----------
           partition: Partition to overwrite with the new image.
           timeout_ms: Optional timeout in milliseconds to wait for it to finish.
           info_cb: See Download. Usually no messages.
@@ -336,33 +359,36 @@ class FastbootCommands(object):
         Returns:
           Response to a download request, normally nothing.
         """
-        return self._SimpleCommand(b'flash', arg=partition, info_cb=info_cb,
-                                   timeout_ms=timeout_ms)
+        return self._simple_command(b'flash', arg=partition, info_cb=info_cb,
+                                    timeout_ms=timeout_ms)
 
-    def Erase(self, partition, timeout_ms=None):
+    def erase(self, partition, timeout_ms=None):
         """Erases the given partition.
 
-        Args:
+        Parameters
+        ----------
           partition: Partition to clear.
         """
-        self._SimpleCommand(b'erase', arg=partition, timeout_ms=timeout_ms)
+        self._simple_command(b'erase', arg=partition, timeout_ms=timeout_ms)
 
-    def Getvar(self, var, info_cb=DEFAULT_MESSAGE_CALLBACK):
+    def get_var(self, var, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Returns the given variable's definition.
 
-        Args:
+        Parameters
+        ----------
           var: A variable the bootloader tracks. Use 'all' to get them all.
           info_cb: See Download. Usually no messages.
 
         Returns:
           Value of var according to the current bootloader.
         """
-        return self._SimpleCommand(b'getvar', arg=var, info_cb=info_cb)
+        return self._simple_command(b'getvar', arg=var, info_cb=info_cb)
 
-    def Oem(self, command, timeout_ms=None, info_cb=DEFAULT_MESSAGE_CALLBACK):
+    def oem(self, command, timeout_ms=None, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Executes an OEM command on the device.
 
-        Args:
+        Parameters
+        ----------
           command: Command to execute, such as 'poweroff' or 'bootconfig read'.
           timeout_ms: Optional timeout in milliseconds to wait for a response.
           info_cb: See Download. Messages vary based on command.
@@ -372,17 +398,18 @@ class FastbootCommands(object):
         """
         if not isinstance(command, bytes):
             command = command.encode('utf8')
-        return self._SimpleCommand(
+        return self._simple_command(
             b'oem %s' % command, timeout_ms=timeout_ms, info_cb=info_cb)
 
-    def Continue(self):
+    def _continue(self):
         """Continues execution past fastboot into the system."""
-        return self._SimpleCommand(b'continue')
+        return self._simple_command(b'continue')
 
-    def Reboot(self, target_mode=b'', timeout_ms=None):
+    def reboot(self, target_mode=b'', timeout_ms=None):
         """Reboots the device.
 
-        Args:
+        Parameters
+        ----------
             target_mode: Normal reboot when unspecified. Can specify other target
                 modes such as 'recovery' or 'bootloader'.
             timeout_ms: Optional timeout in milliseconds to wait for a response.
@@ -390,9 +417,9 @@ class FastbootCommands(object):
         Returns:
             Usually the empty string. Depends on the bootloader and the target_mode.
         """
-        return self._SimpleCommand(
+        return self._simple_command(
             b'reboot', arg=target_mode or None, timeout_ms=timeout_ms)
 
-    def RebootBootloader(self, timeout_ms=None):
+    def reboot_bootloader(self, timeout_ms=None):
         """Reboots into the bootloader, usually equiv to Reboot('bootloader')."""
-        return self._SimpleCommand(b'reboot-bootloader', timeout_ms=timeout_ms)
+        return self._simple_command(b'reboot-bootloader', timeout_ms=timeout_ms)

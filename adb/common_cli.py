@@ -19,7 +19,6 @@ StartCli handles connecting to a device, calling the expected method, and
 outputting the results.
 """
 
-from __future__ import print_function
 import argparse
 import io
 import inspect
@@ -43,7 +42,7 @@ class PositionalArg(argparse.Action):
         namespace.positional.append(values)
 
 
-def GetDeviceArguments():
+def get_device_arguments():
     group = argparse.ArgumentParser('Device', add_help=False)
     group.add_argument(
         '--timeout_ms', default=10000, type=int, metavar='10000',
@@ -57,13 +56,13 @@ def GetDeviceArguments():
     return group
 
 
-def GetCommonArguments():
+def get_common_arguments():
     group = argparse.ArgumentParser('Common', add_help=False)
     group.add_argument('--verbose', action='store_true', help='Enable logging')
     return group
 
 
-def _DocToArgs(doc):
+def _doc_to_args(doc):
     """Converts a docstring documenting arguments into a dict."""
     m = None
     offset = None
@@ -86,7 +85,7 @@ def _DocToArgs(doc):
     return out
 
 
-def MakeSubparser(subparsers, parents, method, arguments=None):
+def make_subparser(subparsers, parents, method, arguments=None):
     """Returns an argparse subparser to create a 'subcommand' to adb."""
     name = ('-'.join(re.split(r'([A-Z][a-z]+)', method.__name__)[1:-1:2])).lower()
     help = method.__doc__.splitlines()[0]
@@ -106,7 +105,7 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
     defaults = [None] * offset + list(argspec.defaults or [])
 
     # Add all arguments so they append to args.positional.
-    args_help = _DocToArgs(method.__doc__)
+    args_help = _doc_to_args(method.__doc__)
     for name, default in zip(positional, defaults):
         if not isinstance(default, (None.__class__, str)):
             continue
@@ -121,7 +120,7 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
     return subparser
 
 
-def _RunMethod(dev, args, extra):
+def _run_method(dev, args, extra):
     """Runs a method registered via MakeSubparser."""
     logging.info('%s(%s)', args.method.__name__, ', '.join(args.positional))
     result = args.method(dev, *args.positional, **extra)
@@ -143,22 +142,22 @@ def _RunMethod(dev, args, extra):
     return 0
 
 
-def StartCli(args, adb_commands, extra=None, **device_kwargs):
+def start_cli(args, adb_commands, extra=None, **device_kwargs):
     """Starts a common CLI interface for this usb path and protocol."""
     try:
         dev = adb_commands()
-        dev.ConnectDevice(port_path=args.port_path, serial=args.serial, default_timeout_ms=args.timeout_ms,
-                          **device_kwargs)
+        dev.connect_device(port_path=args.port_path, serial=args.serial, default_timeout_ms=args.timeout_ms,
+                           **device_kwargs)
     except usb_exceptions.DeviceNotFoundError as e:
-        print('No device found: {}'.format(e), file=sys.stderr)
+        logging.error('No device found: {}'.format(e), file=sys.stderr)
         return 1
     except usb_exceptions.CommonUsbError as e:
-        print('Could not connect to device: {}'.format(e), file=sys.stderr)
+        logging.error('Could not connect to device: {}'.format(e), file=sys.stderr)
         return 1
     try:
-        return _RunMethod(dev, args, extra or {})
+        return _run_method(dev, args, extra or {})
     except Exception as e:  # pylint: disable=broad-except
         sys.stdout.write(str(e))
         return 1
     finally:
-        dev.Close()
+        dev.close()

@@ -62,9 +62,9 @@ class FastbootTest(unittest.TestCase):
 
     self.ExpectDownload([raw])
     dev = fastboot.FastbootCommands()
-    dev.ConnectDevice(handle=self.usb)
+    dev.connect_device(handle=self.usb)
 
-    response = dev.Download(data)
+    response = dev.download(data)
     self.assertEqual(b'Result', response)
 
   def testDownloadFail(self):
@@ -73,27 +73,27 @@ class FastbootTest(unittest.TestCase):
 
     self.ExpectDownload([raw], succeed=False)
     dev = fastboot.FastbootCommands()
-    dev.ConnectDevice(handle=self.usb)
+    dev.connect_device(handle=self.usb)
     with self.assertRaises(fastboot.FastbootRemoteFailure):
-      dev.Download(data)
+      dev.download(data)
 
     data = io.StringIO(raw)
     self.ExpectDownload([raw], accept_data=False)
     with self.assertRaises(fastboot.FastbootTransferError):
-      dev.Download(data)
+      dev.download(data)
 
   def testFlash(self):
     partition = b'yarr'
 
     self.ExpectFlash(partition)
     dev = fastboot.FastbootCommands()
-    dev.ConnectDevice(handle=self.usb)
+    dev.connect_device(handle=self.usb)
 
     output = io.BytesIO()
     def InfoCb(message):
       if message.header == b'INFO':
         output.write(message.message)
-    response = dev.Flash(partition, info_cb=InfoCb)
+    response = dev.flash(partition, info_cb=InfoCb)
     self.assertEqual(b'Done', response)
     self.assertEqual(b'Random info from the bootloader', output.getvalue())
 
@@ -102,10 +102,10 @@ class FastbootTest(unittest.TestCase):
 
     self.ExpectFlash(partition, succeed=False)
     dev = fastboot.FastbootCommands()
-    dev.ConnectDevice(handle=self.usb)
+    dev.connect_device(handle=self.usb)
 
     with self.assertRaises(fastboot.FastbootRemoteFailure):
-      dev.Flash(partition)
+      dev.flash(partition)
 
   def testFlashFromFile(self):
     partition = b'somewhere'
@@ -127,53 +127,53 @@ class FastbootTest(unittest.TestCase):
     cb = lambda progress, total: progresses.append((progress, total))
 
     dev = fastboot.FastbootCommands()
-    dev.ConnectDevice(handle=self.usb)
-    dev.FlashFromFile(
+    dev.connect_device(handle=self.usb)
+    dev.flash_from_file(
         partition, tmp.name, progress_callback=cb)
     self.assertEqual(len(pieces), len(progresses))
     os.remove(tmp.name)
 
   def testSimplerCommands(self):
     dev = fastboot.FastbootCommands()
-    dev.ConnectDevice(handle=self.usb)
+    dev.connect_device(handle=self.usb)
 
     self.usb.ExpectWrite(b'erase:vector')
     self.usb.ExpectRead(b'OKAY')
-    dev.Erase('vector')
+    dev.erase('vector')
 
     self.usb.ExpectWrite(b'getvar:variable')
     self.usb.ExpectRead(b'OKAYstuff')
-    self.assertEqual(b'stuff', dev.Getvar('variable'))
+    self.assertEqual(b'stuff', dev.get_var('variable'))
 
     self.usb.ExpectWrite(b'continue')
     self.usb.ExpectRead(b'OKAY')
-    dev.Continue()
+    dev._continue()
 
     self.usb.ExpectWrite(b'reboot')
     self.usb.ExpectRead(b'OKAY')
-    dev.Reboot()
+    dev.reboot()
 
     self.usb.ExpectWrite(b'reboot-bootloader')
     self.usb.ExpectRead(b'OKAY')
-    dev.RebootBootloader()
+    dev.reboot_bootloader()
 
     self.usb.ExpectWrite(b'oem a little somethin')
     self.usb.ExpectRead(b'OKAYsomethin')
-    self.assertEqual(b'somethin', dev.Oem('a little somethin'))
+    self.assertEqual(b'somethin', dev.oem('a little somethin'))
 
   def testVariousFailures(self):
     dev = fastboot.FastbootCommands()
-    dev.ConnectDevice(handle=self.usb)
+    dev.connect_device(handle=self.usb)
 
     self.usb.ExpectWrite(b'continue')
     self.usb.ExpectRead(b'BLEH')
     with self.assertRaises(fastboot.FastbootInvalidResponse):
-      dev.Continue()
+      dev._continue()
 
     self.usb.ExpectWrite(b'continue')
     self.usb.ExpectRead(b'DATA000000')
     with self.assertRaises(fastboot.FastbootStateMismatch):
-      dev.Continue()
+      dev._continue()
 
 
 if __name__ == '__main__':

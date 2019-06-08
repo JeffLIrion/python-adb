@@ -17,9 +17,11 @@ Implements the ADB protocol as seen in android's adb/adbd binaries, but only the
 host side.
 """
 
+import logging
 import struct
 import time
 from io import BytesIO
+
 from adb import usb_exceptions
 
 # Maximum amount of data in an ADB packet.
@@ -72,7 +74,7 @@ class InterleavedDataError(Exception):
     """We only support command sent serially."""
 
 
-def MakeWireIDs(ids):
+def make_wire_ids(ids):
     id_to_wire = {
         cmd_id: sum(c << (i * 8) for i, c in enumerate(bytearray(cmd_id)))
         for cmd_id in ids
@@ -84,11 +86,11 @@ def MakeWireIDs(ids):
 class AuthSigner(object):
     """Signer for use with authenticated ADB, introduced in 4.4.x/KitKat."""
 
-    def Sign(self, data):
+    def sign(self, data):
         """Signs given data using a private key."""
         raise NotImplementedError()
 
-    def GetPublicKey(self):
+    def get_public_key(self):
         """Returns the public key in PEM format without headers or newlines."""
         raise NotImplementedError()
 
@@ -102,15 +104,15 @@ class _AdbConnection(object):
         self.remote_id = remote_id
         self.timeout_ms = timeout_ms
 
-    def _Send(self, command, arg0, arg1, data=b''):
+    def _send(self, command, arg0, arg1, data=b''):
         message = AdbMessage(command, arg0, arg1, data)
         message.Send(self.usb, self.timeout_ms)
 
-    def Write(self, data):
+    def write(self, data):
         """Write a packet and expect an Ack."""
-        self._Send(b'WRTE', arg0=self.local_id, arg1=self.remote_id, data=data)
+        self._send(b'WRTE', arg0=self.local_id, arg1=self.remote_id, data=data)
         # Expect an ack in response.
-        cmd, okay_data = self.ReadUntil(b'OKAY')
+        cmd, okay_data = self.read_until(b'OKAY')
         if cmd != b'OKAY':
             if cmd == b'FAIL':
                 raise usb_exceptions.AdbCommandFailureException(
@@ -120,10 +122,10 @@ class _AdbConnection(object):
                 cmd, okay_data)
         return len(data)
 
-    def Okay(self):
-        self._Send(b'OKAY', arg0=self.local_id, arg1=self.remote_id)
+    def okay(self):
+        self._send(b'OKAY', arg0=self.local_id, arg1=self.remote_id)
 
-    def ReadUntil(self, *expected_cmds):
+    def read_until(self, *expected_cmds):
         """Read a packet, Ack any write packets."""
         cmd, remote_id, local_id, data = AdbMessage.Read(
             self.usb, expected_cmds, self.timeout_ms)
@@ -135,15 +137,15 @@ class _AdbConnection(object):
                     self.remote_id, remote_id))
         # Ack write packets.
         if cmd == b'WRTE':
-            self.Okay()
+            self.okay()
         return cmd, data
 
-    def ReadUntilClose(self):
+    def read_until_close(self):
         """Yield packets until a Close packet is received."""
         while True:
-            cmd, data = self.ReadUntil(b'CLSE', b'WRTE')
+            cmd, data = self.read_until(b'CLSE', b'WRTE')
             if cmd == b'CLSE':
-                self._Send(b'CLSE', arg0=self.local_id, arg1=self.remote_id)
+                self._send(b'CLSE', arg0=self.local_id, arg1=self.remote_id)
                 break
             if cmd != b'WRTE':
                 if cmd == b'FAIL':
@@ -153,9 +155,9 @@ class _AdbConnection(object):
                                           cmd, data)
             yield data
 
-    def Close(self):
-        self._Send(b'CLSE', arg0=self.local_id, arg1=self.remote_id)
-        cmd, data = self.ReadUntil(b'CLSE')
+    def close(self):
+        self._send(b'CLSE', arg0=self.local_id, arg1=self.remote_id)
+        cmd, data = self.read_until(b'CLSE')
         if cmd != b'CLSE':
             if cmd == b'FAIL':
                 raise usb_exceptions.AdbCommandFailureException('Command failed.', data)
@@ -180,7 +182,7 @@ class AdbMessage(object):
     """
 
     ids = [b'SYNC', b'CNXN', b'AUTH', b'OPEN', b'OKAY', b'CLSE', b'WRTE']
-    commands, constants = MakeWireIDs(ids)
+    commands, constants = make_wire_ids(ids)
     # An ADB message is 6 words in little-endian.
     format = b'<6I'
 
@@ -195,10 +197,10 @@ class AdbMessage(object):
 
     @property
     def checksum(self):
-        return self.CalculateChecksum(self.data)
+        return self.calculate_checksum(self.data)
 
     @staticmethod
-    def CalculateChecksum(data):
+    def calculate_checksum(data):
         # The checksum is just a sum of all the bytes. I swear.
         if isinstance(data, bytearray):
             total = sum(data)
@@ -230,16 +232,16 @@ class AdbMessage(object):
 
     def Send(self, usb, timeout_ms=None):
         """Send this message over USB."""
-        usb.BulkWrite(self.Pack(), timeout_ms)
-        usb.BulkWrite(self.data, timeout_ms)
+        usb.bulk_write(self.Pack(), timeout_ms)
+        usb.bulk_write(self.data, timeout_ms)
 
     @classmethod
     def Read(cls, usb, expected_cmds, timeout_ms=None, total_timeout_ms=None):
         """Receive a response from the device."""
-        total_timeout_ms = usb.Timeout(total_timeout_ms)
+        total_timeout_ms = usb.timeout(total_timeout_ms)
         start = time.time()
         while True:
-            msg = usb.BulkRead(24, timeout_ms)
+            msg = usb.bulk_read(24, timeout_ms)
             cmd, arg0, arg1, data_length, data_checksum = cls.Unpack(msg)
             command = cls.constants.get(cmd)
             if not command:
@@ -256,15 +258,15 @@ class AdbMessage(object):
         if data_length > 0:
             data = bytearray()
             while data_length > 0:
-                temp = usb.BulkRead(data_length, timeout_ms)
+                temp = usb.bulk_read(data_length, timeout_ms)
                 if len(temp) != data_length:
-                    print(
+                    logging.warning(
                         "Data_length {} does not match actual number of bytes read: {}".format(data_length, len(temp)))
                 data += temp
 
                 data_length -= len(temp)
 
-            actual_checksum = cls.CalculateChecksum(data)
+            actual_checksum = cls.calculate_checksum(data)
             if actual_checksum != data_checksum:
                 raise InvalidChecksumError(
                     'Received checksum %s != %s', (actual_checksum, data_checksum))
@@ -273,10 +275,11 @@ class AdbMessage(object):
         return command, arg0, arg1, bytes(data)
 
     @classmethod
-    def Connect(cls, usb, banner=b'notadb', rsa_keys=None, auth_timeout_ms=100):
+    def connect(cls, usb, banner=b'notadb', rsa_keys=None, auth_timeout_ms=100):
         """Establish a new connection to the device.
 
-        Args:
+        Parameters
+        ----------
           usb: A USBHandle with BulkRead and BulkWrite methods.
           banner: A string to send as a host identifier.
           rsa_keys: List of AuthSigner subclass instances to be used for
@@ -323,7 +326,7 @@ class AdbMessage(object):
                         'Unknown AUTH response: %s %s %s' % (arg0, arg1, banner))
 
                 # Do not mangle the banner property here by converting it to a string
-                signed_token = rsa_key.Sign(banner)
+                signed_token = rsa_key.sign(banner)
                 msg = cls(
                     command=b'AUTH', arg0=AUTH_SIGNATURE, arg1=0, data=signed_token)
                 msg.Send(usb)
@@ -333,7 +336,7 @@ class AdbMessage(object):
             # None of the keys worked, so send a public key.
             msg = cls(
                 command=b'AUTH', arg0=AUTH_RSAPUBLICKEY, arg1=0,
-                data=rsa_keys[0].GetPublicKey() + b'\0')
+                data=rsa_keys[0].get_public_key() + b'\0')
             msg.Send(usb)
             try:
                 cmd, arg0, unused_arg1, banner = cls.Read(
@@ -348,12 +351,13 @@ class AdbMessage(object):
         return banner
 
     @classmethod
-    def Open(cls, usb, destination, timeout_ms=None):
+    def open(cls, usb, destination, timeout_ms=None):
         """Opens a new connection to the device via an OPEN message.
 
         Not the same as the posix 'open' or any other google3 Open methods.
 
-        Args:
+        Parameters
+        ----------
           usb: USB device handle with BulkRead and BulkWrite methods.
           destination: The service:command string.
           timeout_ms: Timeout in milliseconds for USB packets.
@@ -388,14 +392,15 @@ class AdbMessage(object):
         return _AdbConnection(usb, local_id, remote_id, timeout_ms)
 
     @classmethod
-    def Command(cls, usb, service, command='', timeout_ms=None):
+    def command(cls, usb, service, command='', timeout_ms=None):
         """One complete set of USB packets for a single command.
 
         Sends service:command in a new connection, reading the data for the
         response. All the data is held in memory, large responses will be slow and
         can fill up memory.
 
-        Args:
+        Parameters
+        ----------
           usb: USB device handle with BulkRead and BulkWrite methods.
           service: The service on the device to talk to.
           command: The command to send to the service.
@@ -408,17 +413,18 @@ class AdbMessage(object):
         Returns:
           The response from the service.
         """
-        return ''.join(cls.StreamingCommand(usb, service, command, timeout_ms))
+        return ''.join(cls.streaming_command(usb, service, command, timeout_ms))
 
     @classmethod
-    def StreamingCommand(cls, usb, service, command='', timeout_ms=None):
+    def streaming_command(cls, usb, service, command='', timeout_ms=None):
         """One complete set of USB packets for a single command.
 
         Sends service:command in a new connection, reading the data for the
         response. All the data is held in memory, large responses will be slow and
         can fill up memory.
 
-        Args:
+        Parameters
+        ----------
           usb: USB device handle with BulkRead and BulkWrite methods.
           service: The service on the device to talk to.
           command: The command to send to the service.
@@ -433,18 +439,19 @@ class AdbMessage(object):
         """
         if not isinstance(command, bytes):
             command = command.encode('utf8')
-        connection = cls.Open(
+        connection = cls.open(
             usb, destination=b'%s:%s' % (service, command),
             timeout_ms=timeout_ms)
-        for data in connection.ReadUntilClose():
+        for data in connection.read_until_close():
             yield data.decode('utf8')
 
     @classmethod
-    def InteractiveShellCommand(cls, conn, cmd=None, strip_cmd=True, delim=None, strip_delim=True, clean_stdout=True):
+    def interactive_shell_command(cls, conn, cmd=None, strip_cmd=True, delim=None, strip_delim=True, clean_stdout=True):
         """Retrieves stdout of the current InteractiveShell and sends a shell command if provided
         TODO: Should we turn this into a yield based function so we can stream all output?
 
-        Args:
+        Parameters
+        ----------
           conn: Instance of AdbConnection
           cmd: Optional. Command to run on the target.
           strip_cmd: Optional (default True). Strip command name from stdout.
@@ -484,19 +491,19 @@ class AdbMessage(object):
                 cmd = cmd.encode('utf8')
 
                 # Send the cmd raw
-                bytes_written = conn.Write(cmd)
+                bytes_written = conn.write(cmd)
 
                 if delim:
                     # Expect multiple WRTE cmds until the delim (usually terminal prompt) is detected
 
                     data = b''
                     while partial_delim not in data:
-                        cmd, data = conn.ReadUntil(b'WRTE')
+                        cmd, data = conn.read_until(b'WRTE')
                         stdout_stream.write(data)
 
                 else:
                     # Otherwise, expect only a single WRTE
-                    cmd, data = conn.ReadUntil(b'WRTE')
+                    cmd, data = conn.read_until(b'WRTE')
 
                     # WRTE cmd from device will follow with stdout data
                     stdout_stream.write(data)
@@ -504,12 +511,12 @@ class AdbMessage(object):
             else:
 
                 # No cmd provided means we should just expect a single line from the terminal. Use this sparingly
-                cmd, data = conn.ReadUntil(b'WRTE')
+                cmd, data = conn.read_until(b'WRTE')
                 if cmd == b'WRTE':
                     # WRTE cmd from device will follow with stdout data
                     stdout_stream.write(data)
                 else:
-                    print("Unhandled cmd: {}".format(cmd))
+                    logging.warning("Unhandled cmd: {}".format(cmd))
 
             cleaned_stdout_stream = BytesIO()
             if clean_stdout:
@@ -558,6 +565,6 @@ class AdbMessage(object):
             stdout = stdout.rstrip()
 
         except Exception as e:
-            print("InteractiveShell exception (most likely timeout): {}".format(e))
+            logging.error("InteractiveShell exception (most likely timeout): {}".format(e))
 
         return stdout

@@ -32,18 +32,18 @@ DEFAULT_TIMEOUT_MS = 10000
 _LOG = logging.getLogger('android_usb')
 
 
-def GetInterface(setting):
+def get_interface(setting):
     """Get the class, subclass, and protocol for the given USB setting."""
     return (setting.getClass(), setting.getSubClass(), setting.getProtocol())
 
 
-def InterfaceMatcher(clazz, subclass, protocol):
+def interface_matcher(clazz, subclass, protocol):
     """Returns a matcher that returns the setting with the given interface."""
     interface = (clazz, subclass, protocol)
 
     def Matcher(device):
         for setting in device.iterSettings():
-            if GetInterface(setting) == interface:
+            if get_interface(setting) == interface:
                 return setting
 
     return Matcher
@@ -91,14 +91,14 @@ class UsbHandle(object):
             return '%s %s' % (self._usb_info, sn)
         return self._usb_info
 
-    def Open(self):
+    def open(self):
         """Opens the USB device for this setting, and claims the interface."""
         # Make sure we close any previous handle open to this usb device.
         port_path = tuple(self.port_path)
         with self._HANDLE_CACHE_LOCK:
             old_handle = self._HANDLE_CACHE.get(port_path)
             if old_handle is not None:
-                old_handle.Close()
+                old_handle.close()
 
         self._read_endpoint = None
         self._write_endpoint = None
@@ -132,7 +132,7 @@ class UsbHandle(object):
         with self._HANDLE_CACHE_LOCK:
             self._HANDLE_CACHE[port_path] = self
         # When this object is deleted, make sure it's closed.
-        weakref.ref(self, self.Close)
+        weakref.ref(self, self.close)
 
     @property
     def serial_number(self):
@@ -142,7 +142,7 @@ class UsbHandle(object):
     def port_path(self):
         return [self._device.getBusNumber()] + self._device.getPortNumberList()
 
-    def Close(self):
+    def close(self):
         if self._handle is None:
             return
         try:
@@ -154,32 +154,32 @@ class UsbHandle(object):
         finally:
             self._handle = None
 
-    def Timeout(self, timeout_ms):
+    def timeout(self, timeout_ms):
         return timeout_ms if timeout_ms is not None else self._timeout_ms
 
-    def FlushBuffers(self):
+    def flush_buffers(self):
         while True:
             try:
-                self.BulkRead(self._max_read_packet_len, timeout_ms=10)
+                self.bulk_read(self._max_read_packet_len, timeout_ms=10)
             except usb_exceptions.ReadFailedError as e:
                 if e.usb_error.value == libusb1.LIBUSB_ERROR_TIMEOUT:
                     break
                 raise
 
-    def BulkWrite(self, data, timeout_ms=None):
+    def bulk_write(self, data, timeout_ms=None):
         if self._handle is None:
             raise usb_exceptions.WriteFailedError(
                 'This handle has been closed, probably due to another being opened.',
                 None)
         try:
             return self._handle.bulkWrite(
-                self._write_endpoint, data, timeout=self.Timeout(timeout_ms))
+                self._write_endpoint, data, timeout=self.timeout(timeout_ms))
         except libusb1.USBError as e:
             raise usb_exceptions.WriteFailedError(
                 'Could not send data to %s (timeout %sms)' % (
-                    self.usb_info, self.Timeout(timeout_ms)), e)
+                    self.usb_info, self.timeout(timeout_ms)), e)
 
-    def BulkRead(self, length, timeout_ms=None):
+    def bulk_read(self, length, timeout_ms=None):
         if self._handle is None:
             raise usb_exceptions.ReadFailedError(
                 'This handle has been closed, probably due to another being opened.',
@@ -189,18 +189,18 @@ class UsbHandle(object):
             # To support older and newer versions, we ensure everything's bytearray()
             # from here on out.
             return bytearray(self._handle.bulkRead(
-                self._read_endpoint, length, timeout=self.Timeout(timeout_ms)))
+                self._read_endpoint, length, timeout=self.timeout(timeout_ms)))
         except libusb1.USBError as e:
             raise usb_exceptions.ReadFailedError(
                 'Could not receive data from %s (timeout %sms)' % (
-                    self.usb_info, self.Timeout(timeout_ms)), e)
+                    self.usb_info, self.timeout(timeout_ms)), e)
 
-    def BulkReadAsync(self, length, timeout_ms=None):
+    def bulk_read_async(self, length, timeout_ms=None):
         # See: https://pypi.python.org/pypi/libusb1 "Asynchronous I/O" section
         return
 
     @classmethod
-    def PortPathMatcher(cls, port_path):
+    def port_path_matcher(cls, port_path):
         """Returns a device matcher for the given port path."""
         if isinstance(port_path, str):
             # Convert from sysfs path to port_path.
@@ -208,40 +208,41 @@ class UsbHandle(object):
         return lambda device: device.port_path == port_path
 
     @classmethod
-    def SerialMatcher(cls, serial):
+    def serial_matcher(cls, serial):
         """Returns a device matcher for the given serial."""
         return lambda device: device.serial_number == serial
 
     @classmethod
-    def FindAndOpen(cls, setting_matcher,
-                    port_path=None, serial=None, timeout_ms=None):
-        dev = cls.Find(
+    def find_and_open(cls, setting_matcher,
+                      port_path=None, serial=None, timeout_ms=None):
+        dev = cls.find(
             setting_matcher, port_path=port_path, serial=serial,
             timeout_ms=timeout_ms)
-        dev.Open()
-        dev.FlushBuffers()
+        dev.open()
+        dev.flush_buffers()
         return dev
 
     @classmethod
-    def Find(cls, setting_matcher, port_path=None, serial=None, timeout_ms=None):
+    def find(cls, setting_matcher, port_path=None, serial=None, timeout_ms=None):
         """Gets the first device that matches according to the keyword args."""
         if port_path:
-            device_matcher = cls.PortPathMatcher(port_path)
+            device_matcher = cls.port_path_matcher(port_path)
             usb_info = port_path
         elif serial:
-            device_matcher = cls.SerialMatcher(serial)
+            device_matcher = cls.serial_matcher(serial)
             usb_info = serial
         else:
             device_matcher = None
             usb_info = 'first'
-        return cls.FindFirst(setting_matcher, device_matcher,
-                             usb_info=usb_info, timeout_ms=timeout_ms)
+        return cls.find_first(setting_matcher, device_matcher,
+                              usb_info=usb_info, timeout_ms=timeout_ms)
 
     @classmethod
-    def FindFirst(cls, setting_matcher, device_matcher=None, **kwargs):
+    def find_first(cls, setting_matcher, device_matcher=None, **kwargs):
         """Find and return the first matching device.
 
-        Args:
+        Parameters
+        ----------
           setting_matcher: See cls.FindDevices.
           device_matcher: See cls.FindDevices.
           **kwargs: See cls.FindDevices.
@@ -253,15 +254,15 @@ class UsbHandle(object):
           DeviceNotFoundError: Raised if the device is not available.
         """
         try:
-            return next(cls.FindDevices(
+            return next(cls.find_devices(
                 setting_matcher, device_matcher=device_matcher, **kwargs))
         except StopIteration:
             raise usb_exceptions.DeviceNotFoundError(
                 'No device available, or it is in the wrong configuration.')
 
     @classmethod
-    def FindDevices(cls, setting_matcher, device_matcher=None,
-                    usb_info='', timeout_ms=None):
+    def find_devices(cls, setting_matcher, device_matcher=None,
+                     usb_info='', timeout_ms=None):
         """Find and yield the devices that match.
 
         Args:
@@ -315,7 +316,7 @@ class TcpHandle(object):
         self._connect()
 
     def _connect(self):
-        timeout = self.TimeoutSeconds(self._timeout_ms)
+        timeout = self.timeout_seconds(self._timeout_ms)
         self._connection = socket.create_connection((self.host, self.port),
                                                     timeout=timeout)
         if timeout:
@@ -325,8 +326,8 @@ class TcpHandle(object):
     def serial_number(self):
         return self._serial_number
 
-    def BulkWrite(self, data, timeout=None):
-        t = self.TimeoutSeconds(timeout)
+    def bulk_write(self, data, timeout=None):
+        t = self.timeout_seconds(timeout)
         _, writeable, _ = select.select([], [self._connection], [], t)
         if writeable:
             return self._connection.send(data)
@@ -334,8 +335,8 @@ class TcpHandle(object):
             self.serial_number, t)
         raise usb_exceptions.TcpTimeoutException(msg)
 
-    def BulkRead(self, numbytes, timeout=None):
-        t = self.TimeoutSeconds(timeout)
+    def bulk_read(self, numbytes, timeout=None):
+        t = self.timeout_seconds(timeout)
         readable, _, _ = select.select([self._connection], [], [], t)
         if readable:
             return self._connection.recv(numbytes)
@@ -343,12 +344,12 @@ class TcpHandle(object):
             self._serial_number, t)
         raise usb_exceptions.TcpTimeoutException(msg)
 
-    def Timeout(self, timeout_ms):
+    def timeout(self, timeout_ms):
         return float(timeout_ms) if timeout_ms is not None else self._timeout_ms
 
-    def TimeoutSeconds(self, timeout_ms):
-        timeout = self.Timeout(timeout_ms)
+    def timeout_seconds(self, timeout_ms):
+        timeout = self.timeout(timeout_ms)
         return timeout / 1000.0 if timeout is not None else timeout
 
-    def Close(self):
+    def close(self):
         return self._connection.close()

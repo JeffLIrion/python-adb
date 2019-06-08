@@ -83,6 +83,7 @@ Android project's ADB.
             "pyadb = adb.adb_debug:main",
             "pyfastboot = adb.fastboot_debug:main",
         ],
-    }
+    },
+    test_suite='test'
 
 )

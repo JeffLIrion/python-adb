@@ -57,7 +57,7 @@ class BaseAdbTest(unittest.TestCase):
   def _MakeHeader(cls, command, arg0, arg1, data):
     command = cls._ConvertCommand(command)
     magic = command ^ 0xFFFFFFFF
-    checksum = adb_protocol.AdbMessage.CalculateChecksum(data)
+    checksum = adb_protocol.AdbMessage.calculate_checksum(data)
     return struct.pack(b'<6I', command, arg0, arg1, len(data), checksum, magic)
 
   @classmethod
@@ -97,14 +97,14 @@ class AdbTest(BaseAdbTest):
     self._ExpectConnection(usb)
 
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
+    dev.connect_device(handle=usb, banner=BANNER)
 
   def testConnectSerialString(self):
     dev = adb_commands.AdbCommands()
 
     with mock.patch.object(common.UsbHandle, 'FindAndOpen', return_value=None):
       with mock.patch.object(adb_commands.AdbCommands, '_Connect', return_value=None):
-        dev.ConnectDevice(serial='/dev/invalidHandle')
+        dev.connect_device(serial='/dev/invalidHandle')
 
   def testSmallResponseShell(self):
     command = b'keepin it real'
@@ -112,8 +112,8 @@ class AdbTest(BaseAdbTest):
     usb = self._ExpectCommand(b'shell', command, response)
 
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    self.assertEqual(response, dev.Shell(command))
+    dev.connect_device(handle=usb, banner=BANNER)
+    self.assertEqual(response, dev.shell(command))
 
   def testBigResponseShell(self):
     command = b'keepin it real big'
@@ -124,9 +124,9 @@ class AdbTest(BaseAdbTest):
     usb = self._ExpectCommand(b'shell', command, *responses)
 
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
+    dev.connect_device(handle=usb, banner=BANNER)
     self.assertEqual(b''.join(responses).decode('utf8'),
-                     dev.Shell(command))
+                     dev.shell(command))
 
   def testUninstall(self):
     package_name = "com.test.package"
@@ -135,8 +135,8 @@ class AdbTest(BaseAdbTest):
     usb = self._ExpectCommand(b'shell', ('pm uninstall "%s"' % package_name).encode('utf8'), response)
 
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    self.assertEqual(response, dev.Uninstall(package_name))
+    dev.connect_device(handle=usb, banner=BANNER)
+    self.assertEqual(response, dev.uninstall(package_name))
 
   def testStreamingResponseShell(self):
     command = b'keepin it real big'
@@ -147,9 +147,9 @@ class AdbTest(BaseAdbTest):
     usb = self._ExpectCommand(b'shell', command, *responses)
 
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
+    dev.connect_device(handle=usb, banner=BANNER)
     response_count = 0
-    for (expected,actual) in zip(responses, dev.StreamingShell(command)):
+    for (expected,actual) in zip(responses, dev.streaming_shell(command)):
       self.assertEqual(expected, actual)
       response_count = response_count + 1
     self.assertEqual(len(responses), response_count)
@@ -157,38 +157,38 @@ class AdbTest(BaseAdbTest):
   def testReboot(self):
     usb = self._ExpectCommand(b'reboot', b'', b'')
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    dev.Reboot()
+    dev.connect_device(handle=usb, banner=BANNER)
+    dev.reboot()
 
   def testRebootBootloader(self):
     usb = self._ExpectCommand(b'reboot', b'bootloader', b'')
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    dev.RebootBootloader()
+    dev.connect_device(handle=usb, banner=BANNER)
+    dev.reboot_bootloader()
 
   def testRemount(self):
     usb = self._ExpectCommand(b'remount', b'', b'')
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    dev.Remount()
+    dev.connect_device(handle=usb, banner=BANNER)
+    dev.remount()
 
   def testRoot(self):
     usb = self._ExpectCommand(b'root', b'', b'')
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    dev.Root()
+    dev.connect_device(handle=usb, banner=BANNER)
+    dev.root()
 
   def testEnableVerity(self):
     usb = self._ExpectCommand(b'enable-verity', b'', b'')
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    dev.EnableVerity()
+    dev.connect_device(handle=usb, banner=BANNER)
+    dev.enable_verity()
 
   def testDisableVerity(self):
     usb = self._ExpectCommand(b'disable-verity', b'', b'')
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    dev.DisableVerity()
+    dev.connect_device(handle=usb, banner=BANNER)
+    dev.disable_verity()
 
 class FilesyncAdbTest(BaseAdbTest):
 
@@ -234,8 +234,8 @@ class FilesyncAdbTest(BaseAdbTest):
     usb = self._ExpectSyncCommand([b''.join(send)], [data])
 
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    dev.Push(BytesIO(filedata), '/data', mtime=mtime)
+    dev.connect_device(handle=usb, banner=BANNER)
+    dev.push(BytesIO(filedata), '/data', mtime=mtime)
 
   def testPull(self):
     filedata = b"g'ddayta, govnah"
@@ -247,8 +247,8 @@ class FilesyncAdbTest(BaseAdbTest):
     ]
     usb = self._ExpectSyncCommand([recv], [b''.join(data)])
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=usb, banner=BANNER)
-    self.assertEqual(filedata, dev.Pull('/data'))
+    dev.connect_device(handle=usb, banner=BANNER)
+    self.assertEqual(filedata, dev.pull('/data'))
 
 
 class TcpTimeoutAdbTest(BaseAdbTest):
@@ -267,14 +267,14 @@ class TcpTimeoutAdbTest(BaseAdbTest):
   def _run_shell(self, cmd, timeout_ms=None):
     tcp = self._ExpectCommand(b'shell', cmd)
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=tcp, banner=BANNER)
-    dev.Shell(cmd, timeout_ms=timeout_ms)
+    dev.connect_device(handle=tcp, banner=BANNER)
+    dev.shell(cmd, timeout_ms=timeout_ms)
 
   def testConnect(self):
     tcp = common_stub.StubTcp('10.0.0.123')
     self._ExpectConnection(tcp)
     dev = adb_commands.AdbCommands()
-    dev.ConnectDevice(handle=tcp, banner=BANNER)
+    dev.connect_device(handle=tcp, banner=BANNER)
 
   def testTcpTimeout(self):
     timeout_ms = 1  

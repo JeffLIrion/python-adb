@@ -17,9 +17,9 @@ class PycryptodomeAuthSigner(adb_protocol.AuthSigner):
             with open(rsa_key_path, 'rb') as rsa_priv_file:
                 self.rsa_key = RSA.import_key(rsa_priv_file.read())
 
-    def Sign(self, data):
+    def sign(self, data):
         h = SHA256.new(data)
         return pkcs1_15.new(self.rsa_key).sign(h)
 
-    def GetPublicKey(self):
+    def get_public_key(self):
         return self.public_key

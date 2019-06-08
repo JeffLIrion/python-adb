@@ -89,13 +89,13 @@ class StubUsb(UsbHandle):
   def ExpectRead(self, data):
     return self.stub_base.ExpectRead(data)
 
-  def BulkWrite(self, data, unused_timeout_ms=None):
+  def bulk_write(self, data, unused_timeout_ms=None):
     return self.stub_base.BulkWrite(data, unused_timeout_ms)
 
-  def BulkRead(self, length, timeout_ms=None):
+  def bulk_read(self, length, timeout_ms=None):
     return self.stub_base.BulkRead(length, timeout_ms)
 
-  def Timeout(self, timeout_ms):
+  def timeout(self, timeout_ms):
     return self.stub_base.Timeout(timeout_ms)
 
 
@@ -113,11 +113,11 @@ class StubTcp(TcpHandle):
   def ExpectRead(self, data):
     return self.stub_base.ExpectRead(data)
 
-  def BulkWrite(self, data, unused_timeout_ms=None):
+  def bulk_write(self, data, unused_timeout_ms=None):
     return self.stub_base.BulkWrite(data, unused_timeout_ms)
 
-  def BulkRead(self, length, timeout_ms=None):
+  def bulk_read(self, length, timeout_ms=None):
     return self.stub_base.BulkRead(length, timeout_ms)
 
-  def Timeout(self, timeout_ms):
+  def timeout(self, timeout_ms):
     return self.stub_base.Timeout(timeout_ms)

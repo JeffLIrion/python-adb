@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Common code for ADB and Fastboot CLI.
 
 Usage introspects the given class for methods, args, and docs to show the user.
@@ -44,54 +45,86 @@ class PositionalArg(argparse.Action):
 
 
 def GetDeviceArguments():
+    """Return a parser for device-related CLI commands.
+
+    Returns
+    -------
+    group : argparse.ArgumentParser
+        A parser for device-related CLI commands.
+
+    """
     group = argparse.ArgumentParser('Device', add_help=False)
-    group.add_argument(
-        '--timeout_ms', default=10000, type=int, metavar='10000',
-        help='Timeout in milliseconds.')
-    group.add_argument(
-        '--port_path', action=_PortPathAction,
-        help='USB port path integers (eg 1,2 or 2,1,1)')
-    group.add_argument(
-        '-s', '--serial',
-        help='Device serial to look for (host:port or USB serial)')
+    group.add_argument('--timeout_ms', default=10000, type=int, metavar='10000', help='Timeout in milliseconds.')
+    group.add_argument('--port_path', action=_PortPathAction, help='USB port path integers (eg 1,2 or 2,1,1)')
+    group.add_argument('-s', '--serial', help='Device serial to look for (host:port or USB serial)')
+
     return group
 
 
 def GetCommonArguments():
+    """Return a parser for common CLI commands.
+
+    Returns
+    -------
+    group : argparse.ArgumentParser
+        A parser for common CLI commands.
+
+    """
     group = argparse.ArgumentParser('Common', add_help=False)
     group.add_argument('--verbose', action='store_true', help='Enable logging')
     return group
 
 
 def _DocToArgs(doc):
-    """Converts a docstring documenting arguments into a dict."""
-    m = None
+    """Converts a docstring documenting arguments into a dict.
+
+    Parameters
+    ----------
+    doc : str
+        The docstring for a method; see `MakeSubparser`.
+
+    Returns
+    -------
+    out : dict
+        A dictionary of arguments and their descriptions from the docstring ``doc``.
+
+    """
     offset = None
-    in_arg = False
+    param = None
     out = {}
+
     for l in doc.splitlines():
-        if l.strip() == 'Args:':
-            in_arg = True
-        elif in_arg:
-            if not l.strip():
+        if l.strip() == 'Parameters':
+            offset = len(l.rstrip()) - len(l.strip())
+
+        elif offset:
+            # The "----------" line
+            if l.strip() == '-' * len('Parameters'):
+                continue
+
+            if l.strip() in ['Returns', 'Yields', 'Raises']:
                 break
-            if offset is None:
-                offset = len(l) - len(l.lstrip())
-            l = l[offset:]
-            if l[0] == ' ' and m:
-                out[m.group(1)] += ' ' + l.lstrip()
-            else:
-                m = re.match(r'^([a-z_]+): (.+)$', l.strip())
-                out[m.group(1)] = m.group(2)
+
+            # start of a parameter
+            if len(l.rstrip()) - len(l.strip()) == offset:
+                param = l.strip().split()[0]
+                out[param] = ''
+
+            # add to a parameter
+            elif l.strip():
+                if out[param]:
+                    out[param] += ' ' + l.strip()
+                else:
+                    out[param] = l.strip()
+
     return out
 
 
 def MakeSubparser(subparsers, parents, method, arguments=None):
     """Returns an argparse subparser to create a 'subcommand' to adb."""
     name = ('-'.join(re.split(r'([A-Z][a-z]+)', method.__name__)[1:-1:2])).lower()
-    help = method.__doc__.splitlines()[0]
-    subparser = subparsers.add_parser(
-        name=name, description=help, help=help.rstrip('.'), parents=parents)
+    help = method.__doc__.splitlines()[0]  # pylint: disable=redefined-builtin
+    subparser = subparsers.add_parser(name=name, description=help, help=help.rstrip('.'), parents=parents)
     subparser.set_defaults(method=method, positional=[])
     argspec = inspect.getargspec(method)
 

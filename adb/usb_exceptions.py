@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Common exceptions for ADB and Fastboot."""
 
 
@@ -25,8 +26,15 @@ class FormatMessageWithArgumentsException(CommonUsbError):
 
     This interpolates the message with the given arguments to make it
     human-readable, but keeps the arguments in case other code try-excepts it.
-    """
 
+    Parameters
+    ----------
+    message : TODO
+        TODO
+    args : TODO
+        TODO
+
+    """
     def __init__(self, message, *args):
         message %= args
         super(FormatMessageWithArgumentsException, self).__init__(message, *args)
@@ -43,10 +51,19 @@ class DeviceAuthError(FormatMessageWithArgumentsException):
 class LibusbWrappingError(CommonUsbError):
     """Wraps libusb1 errors while keeping its original usefulness.
 
-    Attributes:
-      usb_error: Instance of libusb1.USBError
-    """
+    Parameters
+    ----------
+    msg : TODO
+        TODO
+    usb_error : TODO
+        TODO
 
+    Attributes
+    ----------
+    usb_error : TODO
+        Instance of libusb1.USBError
+
+    """
     def __init__(self, msg, usb_error):
         super(LibusbWrappingError, self).__init__(msg)
         self.usb_error = usb_error

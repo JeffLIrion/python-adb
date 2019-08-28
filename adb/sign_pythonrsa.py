@@ -12,24 +12,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import rsa
+"""TODO
+
+"""
+
 
 from pyasn1.codec.der import decoder
 from pyasn1.type import univ
+import rsa
 from rsa import pkcs1
+
+from adb import adb_protocol
 
 
 # python-rsa lib hashes all messages it signs. ADB does it already, we just
 # need to slap a signature on top of already hashed message. Introduce "fake"
 # hashing algo for this.
 class _Accum(object):
+    """TODO
+
+    Attributes
+    ----------
+    _buf : TODO
+        TODO
+
+    """
     def __init__(self):
         self._buf = b''
 
     def update(self, msg):
+        """TODO"""
         self._buf += msg
 
     def digest(self):
+        """TODO
+
+        Returns
+        -------
+        self._buf : TODO
+            TODO
+
+        """
         return self._buf
 
 
@@ -38,7 +61,19 @@ pkcs1.HASH_ASN1['SHA-1-PREHASHED'] = pkcs1.HASH_ASN1['SHA-1']
 
 
 def _load_rsa_private_key(pem):
-    """PEM encoded PKCS#8 private key -> rsa.PrivateKey."""
+    """PEM encoded PKCS#8 private key -> rsa.PrivateKey.
+
+    Parameters
+    ----------
+    pem : TODO
+        TODO
+
+    Returns
+    -------
+    TODO
+        TODO
+
+    """
     # ADB uses private RSA keys in pkcs#8 format. 'rsa' library doesn't support
     # them natively. Do some ASN unwrapping to extract naked RSA key
     # (in der-encoded form). See https://www.ietf.org/rfc/rfc2313.txt.
@@ -55,23 +90,72 @@ def _load_rsa_private_key(pem):
     return rsa.PrivateKey.load_pkcs1(private_key_der, format='DER')
 
 
-class PythonRSASigner(object):
-    """Implements adb_protocol.AuthSigner using http://stuvel.eu/rsa."""
+class PythonRSASigner(adb_protocol.AuthSigner):
+    """Implements adb_protocol.AuthSigner using http://stuvel.eu/rsa.
+
+    Parameters
+    ----------
+    pub : str, None
+        The path to the private key.
+    priv : TODO, None
+        TODO
+
+    Attributes
+    ----------
+    priv_key : TODO
+        TODO
+    pub_key : TODO
+        TODO
+
+    """
+    def __init__(self, pub=None, priv=None):
+        self.priv_key = _load_rsa_private_key(priv)
+        self.pub_key = pub
 
     @classmethod
     def FromRSAKeyPath(cls, rsa_key_path):
+        """TODO
+
+        Parameters
+        ----------
+        rsa_key_path : str
+            The path to the private key; the public key must be ``rsa_key_path + '.pub'``.
+
+        Returns
+        -------
+        PythonRSASigner
+            TODO
+
+        """
         with open(rsa_key_path + '.pub') as f:
             pub = f.read()
         with open(rsa_key_path) as f:
             priv = f.read()
         return cls(pub, priv)
 
-    def __init__(self, pub=None, priv=None):
-        self.priv_key = _load_rsa_private_key(priv)
-        self.pub_key = pub
-
     def Sign(self, data):
+        """Signs given data using a private key.
+
+        Parameters
+        ----------
+        data : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            The signed ``data``
+
+        """
         return rsa.sign(data, self.priv_key, 'SHA-1-PREHASHED')
 
     def GetPublicKey(self):
+        """Returns the public key in PEM format without headers or newlines.
+
+        Returns
+        -------
+        self.pub_key : TODO, None
+            The public key, or ``None`` if it was not provided.
+
+        """
         return self.pub_key

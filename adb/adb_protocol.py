@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """ADB protocol implementation.
 
 Implements the ADB protocol as seen in android's adb/adbd binaries, but only the
@@ -22,18 +23,61 @@ import time
 from io import BytesIO
 from adb import usb_exceptions
 
-# Maximum amount of data in an ADB packet.
+#: Maximum amount of data in an ADB packet.
 MAX_ADB_DATA = 4096
-# ADB protocol version.
+
+#: ADB protocol version.
 VERSION = 0x01000000
 
-# AUTH constants for arg0.
+#: AUTH constants for arg0.
 AUTH_TOKEN = 1
+
+#: AUTH constants for arg0.
 AUTH_SIGNATURE = 2
+
+#: AUTH constants for arg0.
 AUTH_RSAPUBLICKEY = 3
 
 
+class InvalidCommandError(Exception):
+    """Got an invalid command over USB."""
+
+    def __init__(self, message, response_header, response_data):
+        if response_header == b'FAIL':
+            message = 'Command failed, device said so. (%s)' % message
+        super(InvalidCommandError, self).__init__(message, response_header, response_data)
+
+
+class InvalidResponseError(Exception):
+    """Got an invalid response to our command."""
+
+
+class InvalidChecksumError(Exception):
+    """Checksum of data didn't match expected checksum."""
+
+
+class InterleavedDataError(Exception):
+    """We only support command sent serially."""
+
+
 def find_backspace_runs(stdout_bytes, start_pos):
+    """TODO
+
+    Parameters
+    ----------
+    stdout_bytes : TODO
+        TODO
+    start_pos : TODO
+        TODO
+
+    Returns
+    -------
+    int
+        The index/position of the first backspace.
+    num_backspaces : int
+        TODO
+
+    """
     first_backspace_pos = stdout_bytes[start_pos:].find(b'\x08')
     if first_backspace_pos == -1:
         return -1, 0
@@ -50,29 +94,22 @@ def find_backspace_runs(stdout_bytes, start_pos):
     return (start_pos + first_backspace_pos), num_backspaces
 
 
-class InvalidCommandError(Exception):
-    """Got an invalid command over USB."""
-
-    def __init__(self, message, response_header, response_data):
-        if response_header == b'FAIL':
-            message = 'Command failed, device said so. (%s)' % message
-        super(InvalidCommandError, self).__init__(
-            message, response_header, response_data)
-
-
-class InvalidResponseError(Exception):
-    """Got an invalid response to our command."""
-
-
-class InvalidChecksumError(Exception):
-    """Checksum of data didn't match expected checksum."""
-
-
-class InterleavedDataError(Exception):
-    """We only support command sent serially."""
-
-
 def MakeWireIDs(ids):
+    """TODO
+
+    Parameters
+    ----------
+    ids : list[bytes]
+        TODO
+
+    Returns
+    -------
+    id_to_wire : TODO
+        TODO
+    wire_to_id : TODO
+        TODO
+
+    """
     id_to_wire = {
         cmd_id: sum(c << (i * 8) for i, c in enumerate(bytearray(cmd_id)))
         for cmd_id in ids
@@ -94,8 +131,31 @@ class AuthSigner(object):
 
 
 class _AdbConnection(object):
-    """ADB Connection."""
+    """ADB Connection.
 
+    Parameters
+    ----------
+    usb : TODO
+        TODO
+    local_id : TODO
+        TODO
+    remote_id : TODO
+        TODO
+    timeout_ms : TODO
+        TODO
+
+    Attributes
+    ----------
+    local_id : TODO
+        TODO
+    remote_id : TODO
+        TODO
+    timeout_ms : TODO
+        TODO
+    usb : TODO
+        TODO
+
+    """
     def __init__(self, usb, local_id, remote_id, timeout_ms):
         self.usb = usb
         self.local_id = local_id
@@ -103,11 +163,37 @@ class _AdbConnection(object):
         self.timeout_ms = timeout_ms
 
     def _Send(self, command, arg0, arg1, data=b''):
+        """TODO
+
+        Parameters
+        ----------
+        command : TODO
+            TODO
+        arg0 : TODO
+            TODO
+        arg1 : TODO
+            TODO
+        data : bytes
+            TODO
+
+        """
         message = AdbMessage(command, arg0, arg1, data)
         message.Send(self.usb, self.timeout_ms)
 
     def Write(self, data):
-        """Write a packet and expect an Ack."""
+        """Write a packet and expect an Ack.
+
+        Parameters
+        ----------
+        data : TODO
+            TODO
+
+        Returns
+        -------
+        int
+            ``len(data)``
+
+        """
         self._Send(b'WRTE', arg0=self.local_id, arg1=self.remote_id, data=data)
         # Expect an ack in response.
         cmd, okay_data = self.ReadUntil(b'OKAY')
@@ -115,31 +201,50 @@ class _AdbConnection(object):
             if cmd == b'FAIL':
                 raise usb_exceptions.AdbCommandFailureException(
                     'Command failed.', okay_data)
-            raise InvalidCommandError(
-                'Expected an OKAY in response to a WRITE, got %s (%s)',
-                cmd, okay_data)
+            raise InvalidCommandError('Expected an OKAY in response to a WRITE, got {0} ({1})'.format(cmd, okay_data), cmd, okay_data)
         return len(data)
 
     def Okay(self):
+        """TODO"""
         self._Send(b'OKAY', arg0=self.local_id, arg1=self.remote_id)
 
     def ReadUntil(self, *expected_cmds):
-        """Read a packet, Ack any write packets."""
+        """Read a packet, Ack any write packets.
+
+        Parameters
+        ----------
+        *expected_cmds : TODO
+            TODO
+
+        Returns
+        -------
+        cmd : TODO
+            TODO
+        data : TODO
+            TODO
+
+        """
         cmd, remote_id, local_id, data = AdbMessage.Read(
             self.usb, expected_cmds, self.timeout_ms)
-        if local_id != 0 and self.local_id != local_id:
+        if local_id not in (0, self.local_id):
             raise InterleavedDataError("We don't support multiple streams...")
-        if remote_id != 0 and self.remote_id != remote_id:
-            raise InvalidResponseError(
-                'Incorrect remote id, expected %s got %s' % (
-                    self.remote_id, remote_id))
+        if remote_id not in (0, self.remote_id):
+            raise InvalidResponseError('Incorrect remote id, expected {0} got {1}'.format(self.remote_id, remote_id))
+
         # Ack write packets.
         if cmd == b'WRTE':
             self.Okay()
         return cmd, data
 
     def ReadUntilClose(self):
-        """Yield packets until a Close packet is received."""
+        """Yield packets until a Close packet is received.
+
+        Yields
+        ------
+        data : TODO
+            TODO
+
+        """
         while True:
             cmd, data = self.ReadUntil(b'CLSE', b'WRTE')
             if cmd == b'CLSE':
@@ -149,34 +254,62 @@ class _AdbConnection(object):
                 if cmd == b'FAIL':
                     raise usb_exceptions.AdbCommandFailureException(
                         'Command failed.', data)
-                raise InvalidCommandError('Expected a WRITE or a CLOSE, got %s (%s)',
-                                          cmd, data)
+                raise InvalidCommandError('Expected a WRITE or a CLOSE, got {0} ({1})'.format(cmd, data), cmd, data)
             yield data
 
     def Close(self):
+        """TODO"""
         self._Send(b'CLSE', arg0=self.local_id, arg1=self.remote_id)
         cmd, data = self.ReadUntil(b'CLSE')
         if cmd != b'CLSE':
             if cmd == b'FAIL':
                 raise usb_exceptions.AdbCommandFailureException('Command failed.', data)
-            raise InvalidCommandError('Expected a CLSE response, got %s (%s)',
-                                      cmd, data)
+            raise InvalidCommandError('Expected a CLSE response, got {0} ({1})'.format(cmd, data), cmd, data)
 
 
 class AdbMessage(object):
     """ADB Protocol and message class.
 
-    Protocol Notes
+    Notes
+    -----
 
-    local_id/remote_id:
-      Turns out the documentation is host/device ambidextrous, so local_id is the
-      id for 'the sender' and remote_id is for 'the recipient'. So since we're
-      only on the host, we'll re-document with host_id and device_id:
+    **local_id/remote_id**
+
+    Turns out the documentation is host/device ambidextrous, so ``local_id`` is the id for 'the sender' and
+    ``remote_id`` is for 'the recipient'. So since we're only on the host, we'll re-document with host_id and device_id:
+
+    ::
 
       OPEN(host_id, 0, 'shell:XXX')
       READY/OKAY(device_id, host_id, '')
       WRITE(0, host_id, 'data')
       CLOSE(device_id, host_id, '')
+
+
+    Parameters
+    ----------
+    command : TODO, None
+        TODO
+    arg0 : TODO, None
+        TODO
+    arg1 : TODO, None
+        TODO
+    data : bytes
+        TODO
+
+    Attributes
+    ----------
+    commands : dict
+        A dictionary with keys ``[b'SYNC', b'CNXN', b'AUTH', b'OPEN', b'OKAY', b'CLSE', b'WRTE']``.
+    connections : int
+        TODO
+    constants : dict
+        A dictionary with values ``[b'SYNC', b'CNXN', b'AUTH', b'OPEN', b'OKAY', b'CLSE', b'WRTE']``.
+    format : bytes
+        The format for unpacking the ADB message.
+    ids : list[bytes]
+        ``[b'SYNC', b'CNXN', b'AUTH', b'OPEN', b'OKAY', b'CLSE', b'WRTE']``
+
     """
 
     ids = [b'SYNC', b'CNXN', b'AUTH', b'OPEN', b'OKAY', b'CLSE', b'WRTE']
@@ -195,10 +328,26 @@ class AdbMessage(object):
 
     @property
     def checksum(self):
+        """TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+
+        """
         return self.CalculateChecksum(self.data)
 
     @staticmethod
     def CalculateChecksum(data):
+        """TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+
+        """
         # The checksum is just a sum of all the bytes. I swear.
         if isinstance(data, bytearray):
             total = sum(data)
@@ -215,27 +364,89 @@ class AdbMessage(object):
         return total & 0xFFFFFFFF
 
     def Pack(self):
-        """Returns this message in an over-the-wire format."""
+        """Returns this message in an over-the-wire format.
+
+        Returns
+        -------
+        bytes
+            TODO
+
+        """
         return struct.pack(self.format, self.command, self.arg0, self.arg1,
                            len(self.data), self.checksum, self.magic)
 
     @classmethod
     def Unpack(cls, message):
+        """TODO
+
+        Parameters
+        ----------
+        message : TODO
+            TODO
+
+        Returns
+        -------
+        cmd : TODO
+            TODO
+        arg0 : TODO
+            TODO
+        arg1 : TODO
+            TODO
+        data_length : TODO
+            TODO
+        data_checksum : TODO
+            TODO
+        unused_magic : TODO
+            TODO
+
+        """
         try:
-            cmd, arg0, arg1, data_length, data_checksum, unused_magic = struct.unpack(
-                cls.format, message)
+            cmd, arg0, arg1, data_length, data_checksum, unused_magic = struct.unpack(cls.format, message)
         except struct.error as e:
             raise ValueError('Unable to unpack ADB command.', cls.format, message, e)
         return cmd, arg0, arg1, data_length, data_checksum
 
     def Send(self, usb, timeout_ms=None):
-        """Send this message over USB."""
+        """Send this message over USB.
+
+        Parameters
+        ----------
+        usb : TODO
+            TODO
+        timeout_ms : TODO, None
+            TODO
+
+        """
         usb.BulkWrite(self.Pack(), timeout_ms)
         usb.BulkWrite(self.data, timeout_ms)
 
     @classmethod
     def Read(cls, usb, expected_cmds, timeout_ms=None, total_timeout_ms=None):
-        """Receive a response from the device."""
+        """Receive a response from the device.
+
+        Parameters
+        ----------
+        usb : TODO
+            TODO
+        expected_cmds : TODO
+            TODO
+        timeout_ms : TODO, None
+            TODO
+        total_timeout_ms : TODO, None
+            TODO
+
+        Returns
+        -------
+        command : TODO
+            TODO
+        arg0 : TODO
+            TODO
+        arg1 : TODO
+            TODO
+        bytes
+            TODO
+
+        """
         total_timeout_ms = usb.Timeout(total_timeout_ms)
         start = time.time()
         while True:
@@ -266,8 +477,7 @@ class AdbMessage(object):
 
             actual_checksum = cls.CalculateChecksum(data)
             if actual_checksum != data_checksum:
-                raise InvalidChecksumError(
-                    'Received checksum %s != %s', (actual_checksum, data_checksum))
+                raise InvalidChecksumError('Received checksum {0} != {1}'.format(actual_checksum, data_checksum))
         else:
             data = b''
         return command, arg0, arg1, bytes(data)
@@ -276,31 +486,38 @@ class AdbMessage(object):
     def Connect(cls, usb, banner=b'notadb', rsa_keys=None, auth_timeout_ms=100):
         """Establish a new connection to the device.
 
-        Args:
-          usb: A USBHandle with BulkRead and BulkWrite methods.
-          banner: A string to send as a host identifier.
-          rsa_keys: List of AuthSigner subclass instances to be used for
-              authentication. The device can either accept one of these via the Sign
-              method, or we will send the result of GetPublicKey from the first one
-              if the device doesn't accept any of them.
-          auth_timeout_ms: Timeout to wait for when sending a new public key. This
-              is only relevant when we send a new public key. The device shows a
-              dialog and this timeout is how long to wait for that dialog. If used
-              in automation, this should be low to catch such a case as a failure
-              quickly; while in interactive settings it should be high to allow
-              users to accept the dialog. We default to automation here, so it's low
-              by default.
+        Parameters
+        ----------
+        usb : TODO
+            A USBHandle with ``BulkRead`` and ``BulkWrite`` methods.
+        banner : str
+            A string to send as a host identifier.
+        rsa_keys : list[adb_protocol.AuthSigner]
+            List of AuthSigner subclass instances to be used for authentication. The device can either accept one of
+            these via the ``Sign`` method, or we will send the result of ``GetPublicKey`` from the first one if the
+            device doesn't accept any of them.
+        auth_timeout_ms : TODO
+            Timeout to wait for when sending a new public key. This
+            is only relevant when we send a new public key. The device shows a
+            dialog and this timeout is how long to wait for that dialog. If used
+            in automation, this should be low to catch such a case as a failure
+            quickly; while in interactive settings it should be high to allow
+            users to accept the dialog. We default to automation here, so it's low
+            by default.
 
-        Returns:
-          The device's reported banner. Always starts with the state (device,
-              recovery, or sideload), sometimes includes information after a : with
-              various product information.
+        Returns
+        -------
+        banner : TODO
+            The device's reported banner. Always starts with the state (device, recovery, or sideload), sometimes
+            includes information after a : with various product information.
 
-        Raises:
-          usb_exceptions.DeviceAuthError: When the device expects authentication,
-              but we weren't given any valid keys.
-          InvalidResponseError: When the device does authentication in an
-              unexpected way.
+        Raises
+        ------
+        adb.usb_exceptions.DeviceAuthError
+            When the device expects authentication, but we weren't given any valid keys.
+        adb.adb_protocol.InvalidResponseError
+            When the device does authentication in an unexpected way.
+
         """
         # In py3, convert unicode to bytes. In py2, convert str to bytes.
         # It's later joined into a byte string, so in py2, this ends up kind of being a no-op.
@@ -349,39 +566,49 @@ class AdbMessage(object):
 
     @classmethod
     def Open(cls, usb, destination, timeout_ms=None):
-        """Opens a new connection to the device via an OPEN message.
+        """Opens a new connection to the device via an ``OPEN`` message.
 
-        Not the same as the posix 'open' or any other google3 Open methods.
+        Not the same as the posix ``open`` or any other google3 Open methods.
 
-        Args:
-          usb: USB device handle with BulkRead and BulkWrite methods.
-          destination: The service:command string.
-          timeout_ms: Timeout in milliseconds for USB packets.
+        Parameters
+        ----------
+        usb : TODO
+            USB device handle with BulkRead and BulkWrite methods.
+        destination : TODO
+            The service:command string.
+        timeout_ms : TODO, None
+            Timeout in milliseconds for USB packets.
 
-        Raises:
-          InvalidResponseError: Wrong local_id sent to us.
-          InvalidCommandError: Didn't get a ready response.
+        Returns
+        -------
+        _AdbConnection
+            The local connection id.
 
-        Returns:
-          The local connection id.
+        Raises
+        ------
+        adb.adb_protocol.InvalidResponseError
+            Wrong local_id sent to us.
+        adb.adb_protocol.InvalidCommandError
+            Didn't get a ready response.
+
         """
         local_id = 1
         msg = cls(
             command=b'OPEN', arg0=local_id, arg1=0,
             data=destination + b'\0')
         msg.Send(usb, timeout_ms)
-        cmd, remote_id, their_local_id, _ = cls.Read(usb, [b'CLSE', b'OKAY'],
-                                                     timeout_ms=timeout_ms)
+        cmd, remote_id, their_local_id, _ = cls.Read(usb, [b'CLSE', b'OKAY'], timeout_ms=timeout_ms)
+
         if local_id != their_local_id:
-            raise InvalidResponseError(
-                'Expected the local_id to be {}, got {}'.format(local_id, their_local_id))
+            raise InvalidResponseError('Expected the local_id to be {}, got {}'.format(local_id, their_local_id))
+
         if cmd == b'CLSE':
             # Some devices seem to be sending CLSE once more after a request, this *should* handle it
-            cmd, remote_id, their_local_id, _ = cls.Read(usb, [b'CLSE', b'OKAY'],
-                                                         timeout_ms=timeout_ms)
+            cmd, remote_id, their_local_id, _ = cls.Read(usb, [b'CLSE', b'OKAY'], timeout_ms=timeout_ms)
             # Device doesn't support this service.
             if cmd == b'CLSE':
                 return None
+
         if cmd != b'OKAY':
             raise InvalidCommandError('Expected a ready response, got {}'.format(cmd),
                                       cmd, (remote_id, their_local_id))
@@ -395,18 +622,29 @@ class AdbMessage(object):
         response. All the data is held in memory, large responses will be slow and
         can fill up memory.
 
-        Args:
-          usb: USB device handle with BulkRead and BulkWrite methods.
-          service: The service on the device to talk to.
-          command: The command to send to the service.
-          timeout_ms: Timeout for USB packets, in milliseconds.
+        Parameters
+        ----------
+        usb : TODO
+            USB device handle with BulkRead and BulkWrite methods.
+        service : TODO
+            The service on the device to talk to.
+        command : str
+            The command to send to the service.
+        timeout_ms : TODO, None
+            Timeout for USB packets, in milliseconds.
 
-        Raises:
-          InterleavedDataError: Multiple streams running over usb.
-          InvalidCommandError: Got an unexpected response command.
+        Returns
+        -------
+        str
+            The response from the service.
 
-        Returns:
-          The response from the service.
+        Raises
+        ------
+        adb.adb_protocol.InterleavedDataError
+            Multiple streams running over usb.
+        adb.adb_protocol.InvalidCommandError
+            Got an unexpected response command.
+
         """
         return ''.join(cls.StreamingCommand(usb, service, command, timeout_ms))
 
@@ -418,18 +656,29 @@ class AdbMessage(object):
         response. All the data is held in memory, large responses will be slow and
         can fill up memory.
 
-        Args:
-          usb: USB device handle with BulkRead and BulkWrite methods.
-          service: The service on the device to talk to.
-          command: The command to send to the service.
-          timeout_ms: Timeout for USB packets, in milliseconds.
+        Parameters
+        ----------
+        usb : TODO
+            USB device handle with BulkRead and BulkWrite methods.
+        service : TODO
+            The service on the device to talk to.
+        command : str
+            The command to send to the service.
+        timeout_ms : TODO, None
+            Timeout for USB packets, in milliseconds.
 
-        Raises:
-          InterleavedDataError: Multiple streams running over usb.
-          InvalidCommandError: Got an unexpected response command.
+        Yields
+        ------
+        TODO
+            The responses from the service.
 
-        Yields:
-          The responses from the service.
+        Raises
+        ------
+        adb.adb_protocol.InterleavedDataError
+            Multiple streams running over usb.
+        adb.adb_protocol.InvalidCommandError
+            Got an unexpected response command.
+
         """
         if not isinstance(command, bytes):
             command = command.encode('utf8')
@@ -444,18 +693,27 @@ class AdbMessage(object):
         """Retrieves stdout of the current InteractiveShell and sends a shell command if provided
         TODO: Should we turn this into a yield based function so we can stream all output?
 
-        Args:
-          conn: Instance of AdbConnection
-          cmd: Optional. Command to run on the target.
-          strip_cmd: Optional (default True). Strip command name from stdout.
-          delim: Optional. Delimiter to look for in the output to know when to stop expecting more output
-          (usually the shell prompt)
-          strip_delim: Optional (default True): Strip the provided delimiter from the output
-          clean_stdout: Cleanup the stdout stream of any backspaces and the characters that were deleted by the backspace
-        Returns:
-          The stdout from the shell command.
-        """
+        Parameters
+        ----------
+        conn : AdbConnection
+            Instance of AdbConnection
+        cmd : str, None
+            Command to run on the target.
+        strip_cmd : bool
+            Strip command name from stdout.
+        delim : TODO
+            Delimiter to look for in the output to know when to stop expecting more output (usually the shell prompt)
+        strip_delim : bool
+            Strip the provided delimiter from the output
+        clean_stdout : bool
+            Cleanup the stdout stream of any backspaces and the characters that were deleted by the backspace
 
+        Returns
+        -------
+        stdout : TODO
+            The stdout from the shell command.
+
+        """
         if delim is not None and not isinstance(delim, bytes):
             delim = delim.encode('utf-8')
 
@@ -484,7 +742,7 @@ class AdbMessage(object):
                 cmd = cmd.encode('utf8')
 
                 # Send the cmd raw
-                bytes_written = conn.Write(cmd)
+                conn.Write(cmd)
 
                 if delim:
                     # Expect multiple WRTE cmds until the delim (usually terminal prompt) is detected
@@ -557,7 +815,7 @@ class AdbMessage(object):
 
             stdout = stdout.rstrip()
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             print("InteractiveShell exception (most likely timeout): {}".format(e))
 
         return stdout

@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Common code for ADB and Fastboot.
 
 Common usb browsing, and usb communication.
 """
+
 import logging
 import platform
 import socket
@@ -27,6 +29,7 @@ import usb1
 
 from adb import usb_exceptions
 
+#: Default timeout
 DEFAULT_TIMEOUT_MS = 10000
 
 _LOG = logging.getLogger('android_usb')
@@ -45,6 +48,7 @@ def InterfaceMatcher(clazz, subclass, protocol):
         for setting in device.iterSettings():
             if GetInterface(setting) == interface:
                 return setting
+        return None
 
     return Matcher
 
@@ -56,9 +60,10 @@ class UsbHandle(object):
     and interface claiming.
 
     Important methods:
-      FlushBuffers()
-      BulkRead(int length)
-      BulkWrite(bytes data)
+    * `UsbHandle.FlushBuffers`
+    * `UsbHandle.BulkRead`
+    * `UsbHandle.BulkWrite(bytes data)`
+
     """
 
     _HANDLE_CACHE = weakref.WeakValueDictionary()
@@ -76,6 +81,10 @@ class UsbHandle(object):
         self._setting = setting
         self._device = device
         self._handle = None
+
+        self._interface_number = None
+        self._read_endpoint = None
+        self._write_endpoint = None
 
         self._usb_info = usb_info or ''
         self._timeout_ms = timeout_ms if timeout_ms else DEFAULT_TIMEOUT_MS
@@ -117,8 +126,7 @@ class UsbHandle(object):
         handle = self._device.open()
         iface_number = self._setting.getNumber()
         try:
-            if (platform.system() != 'Windows'
-                    and handle.kernelDriverActive(iface_number)):
+            if (platform.system() != 'Windows' and handle.kernelDriverActive(iface_number)):
                 handle.detachKernelDriver(iface_number)
         except libusb1.USBError as e:
             if e.value == libusb1.LIBUSB_ERROR_NOT_FOUND:
@@ -167,6 +175,21 @@ class UsbHandle(object):
                 raise
 
     def BulkWrite(self, data, timeout_ms=None):
+        """TODO
+
+        Parameters
+        ----------
+        data : bytes
+            TODO
+        timeout_ms : TODO, None
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+
+        """
         if self._handle is None:
             raise usb_exceptions.WriteFailedError(
                 'This handle has been closed, probably due to another being opened.',
@@ -180,6 +203,21 @@ class UsbHandle(object):
                     self.usb_info, self.Timeout(timeout_ms)), e)
 
     def BulkRead(self, length, timeout_ms=None):
+        """TODO
+
+        Parameters
+        ----------
+        length : int
+            TODO
+        timeout_ms : TODO, None
+            TODO
+
+        Returns
+        -------
+        bytearray
+            TODO
+
+        """
         if self._handle is None:
             raise usb_exceptions.ReadFailedError(
                 'This handle has been closed, probably due to another being opened.',
@@ -196,6 +234,16 @@ class UsbHandle(object):
                     self.usb_info, self.Timeout(timeout_ms)), e)
 
     def BulkReadAsync(self, length, timeout_ms=None):
+        """TODO
+
+        Parameters
+        ----------
+        length : int
+            TODO
+        timeout_ms : TODO, None
+            TODO
+
+        """
         # See: https://pypi.python.org/pypi/libusb1 "Asynchronous I/O" section
         return
 
@@ -241,16 +289,22 @@ class UsbHandle(object):
     def FindFirst(cls, setting_matcher, device_matcher=None, **kwargs):
         """Find and return the first matching device.
 
-        Args:
+        Parameters
+        ----------
           setting_matcher: See cls.FindDevices.
           device_matcher: See cls.FindDevices.
           **kwargs: See cls.FindDevices.
 
-        Returns:
-          An instance of UsbHandle.
+        Returns
+        -------
+        TODO
+            An instance of UsbHandle.
 
-        Raises:
-          DeviceNotFoundError: Raised if the device is not available.
+        Raises
+        ------
+        adb.usb_exceptions.DeviceNotFoundError
+            Raised if the device is not available.
+
         """
         try:
             return next(cls.FindDevices(
@@ -264,7 +318,8 @@ class UsbHandle(object):
                     usb_info='', timeout_ms=None):
         """Find and yield the devices that match.
 
-        Args:
+        Parameters
+        ----------
           setting_matcher: Function that returns the setting to use given a
             usb1.USBDevice, or None if the device doesn't have a valid setting.
           device_matcher: Function that returns True if the given UsbHandle is
@@ -272,8 +327,11 @@ class UsbHandle(object):
           usb_info: Info string describing device(s).
           timeout_ms: Default timeout of commands in milliseconds.
 
-        Yields:
-          UsbHandle instances
+        Yields
+        ------
+        TODO
+            UsbHandle instances
+
         """
         ctx = usb1.USBContext()
         for device in ctx.getDeviceList(skip_on_error=True):
@@ -289,15 +347,18 @@ class UsbHandle(object):
 class TcpHandle(object):
     """TCP connection object.
 
-       Provides same interface as UsbHandle. """
+    Provides same interface as `UsbHandle`.
+
+    Parameters
+    ----------
+    serial : str, bytes, bytearray
+        Android device serial of the form "host" or "host:port". (Host may be an IP address or a host name.)
+    timeout_ms : TODO, None
+        TODO
+
+    """
 
     def __init__(self, serial, timeout_ms=None):
-        """Initialize the TCP Handle.
-        Arguments:
-          serial: Android device serial of the form host or host:port.
-
-        Host may be an IP address or a host name.
-        """
         # if necessary, convert serial to a unicode string
         if isinstance(serial, (bytes, bytearray)):
             serial = serial.decode('utf-8')
@@ -335,6 +396,21 @@ class TcpHandle(object):
         raise usb_exceptions.TcpTimeoutException(msg)
 
     def BulkRead(self, numbytes, timeout=None):
+        """TODO
+
+        Parameters
+        ----------
+        length : int
+            TODO
+        timeout_ms : TODO, None
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+
+        """
         t = self.TimeoutSeconds(timeout)
         readable, _, _ = select.select([self._connection], [], [], t)
         if readable:

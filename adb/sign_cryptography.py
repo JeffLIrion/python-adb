@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from adb import adb_protocol
+"""TODO
+
+"""
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
@@ -20,21 +22,57 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives.asymmetric import utils
 
+from adb import adb_protocol
 
+
+# pylint: disable=abstract-method
 class CryptographySigner(adb_protocol.AuthSigner):
-    """AuthSigner using cryptography.io."""
+    """AuthSigner using cryptography.io.
 
+    Parameters
+    ----------
+    rsa_key_path : str
+        The path to the private key.
+
+    Attributes
+    ----------
+    public_key : TODO
+        TODO
+    rsa_key : TODO
+        TODO
+
+    """
     def __init__(self, rsa_key_path):
         with open(rsa_key_path + '.pub') as rsa_pub_file:
             self.public_key = rsa_pub_file.read()
 
         with open(rsa_key_path) as rsa_prv_file:
-            self.rsa_key = serialization.load_pem_private_key(
-                    rsa_prv_file.read(), None, default_backend())
+            self.rsa_key = serialization.load_pem_private_key(rsa_prv_file.read(), None, default_backend())
 
     def Sign(self, data):
+        """Signs given data using a private key.
+
+        Parameters
+        ----------
+        data : TODO
+            TODO
+
+        Returns
+        -------
+        TODO
+            The signed ``data``
+
+        """
         return self.rsa_key.sign(
             data, padding.PKCS1v15(), utils.Prehashed(hashes.SHA1()))
 
     def GetPublicKey(self):
+        """Returns the public key in PEM format without headers or newlines.
+
+        Returns
+        -------
+        self.public_key : str
+            The public key
+
+        """
         return self.public_key

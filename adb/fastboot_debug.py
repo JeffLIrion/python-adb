@@ -20,7 +20,12 @@ call android's fastboot, but this only accepts usb paths and no serials.
 """
 
 import argparse
-import inspect
+
+try:
+    from inspect import getfullargspec
+except ImportError:
+    from inspect import getargspec as getfullargspec
+
 import logging
 import sys
 
@@ -37,8 +42,21 @@ except ImportError:
 def Devices(args):
     """Lists the available devices.
 
-    List of devices attached
-    015DB7591102001A        device
+    ::
+
+      List of devices attached
+      015DB7591102001A        device
+
+    Parameters
+    ----------
+    args
+        CLI arguments (not used).
+
+    Returns
+    -------
+    int
+        0
+
     """
     for device in fastboot.FastbootCommands.Devices():
         print('%s\tdevice' % device.serial_number)
@@ -46,6 +64,14 @@ def Devices(args):
 
 
 def _InfoCb(message):
+    """TODO
+
+    Parameters
+    ----------
+    message : TODO
+        TODO
+
+    """
     # Use an unbuffered version of stdout.
     if not message.message:
         return
@@ -54,38 +80,26 @@ def _InfoCb(message):
 
 
 def main():
+    """TODO"""
     common = common_cli.GetCommonArguments()
     device = common_cli.GetDeviceArguments()
-    device.add_argument(
-        '--chunk_kb', type=int, default=1024, metavar='1024',
-        help='Size of packets to write in Kb. For older devices, it may be '
-             'required to use 4.')
+    device.add_argument('--chunk_kb', type=int, default=1024, metavar='1024',
+                        help='Size of packets to write in Kb. For older devices, it may be required to use 4.')
     parents = [common, device]
 
-    parser = argparse.ArgumentParser(
-        description=sys.modules[__name__].__doc__, parents=[common])
+    parser = argparse.ArgumentParser(description=sys.modules[__name__].__doc__, parents=[common])
     subparsers = parser.add_subparsers(title='Commands', dest='command_name')
 
-    subparser = subparsers.add_parser(
-        name='help', help='Prints the commands available')
-    subparser = subparsers.add_parser(
-        name='devices', help='Lists the available devices', parents=[common])
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Continue)
+    subparser = subparsers.add_parser(name='help', help='Prints the commands available')
+    subparser = subparsers.add_parser(name='devices', help='Lists the available devices', parents=[common])
 
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Download,
-        {'source_file': 'Filename on the host to push'})
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Erase)
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Flash)
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Getvar)
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Oem)
-    common_cli.MakeSubparser(
-        subparsers, parents, fastboot.FastbootCommands.Reboot)
+    common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Continue)
+    common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Download, {'source_file': 'Filename on the host to push'})
+    common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Erase)
+    common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Flash)
+    common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Getvar)
+    common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Oem)
+    common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Reboot)
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -101,12 +115,11 @@ def main():
         return 0
 
     kwargs = {}
-    argspec = inspect.getargspec(args.method)
+    argspec = getfullargspec(args.method)
     if 'info_cb' in argspec.args:
         kwargs['info_cb'] = _InfoCb
     if 'progress_callback' in argspec.args and progressbar:
-        bar = progressbar.ProgessBar(
-            widgets=[progressbar.Bar(), progressbar.Percentage()])
+        bar = progressbar.ProgessBar(widgets=[progressbar.Bar(), progressbar.Percentage()])  # pylint: disable=blacklisted-name
         bar.start()
 
         def SetProgress(current, total):

@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """ADB protocol implementation.
 
 Implements the ADB protocol as seen in android's adb/adbd binaries, but only the
@@ -18,6 +19,7 @@ host side.
 """
 
 import collections
+import io
 import os
 import stat
 import struct
@@ -28,9 +30,15 @@ import libusb1
 from adb import adb_protocol
 from adb import usb_exceptions
 
-# Default mode for pushed files.
+try:
+    file_types = (file, io.IOBase)
+except NameError:
+    file_types = (io.IOBase,)
+
+#: Default mode for pushed files.
 DEFAULT_PUSH_MODE = stat.S_IFREG | stat.S_IRWXU | stat.S_IRWXG
-# Maximum size of a filesync DATA packet.
+
+#: Maximum size of a filesync DATA packet.
 MAX_PUSH_DATA = 2 * 1024
 
 
@@ -59,6 +67,25 @@ class FilesyncProtocol(object):
 
     @staticmethod
     def Stat(connection, filename):
+        """TODO
+
+        Parameters
+        ----------
+        connection : TODO
+            TODO
+        filename : TODO
+            TODO
+
+        Returns
+        -------
+        mode : TODO
+            TODO
+        size : TODO
+            TODO
+        mtime : TODO
+            TODO
+
+        """
         cnxn = FileSyncConnection(connection, b'<4I')
         cnxn.Send(b'STAT', filename)
         command, (mode, size, mtime) = cnxn.Read((b'STAT',), read_data=False)
@@ -104,9 +131,12 @@ class FilesyncProtocol(object):
     def _HandleProgress(cls, progress_callback):
         """Calls the callback with the current progress and total bytes written/received.
 
-        Args:
-          progress_callback: callback method that accepts filename, bytes_written and total_bytes,
-                     total_bytes will be -1 for file-like objects
+        Parameters
+        ----------
+        progress_callback : TODO
+            Callback method that accepts filename, bytes_written and total_bytes; total_bytes will be -1 for file-like
+            objects.
+
         """
         current = 0
         while True:
@@ -121,7 +151,8 @@ class FilesyncProtocol(object):
              st_mode=DEFAULT_PUSH_MODE, mtime=0, progress_callback=None):
         """Push a file-like object to the device.
 
-        Args:
+        Parameters
+        ----------
           connection: ADB connection
           datafile: File-like object for reading from
           filename: Filename to push to
@@ -129,17 +160,19 @@ class FilesyncProtocol(object):
           mtime: modification time
           progress_callback: callback method that accepts filename, bytes_written and total_bytes
 
-        Raises:
-          PushFailedError: Raised on push failure.
-        """
+        Raises
+        ------
+        PushFailedError
+            Raised on push failure.
 
+        """
         fileinfo = ('{},{}'.format(filename, int(st_mode))).encode('utf-8')
 
         cnxn = FileSyncConnection(connection, b'<2I')
         cnxn.Send(b'SEND', fileinfo)
 
         if progress_callback:
-            total_bytes = os.fstat(datafile.fileno()).st_size if isinstance(datafile, file) else -1
+            total_bytes = os.fstat(datafile.fileno()).st_size if isinstance(datafile, file_types) else -1
             progress = cls._HandleProgress(lambda current: progress_callback(filename, current, total_bytes))
             next(progress)
 
@@ -167,10 +200,7 @@ class FilesyncProtocol(object):
 class FileSyncConnection(object):
     """Encapsulate a FileSync service connection."""
 
-    ids = [
-        b'STAT', b'LIST', b'SEND', b'RECV', b'DENT', b'DONE', b'DATA', b'OKAY',
-        b'FAIL', b'QUIT',
-    ]
+    ids = [b'STAT', b'LIST', b'SEND', b'RECV', b'DENT', b'DONE', b'DATA', b'OKAY', b'FAIL', b'QUIT']
     id_to_wire, wire_to_id = adb_protocol.MakeWireIDs(ids)
 
     def __init__(self, adb_connection, recv_header_format):
@@ -193,7 +223,8 @@ class FileSyncConnection(object):
         Packets are buffered and only flushed when this connection is read from. All
         messages have a response from the device, so this will always get flushed.
 
-        Args:
+        Parameters
+        ----------
           command_id: Command to send.
           data: Optional data to send, must set data or size.
           size: Optionally override size from len(data).
@@ -253,8 +284,7 @@ class FileSyncConnection(object):
         try:
             self.adb.Write(self.send_buffer[:self.send_idx])
         except libusb1.USBError as e:
-            raise adb_protocol.SendFailedError(
-                'Could not send data %s' % self.send_buffer, e)
+            raise usb_exceptions.WriteFailedError('Could not send data %s' % self.send_buffer, e)
         self.send_idx = 0
 
     def _ReadBuffered(self, size):

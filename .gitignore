@@ -1,12 +1,19 @@
 *.pyc
+*.DS_Store*
+
 .cache/
-.coverage
-adb.egg-info/
+.eggs/
+.idea/
 .tox/
+adb.egg-info/
+build/
+dist/
+
+.coverage
 /adb.zip
 /fastboot.zip
-.idea/
-*.DS_Store*
 
 # Documentation
 docs/build
+docs/html
+

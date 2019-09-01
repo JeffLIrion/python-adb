@@ -52,23 +52,43 @@ DeviceIsAvailable = common.InterfaceMatcher(CLASS, SUBCLASS, PROTOCOL)  # pylint
 # pylint doesn't understand cross-module exception baseclasses.
 # pylint: disable=bad-option-value
 class FastbootTransferError(usb_exceptions.FormatMessageWithArgumentsException):
-    """Transfer error."""
+    """Transfer error.
+
+    .. image:: _static/adb.fastboot.FastbootTransferError.CALL_GRAPH.svg
+
+    """
 
 
 class FastbootRemoteFailure(usb_exceptions.FormatMessageWithArgumentsException):
-    """Remote error."""
+    """Remote error.
+
+    .. image:: _static/adb.fastboot.FastbootRemoteFailure.CALL_GRAPH.svg
+
+    """
 
 
 class FastbootStateMismatch(usb_exceptions.FormatMessageWithArgumentsException):
-    """Fastboot and uboot's state machines are arguing. You Lose."""
+    """Fastboot and uboot's state machines are arguing. You Lose.
+
+    .. image:: _static/adb.fastboot.FastbootStateMismatch.CALL_GRAPH.svg
+
+    """
 
 
 class FastbootInvalidResponse(usb_exceptions.FormatMessageWithArgumentsException):
-    """Fastboot responded with a header we didn't expect."""
+    """Fastboot responded with a header we didn't expect.
+
+    .. image:: _static/adb.fastboot.FastbootInvalidResponse.CALL_GRAPH.svg
+
+    """
 
 
 class FastbootProtocol(object):
-    """Encapsulates the fastboot protocol."""
+    """Encapsulates the fastboot protocol.
+
+    .. image:: _static/adb.fastboot.FastbootProtocol.__init__.CALLER_GRAPH.svg
+
+    """
     FINAL_HEADERS = {b'OKAY', b'DATA'}
 
     def __init__(self, usb, chunk_kb=1024):
@@ -100,6 +120,8 @@ class FastbootProtocol(object):
     def SendCommand(self, command, arg=None):
         """Sends a command to the device.
 
+        .. image:: _static/adb.fastboot.FastbootProtocol.SendCommand.CALL_GRAPH.svg
+
         Parameters
         ----------
         command : str
@@ -115,9 +137,12 @@ class FastbootProtocol(object):
 
         self._Write(io.BytesIO(command), len(command))
 
-    def HandleSimpleResponses(
-            self, timeout_ms=None, info_cb=DEFAULT_MESSAGE_CALLBACK):
+    def HandleSimpleResponses(self, timeout_ms=None, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Accepts normal responses from the device.
+
+        .. image:: _static/adb.fastboot.FastbootProtocol.HandleSimpleResponses.CALL_GRAPH.svg
+
+        .. image:: _static/adb.fastboot.FastbootProtocol.HandleSimpleResponses.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -138,6 +163,10 @@ class FastbootProtocol(object):
                           info_cb=DEFAULT_MESSAGE_CALLBACK,
                           progress_callback=None, timeout_ms=None):
         """Handles the protocol for sending data to the device.
+
+        .. image:: _static/adb.fastboot.FastbootProtocol.HandleDataSending.CALL_GRAPH.svg
+
+        .. image:: _static/adb.fastboot.FastbootProtocol.HandleDataSending.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -182,6 +211,8 @@ class FastbootProtocol(object):
 
     def _AcceptResponses(self, expected_header, info_cb, timeout_ms=None):
         """Accepts responses until the expected header or a FAIL.
+
+        .. image:: _static/adb.fastboot.FastbootProtocol._AcceptResponses.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -231,6 +262,8 @@ class FastbootProtocol(object):
     def _HandleProgress(total, progress_callback):
         """Calls the callback with the current progress and total.
 
+        .. image:: _static/adb.fastboot.FastbootProtocol._HandleProgress.CALLER_GRAPH.svg
+
         Parameters
         ----------
         total : TODO
@@ -251,6 +284,10 @@ class FastbootProtocol(object):
 
     def _Write(self, data, length, progress_callback=None):
         """Sends the data to the device, tracking progress with the callback.
+
+        .. image:: _static/adb.fastboot.FastbootProtocol._Write.CALL_GRAPH.svg
+
+        .. image:: _static/adb.fastboot.FastbootProtocol._Write.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -275,8 +312,11 @@ class FastbootProtocol(object):
 
 
 class FastbootCommands(object):
-    """Encapsulates the fastboot commands."""
+    """Encapsulates the fastboot commands.
 
+    .. image:: _static/adb.fastboot.FastbootCommands.__init__.CALLER_GRAPH.svg
+
+    """
     def __init__(self):
         """Constructs a FastbootCommands instance.
 
@@ -297,7 +337,11 @@ class FastbootCommands(object):
         self._protocol = None
 
     def __reset(self):
-        """TODO"""
+        """TODO
+
+        .. image:: _static/adb.fastboot.FastbootCommands.__reset.CALL_GRAPH.svg
+
+        """
         self.__init__()
 
     @property
@@ -380,6 +424,10 @@ class FastbootCommands(object):
     def _SimpleCommand(self, command, arg=None, **kwargs):
         """TODO
 
+        .. image:: _static/adb.fastboot.FastbootCommands._SimpleCommand.CALL_GRAPH.svg
+
+        .. image:: _static/adb.fastboot.FastbootCommands._SimpleCommand.CALLER_GRAPH.svg
+
         Parameters
         ----------
         command : TODO
@@ -403,6 +451,10 @@ class FastbootCommands(object):
     def FlashFromFile(self, partition, source_file, source_len=0,
                       info_cb=DEFAULT_MESSAGE_CALLBACK, progress_callback=None):
         """Flashes a partition from the file on disk.
+
+        .. image:: _static/adb.fastboot.FastbootCommands.FlashFromFile.CALL_GRAPH.svg
+
+        .. image:: _static/adb.fastboot.FastbootCommands.FlashFromFile.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -435,6 +487,8 @@ class FastbootCommands(object):
     def Download(self, source_file, source_len=0,
                  info_cb=DEFAULT_MESSAGE_CALLBACK, progress_callback=None):
         """Downloads a file to the device.
+
+        .. image:: _static/adb.fastboot.FastbootCommands.Download.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -473,6 +527,10 @@ class FastbootCommands(object):
     def Flash(self, partition, timeout_ms=0, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Flashes the last downloaded file to the given partition.
 
+        .. image:: _static/adb.fastboot.FastbootCommands.Flash.CALL_GRAPH.svg
+
+        .. image:: _static/adb.fastboot.FastbootCommands.Flash.CALLER_GRAPH.svg
+
         Parameters
         ----------
         partition : TODO
@@ -493,6 +551,8 @@ class FastbootCommands(object):
     def Erase(self, partition, timeout_ms=None):
         """Erases the given partition.
 
+        .. image:: _static/adb.fastboot.FastbootCommands.Erase.CALL_GRAPH.svg
+
         Parameters
         ----------
         partition : TODO
@@ -505,6 +565,8 @@ class FastbootCommands(object):
 
     def Getvar(self, var, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Returns the given variable's definition.
+
+        .. image:: _static/adb.fastboot.FastbootCommands.Getvar.CALL_GRAPH.svg
 
         Parameters
         ----------
@@ -523,6 +585,8 @@ class FastbootCommands(object):
 
     def Oem(self, command, timeout_ms=None, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Executes an OEM command on the device.
+
+        .. image:: _static/adb.fastboot.FastbootCommands.Oem.CALL_GRAPH.svg
 
         Parameters
         ----------
@@ -545,6 +609,8 @@ class FastbootCommands(object):
     def Continue(self):
         """Continues execution past fastboot into the system.
 
+        .. image:: _static/adb.fastboot.FastbootCommands.Continue.CALL_GRAPH.svg
+
         Returns
         -------
         TODO
@@ -555,6 +621,8 @@ class FastbootCommands(object):
 
     def Reboot(self, target_mode=b'', timeout_ms=None):
         """Reboots the device.
+
+        .. image:: _static/adb.fastboot.FastbootCommands.Reboot.CALL_GRAPH.svg
 
         Parameters
         ----------
@@ -574,6 +642,8 @@ class FastbootCommands(object):
 
     def RebootBootloader(self, timeout_ms=None):
         """Reboots into the bootloader, usually equiv to Reboot('bootloader').
+
+        .. image:: _static/adb.fastboot.FastbootCommands.RebootBootloader.CALL_GRAPH.svg
 
         Parameters
         ----------

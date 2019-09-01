@@ -47,6 +47,9 @@ def Devices(args):
       List of devices attached
       015DB7591102001A        device
 
+
+    .. image:: _static/adb.fastboot_debug.Devices.CALLER_GRAPH.svg
+
     Parameters
     ----------
     args

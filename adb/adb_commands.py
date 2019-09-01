@@ -55,6 +55,8 @@ class AdbCommands(object):
 
     Some methods are more-pythonic and/or have more options.
 
+    .. image:: _static/adb.adb_commands.AdbCommands.__init__.CALLER_GRAPH.svg
+
     Attributes
     ----------
     build_props : TODO, None
@@ -82,10 +84,19 @@ class AdbCommands(object):
         self._service_connections = {}
 
     def __reset(self):
+        """TODO
+
+        .. image:: _static/adb.adb_commands.AdbCommands.__reset.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_commands.AdbCommands.__reset.CALLER_GRAPH.svg
+
+        """
         self.__init__()
 
     def _get_service_connection(self, service, service_command=None, create=True, timeout_ms=None):
         """Based on the service, get the AdbConnection for that service or create one if it doesnt exist
+
+        .. image:: _static/adb.adb_commands.AdbCommands._get_service_connection.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -127,6 +138,8 @@ class AdbCommands(object):
     def ConnectDevice(self, port_path=None, serial=None, default_timeout_ms=None, **kwargs):
         """Convenience function to setup a transport handle for the adb device from usb path or serial then connect to
         it.
+
+        .. image:: _static/adb.adb_commands.AdbCommands.ConnectDevice.CALL_GRAPH.svg
 
         Parameters
         ----------
@@ -179,7 +192,13 @@ class AdbCommands(object):
         return self
 
     def Close(self):
-        """TODO"""
+        """TODO
+
+        .. image:: _static/adb.adb_commands.AdbCommands.Close.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_commands.AdbCommands.Close.CALLER_GRAPH.svg
+
+        """
         for conn in list(self._service_connections.values()):
             if conn:
                 try:
@@ -194,6 +213,8 @@ class AdbCommands(object):
 
     def _Connect(self, banner=None, **kwargs):
         """Connect to the device.
+
+        .. image:: _static/adb.adb_commands.AdbCommands._Connect.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -238,6 +259,8 @@ class AdbCommands(object):
     def GetState(self):
         """TODO
 
+        .. image:: _static/adb.adb_commands.AdbCommands.GetState.CALL_GRAPH.svg
+
         Returns
         -------
         self._device_state : TODO
@@ -252,6 +275,10 @@ class AdbCommands(object):
 
         Doesn't support verifier file, instead allows destination directory to be
         overridden.
+
+        .. image:: _static/adb.adb_commands.AdbCommands.Install.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_commands.AdbCommands.Install.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -298,6 +325,8 @@ class AdbCommands(object):
     def Uninstall(self, package_name, keep_data=False, timeout_ms=None):
         """Removes a package from the device.
 
+        .. image:: _static/adb.adb_commands.AdbCommands.Uninstall.CALL_GRAPH.svg
+
         Parameters
         ----------
         package_name : TODO
@@ -322,6 +351,10 @@ class AdbCommands(object):
 
     def Push(self, source_file, device_filename, mtime='0', timeout_ms=None, progress_callback=None, st_mode=None):
         """Push a file or directory to the device.
+
+        .. image:: _static/adb.adb_commands.AdbCommands.Push.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_commands.AdbCommands.Push.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -408,6 +441,8 @@ class AdbCommands(object):
     def Stat(self, device_filename):
         """Get a file's stat() information.
 
+        .. image:: _static/adb.adb_commands.AdbCommands.Stat.CALLER_GRAPH.svg
+
         Parameters
         ----------
         device_filename : TODO
@@ -451,6 +486,8 @@ class AdbCommands(object):
     def Reboot(self, destination=b''):
         """Reboot the device.
 
+        .. image:: _static/adb.adb_commands.AdbCommands.Reboot.CALLER_GRAPH.svg
+
         Parameters
         ----------
         destination : bytes
@@ -460,7 +497,11 @@ class AdbCommands(object):
         self.protocol_handler.Open(self._handle, b'reboot:%s' % destination)
 
     def RebootBootloader(self):
-        """Reboot device into fastboot."""
+        """Reboot device into fastboot.
+
+        .. image:: _static/adb.adb_commands.AdbCommands.RebootBootloader.CALL_GRAPH.svg
+
+        """
         self.Reboot(b'bootloader')
 
     def Remount(self):
@@ -510,6 +551,8 @@ class AdbCommands(object):
     def Shell(self, command, timeout_ms=None):
         """Run command on the device, returning the output.
 
+        .. image:: _static/adb.adb_commands.AdbCommands.Shell.CALLER_GRAPH.svg
+
         Parameters
         ----------
         command : TODO
@@ -527,6 +570,8 @@ class AdbCommands(object):
 
     def StreamingShell(self, command, timeout_ms=None):
         """Run command on the device, yielding each line of output.
+
+        .. image:: _static/adb.adb_commands.AdbCommands.StreamingShell.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -548,6 +593,8 @@ class AdbCommands(object):
     def Logcat(self, options, timeout_ms=None):
         """Run ``shell logcat`` and stream the output to stdout.
 
+        .. image:: _static/adb.adb_commands.AdbCommands.Logcat.CALL_GRAPH.svg
+
         Parameters
         ----------
         options : str
@@ -566,6 +613,8 @@ class AdbCommands(object):
     def InteractiveShell(self, cmd=None, strip_cmd=True, delim=None, strip_delim=True):
         """Get stdout from the currently open interactive shell and optionally run a command on the device, returning
         all output.
+
+        .. image:: _static/adb.adb_commands.AdbCommands.InteractiveShell.CALL_GRAPH.svg
 
         Parameters
         ----------

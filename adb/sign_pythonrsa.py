@@ -31,6 +31,8 @@ from adb import adb_protocol
 class _Accum(object):
     """TODO
 
+    .. image:: _static/adb.sign_pythonrsa._Accum.CALL_GRAPH.svg
+
     Attributes
     ----------
     _buf : TODO
@@ -92,6 +94,8 @@ def _load_rsa_private_key(pem):
 
 class PythonRSASigner(adb_protocol.AuthSigner):
     """Implements adb_protocol.AuthSigner using http://stuvel.eu/rsa.
+
+    .. image:: _static/adb.sign_pythonrsa.PythonRSASigner.CALL_GRAPH.svg
 
     Parameters
     ----------

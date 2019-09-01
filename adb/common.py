@@ -36,12 +36,20 @@ _LOG = logging.getLogger('android_usb')
 
 
 def GetInterface(setting):
-    """Get the class, subclass, and protocol for the given USB setting."""
+    """Get the class, subclass, and protocol for the given USB setting.
+
+    .. image:: _static/adb.common.GetInterface.CALLER_GRAPH.svg
+
+    """
     return (setting.getClass(), setting.getSubClass(), setting.getProtocol())
 
 
 def InterfaceMatcher(clazz, subclass, protocol):
-    """Returns a matcher that returns the setting with the given interface."""
+    """Returns a matcher that returns the setting with the given interface.
+
+    .. image:: _static/adb.common.InterfaceMatcher.CALL_GRAPH.svg
+
+    """
     interface = (clazz, subclass, protocol)
 
     def Matcher(device):
@@ -64,8 +72,9 @@ class UsbHandle(object):
     * `UsbHandle.BulkRead`
     * `UsbHandle.BulkWrite(bytes data)`
 
-    """
+    .. image:: _static/adb.common.UsbHandle.__init__.CALLER_GRAPH.svg
 
+    """
     _HANDLE_CACHE = weakref.WeakValueDictionary()
     _HANDLE_CACHE_LOCK = threading.Lock()
 
@@ -92,6 +101,13 @@ class UsbHandle(object):
 
     @property
     def usb_info(self):
+        """TODO
+
+        .. image:: _static/adb.common.UsbHandle.usb_info.CALL_GRAPH.svg
+
+        .. image:: _static/adb.common.UsbHandle.usb_info.CALLER_GRAPH.svg
+
+        """
         try:
             sn = self.serial_number
         except libusb1.USBError:
@@ -101,7 +117,11 @@ class UsbHandle(object):
         return self._usb_info
 
     def Open(self):
-        """Opens the USB device for this setting, and claims the interface."""
+        """Opens the USB device for this setting, and claims the interface.
+
+        .. image:: _static/adb.common.UsbHandle.Open.CALL_GRAPH.svg
+
+        """
         # Make sure we close any previous handle open to this usb device.
         port_path = tuple(self.port_path)
         with self._HANDLE_CACHE_LOCK:
@@ -144,13 +164,30 @@ class UsbHandle(object):
 
     @property
     def serial_number(self):
+        """TODO
+
+        .. image:: _static/adb.common.UsbHandle.serial_number.CALLER_GRAPH.svg
+
+        """
         return self._device.getSerialNumber()
 
     @property
     def port_path(self):
+        """TODO
+
+        .. image:: _static/adb.common.UsbHandle.port_path.CALLER_GRAPH.svg
+
+        """
         return [self._device.getBusNumber()] + self._device.getPortNumberList()
 
     def Close(self):
+        """TODO
+
+        .. image:: _static/adb.common.UsbHandle.Close.CALL_GRAPH.svg
+
+        .. image:: _static/adb.common.UsbHandle.Close.CALLER_GRAPH.svg
+
+        """
         if self._handle is None:
             return
         try:
@@ -163,9 +200,19 @@ class UsbHandle(object):
             self._handle = None
 
     def Timeout(self, timeout_ms):
+        """TODO
+
+        .. image:: _static/adb.common.UsbHandle.Timeout.CALLER_GRAPH.svg
+
+        """
         return timeout_ms if timeout_ms is not None else self._timeout_ms
 
     def FlushBuffers(self):
+        """TODO
+
+        .. image:: _static/adb.common.UsbHandle.FlushBuffers.CALL_GRAPH.svg
+
+        """
         while True:
             try:
                 self.BulkRead(self._max_read_packet_len, timeout_ms=10)
@@ -176,6 +223,8 @@ class UsbHandle(object):
 
     def BulkWrite(self, data, timeout_ms=None):
         """TODO
+
+        .. image:: _static/adb.common.UsbHandle.BulkWrite.CALL_GRAPH.svg
 
         Parameters
         ----------
@@ -204,6 +253,10 @@ class UsbHandle(object):
 
     def BulkRead(self, length, timeout_ms=None):
         """TODO
+
+        .. image:: _static/adb.common.UsbHandle.BulkRead.CALL_GRAPH.svg
+
+        .. image:: _static/adb.common.UsbHandle.BulkRead.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -249,7 +302,13 @@ class UsbHandle(object):
 
     @classmethod
     def PortPathMatcher(cls, port_path):
-        """Returns a device matcher for the given port path."""
+        """Returns a device matcher for the given port path.
+
+        .. image:: _static/adb.common.UsbHandle.SerialMatcher.CALL_GRAPH.svg
+
+        .. image:: _static/adb.common.UsbHandle.PortPathMatcher.CALLER_GRAPH.svg
+
+        """
         if isinstance(port_path, str):
             # Convert from sysfs path to port_path.
             port_path = [int(part) for part in SYSFS_PORT_SPLIT_RE.split(port_path)]
@@ -257,12 +316,22 @@ class UsbHandle(object):
 
     @classmethod
     def SerialMatcher(cls, serial):
-        """Returns a device matcher for the given serial."""
+        """Returns a device matcher for the given serial.
+
+        .. image:: _static/adb.common.UsbHandle.SerialMatcher.CALLER_GRAPH.svg
+
+        """
         return lambda device: device.serial_number == serial
 
     @classmethod
-    def FindAndOpen(cls, setting_matcher,
-                    port_path=None, serial=None, timeout_ms=None):
+    def FindAndOpen(cls, setting_matcher, port_path=None, serial=None, timeout_ms=None):
+        """TODO
+
+        .. image:: _static/adb.common.UsbHandle.FindAndOpen.CALL_GRAPH.svg
+
+        .. image:: _static/adb.common.UsbHandle.FindAndOpen.CALLER_GRAPH.svg
+
+        """
         dev = cls.Find(
             setting_matcher, port_path=port_path, serial=serial,
             timeout_ms=timeout_ms)
@@ -272,7 +341,13 @@ class UsbHandle(object):
 
     @classmethod
     def Find(cls, setting_matcher, port_path=None, serial=None, timeout_ms=None):
-        """Gets the first device that matches according to the keyword args."""
+        """Gets the first device that matches according to the keyword args.
+
+        .. image:: _static/adb.common.UsbHandle.Find.CALL_GRAPH.svg
+
+        .. image:: _static/adb.common.UsbHandle.Find.CALLER_GRAPH.svg
+
+        """
         if port_path:
             device_matcher = cls.PortPathMatcher(port_path)
             usb_info = port_path
@@ -288,6 +363,10 @@ class UsbHandle(object):
     @classmethod
     def FindFirst(cls, setting_matcher, device_matcher=None, **kwargs):
         """Find and return the first matching device.
+
+        .. image:: _static/adb.common.UsbHandle.FindFirst.CALL_GRAPH.svg
+
+        .. image:: _static/adb.common.UsbHandle.FindFirst.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -317,6 +396,8 @@ class UsbHandle(object):
     def FindDevices(cls, setting_matcher, device_matcher=None,
                     usb_info='', timeout_ms=None):
         """Find and yield the devices that match.
+
+        .. image:: _static/adb.common.UsbHandle.FindDevices.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -349,6 +430,8 @@ class TcpHandle(object):
 
     Provides same interface as `UsbHandle`.
 
+    .. image:: _static/adb.common.TcpHandle.__init__.CALLER_GRAPH.svg
+
     Parameters
     ----------
     serial : str, bytes, bytearray
@@ -357,7 +440,6 @@ class TcpHandle(object):
         TODO
 
     """
-
     def __init__(self, serial, timeout_ms=None):
         # if necessary, convert serial to a unicode string
         if isinstance(serial, (bytes, bytearray)):
@@ -376,6 +458,11 @@ class TcpHandle(object):
         self._connect()
 
     def _connect(self):
+        """TODO
+
+        .. image:: _static/adb.common.TcpHandle._connect.CALL_GRAPH.svg
+
+        """
         timeout = self.TimeoutSeconds(self._timeout_ms)
         self._connection = socket.create_connection((self.host, self.port),
                                                     timeout=timeout)
@@ -384,9 +471,19 @@ class TcpHandle(object):
 
     @property
     def serial_number(self):
+        """TODO
+
+        .. image:: _static/adb.common.TcpHandle.serial_number.CALLER_GRAPH.svg
+
+        """
         return self._serial_number
 
     def BulkWrite(self, data, timeout=None):
+        """TODO
+
+        .. image:: _static/adb.common.TcpHandle.BulkWrite.CALL_GRAPH.svg
+
+        """
         t = self.TimeoutSeconds(timeout)
         _, writeable, _ = select.select([], [self._connection], [], t)
         if writeable:
@@ -397,6 +494,8 @@ class TcpHandle(object):
 
     def BulkRead(self, numbytes, timeout=None):
         """TODO
+
+        .. image:: _static/adb.common.TcpHandle.BulkRead.CALL_GRAPH.svg
 
         Parameters
         ----------
@@ -420,9 +519,21 @@ class TcpHandle(object):
         raise usb_exceptions.TcpTimeoutException(msg)
 
     def Timeout(self, timeout_ms):
+        """TODO
+
+        .. image:: _static/adb.common.TcpHandle.Timeout.CALLER_GRAPH.svg
+
+        """
         return float(timeout_ms) if timeout_ms is not None else self._timeout_ms
 
     def TimeoutSeconds(self, timeout_ms):
+        """TODO
+
+        .. image:: _static/adb.common.TcpHandle.TimeoutSeconds.CALL_GRAPH.svg
+
+        .. image:: _static/adb.common.TcpHandle.TimeoutSeconds.CALLER_GRAPH.svg
+
+        """
         timeout = self.Timeout(timeout_ms)
         return timeout / 1000.0 if timeout is not None else timeout
 

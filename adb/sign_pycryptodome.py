@@ -26,6 +26,8 @@ from adb import adb_protocol
 class PycryptodomeAuthSigner(adb_protocol.AuthSigner):
     """TODO
 
+    .. image:: _static/adb.sign_pycryptodome.PycryptodomeAuthSigner.CALL_GRAPH.svg
+
     Parameters
     ----------
     rsa_key_path : TODO, None

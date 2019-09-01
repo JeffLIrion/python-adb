@@ -43,19 +43,35 @@ MAX_PUSH_DATA = 2 * 1024
 
 
 class InvalidChecksumError(Exception):
-    """Checksum of data didn't match expected checksum."""
+    """Checksum of data didn't match expected checksum.
+
+    .. image:: _static/adb.filesync_protocol.InvalidChecksumError.CALL_GRAPH.svg
+
+    """
 
 
 class InterleavedDataError(Exception):
-    """We only support command sent serially."""
+    """We only support command sent serially.
+
+    .. image:: _static/adb.filesync_protocol.InterleavedDataError.CALL_GRAPH.svg
+
+    """
 
 
 class PushFailedError(Exception):
-    """Pushing a file failed for some reason."""
+    """Pushing a file failed for some reason.
+
+    .. image:: _static/adb.filesync_protocol.PushFailedError.CALL_GRAPH.svg
+
+    """
 
 
 class PullFailedError(Exception):
-    """Pulling a file failed for some reason."""
+    """Pulling a file failed for some reason.
+
+    .. image:: _static/adb.filesync_protocol.PullFailedError.CALL_GRAPH.svg
+
+    """
 
 
 DeviceFile = collections.namedtuple('DeviceFile', [
@@ -68,6 +84,8 @@ class FilesyncProtocol(object):
     @staticmethod
     def Stat(connection, filename):
         """TODO
+
+        .. image:: _static/adb.filesync_protocol.FilesyncProtocol.Stat.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -109,7 +127,11 @@ class FilesyncProtocol(object):
 
     @classmethod
     def Pull(cls, connection, filename, dest_file, progress_callback):
-        """Pull a file from the device into the file-like dest_file."""
+        """Pull a file from the device into the file-like dest_file.
+
+        .. image:: _static/adb.filesync_protocol.FilesyncProtocol.Pull.CALL_GRAPH.svg
+
+        """
         if progress_callback:
             total_bytes = cls.Stat(connection, filename)[1]
             progress = cls._HandleProgress(lambda current: progress_callback(filename, current, total_bytes))
@@ -131,6 +153,10 @@ class FilesyncProtocol(object):
     def _HandleProgress(cls, progress_callback):
         """Calls the callback with the current progress and total bytes written/received.
 
+        .. image:: _static/adb.filesync_protocol.FilesyncProtocol._HandleProgress.CALL_GRAPH.svg
+
+        .. image:: _static/adb.filesync_protocol.FilesyncProtocol._HandleProgress.CALLER_GRAPH.svg
+
         Parameters
         ----------
         progress_callback : TODO
@@ -150,6 +176,10 @@ class FilesyncProtocol(object):
     def Push(cls, connection, datafile, filename,
              st_mode=DEFAULT_PUSH_MODE, mtime=0, progress_callback=None):
         """Push a file-like object to the device.
+
+        .. image:: _static/adb.filesync_protocol.FilesyncProtocol.Push.CALL_GRAPH.svg
+
+        .. image:: _static/adb.filesync_protocol.FilesyncProtocol.Push.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -223,6 +253,8 @@ class FileSyncConnection(object):
         Packets are buffered and only flushed when this connection is read from. All
         messages have a response from the device, so this will always get flushed.
 
+        .. image:: _static/adb.filesync_protocol.FileSyncConnection.Send.CALL_GRAPH.svg
+
         Parameters
         ----------
           command_id: Command to send.
@@ -241,7 +273,13 @@ class FileSyncConnection(object):
         self.send_idx += len(buf)
 
     def Read(self, expected_ids, read_data=True):
-        """Read ADB messages and return FileSync packets."""
+        """Read ADB messages and return FileSync packets.
+
+        .. image:: _static/adb.filesync_protocol.FileSyncConnection.Read.CALL_GRAPH.svg
+
+        .. image:: _static/adb.filesync_protocol.FileSyncConnection.Read.CALLER_GRAPH.svg
+
+        """
         if self.send_idx:
             self._Flush()
 
@@ -269,7 +307,11 @@ class FileSyncConnection(object):
         return command_id, header[1:-1], data
 
     def ReadUntil(self, expected_ids, *finish_ids):
-        """Useful wrapper around Read."""
+        """Useful wrapper around Read.
+
+        .. image:: _static/adb.filesync_protocol.FileSyncConnection.ReadUntil.CALL_GRAPH.svg
+
+        """
         while True:
             cmd_id, header, data = self.Read(expected_ids + finish_ids)
             yield cmd_id, header, data
@@ -277,10 +319,20 @@ class FileSyncConnection(object):
                 break
 
     def _CanAddToSendBuffer(self, data_len):
+        """TODO
+
+        .. image:: _static/adb.filesync_protocol.FileSyncConnection._CanAddToSendBuffer.CALLER_GRAPH.svg
+
+        """
         added_len = self.send_header_len + data_len
         return self.send_idx + added_len < adb_protocol.MAX_ADB_DATA
 
     def _Flush(self):
+        """TODO
+
+        .. image:: _static/adb.filesync_protocol.FileSyncConnection._Flush.CALLER_GRAPH.svg
+
+        """
         try:
             self.adb.Write(self.send_buffer[:self.send_idx])
         except libusb1.USBError as e:
@@ -288,6 +340,11 @@ class FileSyncConnection(object):
         self.send_idx = 0
 
     def _ReadBuffered(self, size):
+        """TODO
+
+        .. image:: _static/adb.filesync_protocol.FileSyncConnection._ReadBuffered.CALLER_GRAPH.svg
+
+        """
         # Ensure recv buffer has enough data.
         while len(self.recv_buffer) < size:
             _, data = self.adb.ReadUntil(b'WRTE')

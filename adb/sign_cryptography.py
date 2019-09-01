@@ -29,6 +29,8 @@ from adb import adb_protocol
 class CryptographySigner(adb_protocol.AuthSigner):
     """AuthSigner using cryptography.io.
 
+    .. image:: _static/adb.sign_cryptography.CryptographySigner.CALL_GRAPH.svg
+
     Parameters
     ----------
     rsa_key_path : str

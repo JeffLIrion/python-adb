@@ -54,6 +54,9 @@ def Devices(args):
       List of devices attached
       015DB7591102001A        device        1,2
 
+
+    .. image:: _static/adb.adb_debug.Devices.CALLER_GRAPH.svg
+
     Parameters
     ----------
     args : argparse.ArgumentParser

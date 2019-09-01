@@ -40,8 +40,13 @@ AUTH_RSAPUBLICKEY = 3
 
 
 class InvalidCommandError(Exception):
-    """Got an invalid command over USB."""
+    """Got an invalid command over USB.
 
+    .. image:: _static/adb.adb_protocol.InvalidCommandError.CALL_GRAPH.svg
+
+    .. image:: _static/adb.adb_protocol.InvalidCommandError.__init__.CALLER_GRAPH.svg
+
+    """
     def __init__(self, message, response_header, response_data):
         if response_header == b'FAIL':
             message = 'Command failed, device said so. (%s)' % message
@@ -49,19 +54,33 @@ class InvalidCommandError(Exception):
 
 
 class InvalidResponseError(Exception):
-    """Got an invalid response to our command."""
+    """Got an invalid response to our command.
+
+    .. image:: _static/adb.adb_protocol.InvalidResponseError.CALL_GRAPH.svg
+
+    """
 
 
 class InvalidChecksumError(Exception):
-    """Checksum of data didn't match expected checksum."""
+    """Checksum of data didn't match expected checksum.
+
+    .. image:: _static/adb.adb_protocol.InvalidChecksumError.CALL_GRAPH.svg
+
+    """
 
 
 class InterleavedDataError(Exception):
-    """We only support command sent serially."""
+    """We only support command sent serially.
+
+    .. image:: _static/adb.adb_protocol.InterleavedDataError.CALL_GRAPH.svg
+
+    """
 
 
 def find_backspace_runs(stdout_bytes, start_pos):
     """TODO
+
+    .. image:: _static/adb.adb_protocol.find_backspace_runs.CALLER_GRAPH.svg
 
     Parameters
     ----------
@@ -133,6 +152,8 @@ class AuthSigner(object):
 class _AdbConnection(object):
     """ADB Connection.
 
+    .. image:: _static/adb.adb_protocol._AdbConnection.__init__.CALLER_GRAPH.svg
+
     Parameters
     ----------
     usb : TODO
@@ -165,6 +186,8 @@ class _AdbConnection(object):
     def _Send(self, command, arg0, arg1, data=b''):
         """TODO
 
+        .. image:: _static/adb.adb_protocol._AdbConnection._Send.CALLER_GRAPH.svg
+
         Parameters
         ----------
         command : TODO
@@ -182,6 +205,8 @@ class _AdbConnection(object):
 
     def Write(self, data):
         """Write a packet and expect an Ack.
+
+        .. image:: _static/adb.adb_protocol._AdbConnection.Write.CALL_GRAPH.svg
 
         Parameters
         ----------
@@ -205,11 +230,21 @@ class _AdbConnection(object):
         return len(data)
 
     def Okay(self):
-        """TODO"""
+        """TODO
+
+        .. image:: _static/adb.adb_protocol._AdbConnection.Okay.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_protocol._AdbConnection.Okay.CALLER_GRAPH.svg
+
+        """
         self._Send(b'OKAY', arg0=self.local_id, arg1=self.remote_id)
 
     def ReadUntil(self, *expected_cmds):
         """Read a packet, Ack any write packets.
+
+        .. image:: _static/adb.adb_protocol._AdbConnection.ReadUntil.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_protocol._AdbConnection.ReadUntil.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -239,6 +274,8 @@ class _AdbConnection(object):
     def ReadUntilClose(self):
         """Yield packets until a Close packet is received.
 
+        .. image:: _static/adb.adb_protocol._AdbConnection.ReadUntilClose.CALL_GRAPH.svg
+
         Yields
         ------
         data : TODO
@@ -258,7 +295,13 @@ class _AdbConnection(object):
             yield data
 
     def Close(self):
-        """TODO"""
+        """TODO
+
+        .. image:: _static/adb.adb_protocol._AdbConnection.Close.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_protocol._AdbConnection.Close.CALLER_GRAPH.svg
+
+        """
         self._Send(b'CLSE', arg0=self.local_id, arg1=self.remote_id)
         cmd, data = self.ReadUntil(b'CLSE')
         if cmd != b'CLSE':
@@ -285,6 +328,8 @@ class AdbMessage(object):
       WRITE(0, host_id, 'data')
       CLOSE(device_id, host_id, '')
 
+
+    .. image:: _static/adb.adb_protocol.AdbMessage.__init__.CALLER_GRAPH.svg
 
     Parameters
     ----------
@@ -330,6 +375,10 @@ class AdbMessage(object):
     def checksum(self):
         """TODO
 
+        .. image:: _static/adb.adb_protocol.AdbMessage.checksum.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.checksum.CALLER_GRAPH.svg
+
         Returns
         -------
         TODO
@@ -341,6 +390,8 @@ class AdbMessage(object):
     @staticmethod
     def CalculateChecksum(data):
         """TODO
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.CalculateChecksum.CALLER_GRAPH.svg
 
         Returns
         -------
@@ -366,6 +417,10 @@ class AdbMessage(object):
     def Pack(self):
         """Returns this message in an over-the-wire format.
 
+        .. image:: _static/adb.adb_protocol.AdbMessage.Pack.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.Pack.CALLER_GRAPH.svg
+
         Returns
         -------
         bytes
@@ -378,6 +433,8 @@ class AdbMessage(object):
     @classmethod
     def Unpack(cls, message):
         """TODO
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.Unpack.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -409,6 +466,8 @@ class AdbMessage(object):
     def Send(self, usb, timeout_ms=None):
         """Send this message over USB.
 
+        .. image:: _static/adb.adb_protocol.AdbMessage.Send.CALL_GRAPH.svg
+
         Parameters
         ----------
         usb : TODO
@@ -423,6 +482,10 @@ class AdbMessage(object):
     @classmethod
     def Read(cls, usb, expected_cmds, timeout_ms=None, total_timeout_ms=None):
         """Receive a response from the device.
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.Read.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.Read.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -485,6 +548,8 @@ class AdbMessage(object):
     @classmethod
     def Connect(cls, usb, banner=b'notadb', rsa_keys=None, auth_timeout_ms=100):
         """Establish a new connection to the device.
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.Connect.CALL_GRAPH.svg
 
         Parameters
         ----------
@@ -570,6 +635,10 @@ class AdbMessage(object):
 
         Not the same as the posix ``open`` or any other google3 Open methods.
 
+        .. image:: _static/adb.adb_protocol.AdbMessage.Open.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.Open.CALLER_GRAPH.svg
+
         Parameters
         ----------
         usb : TODO
@@ -622,6 +691,8 @@ class AdbMessage(object):
         response. All the data is held in memory, large responses will be slow and
         can fill up memory.
 
+        .. image:: _static/adb.adb_protocol.AdbMessage.Command.CALL_GRAPH.svg
+
         Parameters
         ----------
         usb : TODO
@@ -655,6 +726,10 @@ class AdbMessage(object):
         Sends service:command in a new connection, reading the data for the
         response. All the data is held in memory, large responses will be slow and
         can fill up memory.
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.StreamingCommand.CALL_GRAPH.svg
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.StreamingCommand.CALLER_GRAPH.svg
 
         Parameters
         ----------
@@ -692,6 +767,8 @@ class AdbMessage(object):
     def InteractiveShellCommand(cls, conn, cmd=None, strip_cmd=True, delim=None, strip_delim=True, clean_stdout=True):
         """Retrieves stdout of the current InteractiveShell and sends a shell command if provided
         TODO: Should we turn this into a yield based function so we can stream all output?
+
+        .. image:: _static/adb.adb_protocol.AdbMessage.InteractiveShellCommand.CALL_GRAPH.svg
 
         Parameters
         ----------

@@ -33,6 +33,11 @@ from adb import usb_exceptions
 
 
 class _PortPathAction(argparse.Action):
+    """TODO
+
+    .. image:: _static/adb.common_cli._PortPathAction.CALL_GRAPH.svg
+
+    """
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(
             namespace, self.dest,
@@ -40,6 +45,11 @@ class _PortPathAction(argparse.Action):
 
 
 class PositionalArg(argparse.Action):
+    """TODO
+
+    .. image:: _static/adb.common_cli.PositionalArg.CALL_GRAPH.svg
+
+    """
     def __call__(self, parser, namespace, values, option_string=None):
         namespace.positional.append(values)
 
@@ -77,6 +87,8 @@ def GetCommonArguments():
 
 def _DocToArgs(doc):
     """Converts a docstring documenting arguments into a dict.
+
+    .. image:: _static/adb.common_cli._DocToArgs.CALLER_GRAPH.svg
 
     Parameters
     ----------
@@ -121,7 +133,11 @@ def _DocToArgs(doc):
 
 
 def MakeSubparser(subparsers, parents, method, arguments=None):
-    """Returns an argparse subparser to create a 'subcommand' to adb."""
+    """Returns an argparse subparser to create a 'subcommand' to adb.
+
+    .. image:: _static/adb.common_cli.MakeSubparser.CALL_GRAPH.svg
+
+    """
     name = ('-'.join(re.split(r'([A-Z][a-z]+)', method.__name__)[1:-1:2])).lower()
     help = method.__doc__.splitlines()[0]  # pylint: disable=redefined-builtin
     subparser = subparsers.add_parser(name=name, description=help, help=help.rstrip('.'), parents=parents)
@@ -155,7 +171,11 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
 
 
 def _RunMethod(dev, args, extra):
-    """Runs a method registered via MakeSubparser."""
+    """Runs a method registered via MakeSubparser.
+
+    .. image:: _static/adb.common_cli._RunMethod.CALLER_GRAPH.svg
+
+    """
     logging.info('%s(%s)', args.method.__name__, ', '.join(args.positional))
     result = args.method(dev, *args.positional, **extra)
     if result is not None:
@@ -177,7 +197,11 @@ def _RunMethod(dev, args, extra):
 
 
 def StartCli(args, adb_commands, extra=None, **device_kwargs):
-    """Starts a common CLI interface for this usb path and protocol."""
+    """Starts a common CLI interface for this usb path and protocol.
+
+    .. image:: _static/adb.common_cli.StartCli.CALL_GRAPH.svg
+
+    """
     try:
         dev = adb_commands()
         dev.ConnectDevice(port_path=args.port_path, serial=args.serial, default_timeout_ms=args.timeout_ms,

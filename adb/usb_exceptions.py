@@ -16,7 +16,11 @@
 
 
 class CommonUsbError(Exception):
-    """Base class for usb communication errors."""
+    """Base class for usb communication errors.
+
+    .. image:: _static/adb.usb_exceptions.CommonUsbError.CALL_GRAPH.svg
+
+    """
 
 
 class FormatMessageWithArgumentsException(CommonUsbError):
@@ -26,6 +30,8 @@ class FormatMessageWithArgumentsException(CommonUsbError):
 
     This interpolates the message with the given arguments to make it
     human-readable, but keeps the arguments in case other code try-excepts it.
+
+    .. image:: _static/adb.usb_exceptions.FormatMessageWithArgumentsException.CALL_GRAPH.svg
 
     Parameters
     ----------
@@ -41,15 +47,25 @@ class FormatMessageWithArgumentsException(CommonUsbError):
 
 
 class DeviceNotFoundError(FormatMessageWithArgumentsException):
-    """Device isn't on USB."""
+    """Device isn't on USB.
+
+    .. image:: _static/adb.usb_exceptions.DeviceNotFoundError.CALL_GRAPH.svg
+
+    """
 
 
 class DeviceAuthError(FormatMessageWithArgumentsException):
-    """Device authentication failed."""
+    """Device authentication failed.
+
+    .. image:: _static/adb.usb_exceptions.DeviceAuthError.CALL_GRAPH.svg
+
+    """
 
 
 class LibusbWrappingError(CommonUsbError):
     """Wraps libusb1 errors while keeping its original usefulness.
+
+    .. image:: _static/adb.usb_exceptions.LibusbWrappingError.CALL_GRAPH.svg
 
     Parameters
     ----------
@@ -74,20 +90,40 @@ class LibusbWrappingError(CommonUsbError):
 
 
 class WriteFailedError(LibusbWrappingError):
-    """Raised when the device doesn't accept our command."""
+    """Raised when the device doesn't accept our command.
+
+    .. image:: _static/adb.usb_exceptions.WriteFailedError.CALL_GRAPH.svg
+
+    """
 
 
 class ReadFailedError(LibusbWrappingError):
-    """Raised when the device doesn't respond to our commands."""
+    """Raised when the device doesn't respond to our commands.
+
+    .. image:: _static/adb.usb_exceptions.ReadFailedError.CALL_GRAPH.svg
+
+    """
 
 
 class AdbCommandFailureException(Exception):
-    """ADB Command returned a FAIL."""
+    """ADB Command returned a FAIL.
+
+    .. image:: _static/adb.usb_exceptions.AdbCommandFailureException.CALL_GRAPH.svg
+
+    """
 
 
 class AdbOperationException(Exception):
-    """Failed to communicate over adb with device after multiple retries."""
+    """Failed to communicate over adb with device after multiple retries.
+
+    .. image:: _static/adb.usb_exceptions.AdbOperationException.CALL_GRAPH.svg
+
+    """
 
 
 class TcpTimeoutException(FormatMessageWithArgumentsException):
-    """TCP connection timed out in the time out given."""
+    """TCP connection timed out in the time out given.
+
+    .. image:: _static/adb.usb_exceptions.TcpTimeoutException.CALL_GRAPH.svg
+
+    """

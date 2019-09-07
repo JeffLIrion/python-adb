@@ -141,11 +141,30 @@ class AuthSigner(object):
     """Signer for use with authenticated ADB, introduced in 4.4.x/KitKat."""
 
     def Sign(self, data):
-        """Signs given data using a private key."""
+        """Signs given data using a private key.
+
+        Parameters
+        ----------
+        data : TODO
+            TODO
+
+        Raises
+        ------
+        NotImplementedError
+            This method is implemented in subclasses.
+
+        """
         raise NotImplementedError()
 
     def GetPublicKey(self):
-        """Returns the public key in PEM format without headers or newlines."""
+        """Returns the public key in PEM format without headers or newlines.
+
+        Raises
+        ------
+        NotImplementedError
+            This method is implemented in subclasses.
+
+        """
         raise NotImplementedError()
 
 
@@ -218,6 +237,13 @@ class _AdbConnection(object):
         int
             ``len(data)``
 
+        Raises
+        ------
+        usb_exceptions.AdbCommandFailureException
+            The command failed.
+        InvalidCommandError
+            Expected an OKAY in response to a WRITE, got something else.
+
         """
         self._Send(b'WRTE', arg0=self.local_id, arg1=self.remote_id, data=data)
         # Expect an ack in response.
@@ -258,9 +284,16 @@ class _AdbConnection(object):
         data : TODO
             TODO
 
+        Raises
+        ------
+        InterleavedDataError
+            We don't support multiple streams...
+        InvalidResponseError
+            Incorrect remote id.
+
         """
-        cmd, remote_id, local_id, data = AdbMessage.Read(
-            self.usb, expected_cmds, self.timeout_ms)
+        cmd, remote_id, local_id, data = AdbMessage.Read(self.usb, expected_cmds, self.timeout_ms)
+
         if local_id not in (0, self.local_id):
             raise InterleavedDataError("We don't support multiple streams...")
         if remote_id not in (0, self.remote_id):
@@ -301,6 +334,13 @@ class _AdbConnection(object):
 
         .. image:: _static/adb.adb_protocol._AdbConnection.Close.CALLER_GRAPH.svg
 
+        Raises
+        ------
+        usb_exceptions.AdbCommandFailureException
+            Command failed.
+        InvalidCommandError
+            Expected a ``CLSE`` response but received something else.
+
         """
         self._Send(b'CLSE', arg0=self.local_id, arg1=self.remote_id)
         cmd, data = self.ReadUntil(b'CLSE')
@@ -316,7 +356,8 @@ class AdbMessage(object):
     Notes
     -----
 
-    **local_id/remote_id**
+    local_id/remote_id
+    ******************
 
     Turns out the documentation is host/device ambidextrous, so ``local_id`` is the id for 'the sender' and
     ``remote_id`` is for 'the recipient'. So since we're only on the host, we'll re-document with host_id and device_id:
@@ -333,8 +374,8 @@ class AdbMessage(object):
 
     Parameters
     ----------
-    command : TODO, None
-        TODO
+    command : bytes, None
+        One of: ``[b'SYNC', b'CNXN', b'AUTH', b'OPEN', b'OKAY', b'CLSE', b'WRTE']``
     arg0 : TODO, None
         TODO
     arg1 : TODO, None
@@ -344,6 +385,8 @@ class AdbMessage(object):
 
     Attributes
     ----------
+    command : int
+        The value in :const:`AdbMessage.commands` that corresponds to the ``command`` parameter
     commands : dict
         A dictionary with keys ``[b'SYNC', b'CNXN', b'AUTH', b'OPEN', b'OKAY', b'CLSE', b'WRTE']``.
     connections : int
@@ -456,6 +499,11 @@ class AdbMessage(object):
         unused_magic : TODO
             TODO
 
+        Raises
+        ------
+        ValueError
+            Unable to unpack the ADB command.
+
         """
         try:
             cmd, arg0, arg1, data_length, data_checksum, unused_magic = struct.unpack(cls.format, message)
@@ -508,6 +556,15 @@ class AdbMessage(object):
             TODO
         bytes
             TODO
+
+        Raises
+        ------
+        InvalidCommandError
+            Unknown command.
+        InvalidCommandError
+            Never got one of the expected responses.
+        InvalidChecksumError
+            Received checksum does not match the expected checksum.
 
         """
         total_timeout_ms = usb.Timeout(total_timeout_ms)
@@ -582,6 +639,8 @@ class AdbMessage(object):
             When the device expects authentication, but we weren't given any valid keys.
         adb.adb_protocol.InvalidResponseError
             When the device does authentication in an unexpected way.
+        usb_exceptions.ReadFailedError
+            TODO
 
         """
         # In py3, convert unicode to bytes. In py2, convert str to bytes.
@@ -650,7 +709,7 @@ class AdbMessage(object):
 
         Returns
         -------
-        _AdbConnection
+        _AdbConnection, None
             The local connection id.
 
         Raises
@@ -744,7 +803,7 @@ class AdbMessage(object):
 
         Yields
         ------
-        TODO
+        str
             The responses from the service.
 
         Raises

@@ -227,7 +227,7 @@ class AdbCommands(object):
         Returns
         -------
         bool
-            An instance of this class if the device connected successfully.
+            ``True``
 
         """
         if not banner:
@@ -246,7 +246,7 @@ class AdbCommands(object):
 
     @classmethod
     def Devices(cls):
-        """Get a generator of UsbHandle for devices available.
+        """Get a generator of :py:class:`~adb.common.UsbHandle` for devices available.
 
         Returns
         -------
@@ -285,20 +285,20 @@ class AdbCommands(object):
         apk_path : TODO
             Local path to apk to install.
         destination_dir : str
-            Optional destination directory. Use /system/app/ for persistent applications.
+            Optional destination directory. Use ``/system/app/`` for persistent applications.
         replace_existing : bool
-            whether to replace existing application
+            Whether to replace existing application
         grant_permissions : bool
-            If True, grant all permissions to the app specified in its manifest
+            If ``True``, grant all permissions to the app specified in its manifest
         timeout_ms : TODO, None
             Expected timeout for pushing and installing.
         transfer_progress_callback : TODO, None
-            callback method that accepts filename, bytes_written and total_bytes of APK transfer
+            callback method that accepts ``filename``, ``bytes_written``, and ``total_bytes`` of APK transfer
 
         Returns
         -------
         ret : TODO
-            The pm install output.
+            The ``pm install`` output.
 
         """
         if not destination_dir:
@@ -332,14 +332,14 @@ class AdbCommands(object):
         package_name : TODO
             Package name of target package.
         keep_data : bool
-            whether to keep the data and cache directories
+            Whether to keep the data and cache directories
         timeout_ms : TODO, None
             Expected timeout for pushing and installing.
 
         Returns
         -------
         TODO
-            The pm uninstall output.
+            The ``pm uninstall`` output.
 
         """
         cmd = ['pm uninstall']
@@ -367,10 +367,10 @@ class AdbCommands(object):
         timeout_ms : TODO, None
             Expected timeout for any part of the push.
         progress_callback : TODO, None
-            callback method that accepts filename, bytes_written and total_bytes, total_bytes will be -1 for file-like
+            Callback method that accepts filename, bytes_written and total_bytes, total_bytes will be -1 for file-like
             objects
         st_mode : TODO, None
-            stat mode for filename
+            Stat mode for filename
 
         """
         if isinstance(source_file, str):
@@ -399,18 +399,23 @@ class AdbCommands(object):
         ----------
         device_filename : TODO
             Filename on the device to pull.
-        dest_file : TODO, None
+        dest_file : str, file, io.IOBase, None
             If set, a filename or writable file-like object.
         timeout_ms : TODO, None
             Expected timeout for any part of the pull.
         progress_callback : TODO, None
-            callback method that accepts filename, bytes_written and total_bytes, total_bytes will be -1 for file-like
+            Callback method that accepts filename, bytes_written and total_bytes, total_bytes will be -1 for file-like
             objects
 
         Returns
         -------
         TODO
-            The file data if dest_file is not set. Otherwise, True if the destination file exists
+            The file data if ``dest_file`` is not set. Otherwise, ``True`` if the destination file exists
+
+        Raises
+        ------
+        ValueError
+            If ``dest_file`` is of unknown type.
 
         """
         if not dest_file:
@@ -420,7 +425,7 @@ class AdbCommands(object):
         elif isinstance(dest_file, file_types):
             pass
         else:
-            raise ValueError("destfile is of unknown type")
+            raise ValueError("dest_file is of unknown type")
 
         conn = self.protocol_handler.Open(
             self._handle, destination=b'sync:', timeout_ms=timeout_ms)
@@ -439,7 +444,7 @@ class AdbCommands(object):
         return True
 
     def Stat(self, device_filename):
-        """Get a file's stat() information.
+        """Get a file's ``stat()`` information.
 
         .. image:: _static/adb.adb_commands.AdbCommands.Stat.CALLER_GRAPH.svg
 
@@ -491,7 +496,7 @@ class AdbCommands(object):
         Parameters
         ----------
         destination : bytes
-            Specify 'bootloader' for fastboot.
+            Specify ``'bootloader'`` for fastboot.
 
         """
         self.protocol_handler.Open(self._handle, b'reboot:%s' % destination)
@@ -516,7 +521,7 @@ class AdbCommands(object):
         return self.protocol_handler.Command(self._handle, service=b'remount')
 
     def Root(self):
-        """Restart adbd as root on the device.
+        """Restart ``adbd`` as root on the device.
 
         Returns
         -------

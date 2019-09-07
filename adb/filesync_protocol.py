@@ -126,7 +126,7 @@ class FilesyncProtocol(object):
 
         Returns
         -------
-        files : List
+        files : list
             TODO
 
         """

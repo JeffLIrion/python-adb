@@ -17,9 +17,9 @@
 
 # Documentation Skeleton
 
-[ ] `adb_commands.py`
-[ ] `adb_debug.py`
-[ ] `adb_protocol.py`
+[x] `adb_commands.py`
+[x] `adb_debug.py`
+[x] `adb_protocol.py`
 [ ] `common_cli.py`
 [ ] `common.py`
 [ ] `fastboot_debug.py`

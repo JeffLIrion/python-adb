@@ -119,6 +119,13 @@ def List(device, device_path):
 def Logcat(device, *options):
     """TODO
 
+    Parameters
+    ----------
+    device : TODO
+        TODO
+    options : TODO
+        TODO
+
     Returns
     -------
     TODO

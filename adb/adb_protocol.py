@@ -241,7 +241,7 @@ class _AdbConnection(object):
         ------
         usb_exceptions.AdbCommandFailureException
             The command failed.
-        InvalidCommandError
+        adb.adb_protocol.InvalidCommandError
             Expected an OKAY in response to a WRITE, got something else.
 
         """
@@ -286,9 +286,9 @@ class _AdbConnection(object):
 
         Raises
         ------
-        InterleavedDataError
+        adb.adb_protocol.InterleavedDataError
             We don't support multiple streams...
-        InvalidResponseError
+        adb.adb_protocol.InvalidResponseError
             Incorrect remote id.
 
         """
@@ -338,7 +338,7 @@ class _AdbConnection(object):
         ------
         usb_exceptions.AdbCommandFailureException
             Command failed.
-        InvalidCommandError
+        adb.adb_protocol.InvalidCommandError
             Expected a ``CLSE`` response but received something else.
 
         """
@@ -559,11 +559,9 @@ class AdbMessage(object):
 
         Raises
         ------
-        InvalidCommandError
-            Unknown command.
-        InvalidCommandError
-            Never got one of the expected responses.
-        InvalidChecksumError
+        adb.adb_protocol.InvalidCommandError
+            Unknown command *or* never got one of the expected responses.
+        adb.adb_protocol.InvalidChecksumError
             Received checksum does not match the expected checksum.
 
         """
@@ -746,7 +744,7 @@ class AdbMessage(object):
     def Command(cls, usb, service, command='', timeout_ms=None):
         """One complete set of USB packets for a single command.
 
-        Sends service:command in a new connection, reading the data for the
+        Sends ``service:command`` in a new connection, reading the data for the
         response. All the data is held in memory, large responses will be slow and
         can fill up memory.
 
@@ -782,7 +780,7 @@ class AdbMessage(object):
     def StreamingCommand(cls, usb, service, command='', timeout_ms=None):
         """One complete set of USB packets for a single command.
 
-        Sends service:command in a new connection, reading the data for the
+        Sends ``service:command`` in a new connection, reading the data for the
         response. All the data is held in memory, large responses will be slow and
         can fill up memory.
 

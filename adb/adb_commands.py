@@ -71,7 +71,7 @@ class AdbCommands(object):
         TODO
     _service_connections : dict
         [TODO] Connection table tracks each open AdbConnection objects per service type for program functions that
-        choose to persist an AdbConnection object for their functionality, using `AdbCommands._get_service_connection`
+        choose to persist an AdbConnection object for their functionality, using :func:`AdbCommands._get_service_connection`
 
     """
     protocol_handler = adb_protocol.AdbMessage

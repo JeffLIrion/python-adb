@@ -2,6 +2,12 @@ python-adb
 ==========
 
  
+.. image:: https://coveralls.io/repos/github/JeffLIrion/python-adb/badge.svg?branch=documentation
+  :target: https://coveralls.io/github/JeffLIrion/python-adb?branch=documentation
+
+.. image:: https://travis-ci.com/JeffLIrion/python-adb.svg?branch=documentation
+    :target: https://travis-ci.com/JeffLIrion/python-adb
+
 
 .. image:: https://coveralls.io/repos/github/google/python-adb/badge.svg?branch=master
    :target: https://coveralls.io/github/google/python-adb?branch=master

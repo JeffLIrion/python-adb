@@ -20,12 +20,7 @@ call android's fastboot, but this only accepts usb paths and no serials.
 """
 
 import argparse
-
-try:
-    from inspect import getfullargspec
-except ImportError:
-    from inspect import getargspec as getfullargspec
-
+import inspect
 import logging
 import sys
 
@@ -39,7 +34,7 @@ except ImportError:
     progressbar = None
 
 
-def Devices(args):
+def Devices():
     """Lists the available devices.
 
     ::
@@ -93,8 +88,8 @@ def main():
     parser = argparse.ArgumentParser(description=sys.modules[__name__].__doc__, parents=[common])
     subparsers = parser.add_subparsers(title='Commands', dest='command_name')
 
-    subparser = subparsers.add_parser(name='help', help='Prints the commands available')
-    subparser = subparsers.add_parser(name='devices', help='Lists the available devices', parents=[common])
+    subparser = subparsers.add_parser(name='help', help='Prints the commands available')  # pylint: disable=unused-variable
+    subparser = subparsers.add_parser(name='devices', help='Lists the available devices', parents=[common])  # noqa: F841
 
     common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Continue)
     common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Download, {'source_file': 'Filename on the host to push'})
@@ -112,13 +107,13 @@ def main():
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
     if args.command_name == 'devices':
-        return Devices(args)
+        return Devices()
     if args.command_name == 'help':
         parser.print_help()
         return 0
 
     kwargs = {}
-    argspec = getfullargspec(args.method)
+    argspec = inspect.getfullargspec(args.method)
     if 'info_cb' in argspec.args:
         kwargs['info_cb'] = _InfoCb
     if 'progress_callback' in argspec.args and progressbar:

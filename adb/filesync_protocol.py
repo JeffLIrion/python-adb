@@ -115,6 +115,21 @@ class FilesyncProtocol(object):
 
     @classmethod
     def List(cls, connection, path):
+        """TODO
+
+        Parameters
+        ----------
+        connection : TODO
+            TODO
+        path : TODO
+            TODO
+
+        Returns
+        -------
+        files : List
+            TODO
+
+        """
         cnxn = FileSyncConnection(connection, b'<5I')
         cnxn.Send(b'LIST', path)
         files = []

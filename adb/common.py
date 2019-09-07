@@ -19,18 +19,27 @@ Common usb browsing, and usb communication.
 
 import logging
 import platform
+import re
+import select
 import socket
 import threading
 import weakref
-import select
 
 import libusb1
 import usb1
+
+try:
+    from libusb1 import LIBUSB_ERROR_NOT_FOUND, LIBUSB_ERROR_TIMEOUT  # pylint: disable=ungrouped-imports
+except ImportError:
+    LIBUSB_ERROR_NOT_FOUND = 'LIBUSB_ERROR_NOT_FOUND'
+    LIBUSB_ERROR_TIMEOUT = 'LIBUSB_ERROR_TIMEOUT'
 
 from adb import usb_exceptions
 
 #: Default timeout
 DEFAULT_TIMEOUT_MS = 10000
+
+SYSFS_PORT_SPLIT_RE = re.compile("[,/:.-]")
 
 _LOG = logging.getLogger('android_usb')
 
@@ -149,7 +158,7 @@ class UsbHandle(object):
             if (platform.system() != 'Windows' and handle.kernelDriverActive(iface_number)):
                 handle.detachKernelDriver(iface_number)
         except libusb1.USBError as e:
-            if e.value == libusb1.LIBUSB_ERROR_NOT_FOUND:
+            if e.value == LIBUSB_ERROR_NOT_FOUND:
                 _LOG.warning('Kernel driver not found for interface: %s.', iface_number)
             else:
                 raise
@@ -217,7 +226,7 @@ class UsbHandle(object):
             try:
                 self.BulkRead(self._max_read_packet_len, timeout_ms=10)
             except usb_exceptions.ReadFailedError as e:
-                if e.usb_error.value == libusb1.LIBUSB_ERROR_TIMEOUT:
+                if e.usb_error.value == LIBUSB_ERROR_TIMEOUT:
                     break
                 raise
 
@@ -296,9 +305,14 @@ class UsbHandle(object):
         timeout_ms : TODO, None
             TODO
 
+        Raises
+        ------
+        NotImplementedError
+            This is always raised because this method is not implemented.
+
         """
         # See: https://pypi.python.org/pypi/libusb1 "Asynchronous I/O" section
-        return
+        raise NotImplementedError
 
     @classmethod
     def PortPathMatcher(cls, port_path):
@@ -538,4 +552,12 @@ class TcpHandle(object):
         return timeout / 1000.0 if timeout is not None else timeout
 
     def Close(self):
+        """TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+
+        """
         return self._connection.close()

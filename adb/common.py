@@ -15,6 +15,39 @@
 """Common code for ADB and Fastboot.
 
 Common usb browsing, and usb communication.
+
+* :func:`GetInterface`
+* :func:`InterfaceMatcher`
+* :class:`TcpHandle`
+
+    * :meth:`TcpHandle._connect`
+    * :meth:`TcpHandle.BulkRead`
+    * :meth:`TcpHandle.BulkWrite`
+    * :meth:`TcpHandle.Close`
+    * :meth:`TcpHandle.serial_number`
+    * :meth:`TcpHandle.Timeout`
+    * :meth:`TcpHandle.TimeoutSeconds`
+
+* :class:`UsbHandle`
+
+    * :meth:`UsbHandle.BulkRead`
+    * :meth:`UsbHandle.BulkReadAsync`
+    * :meth:`UsbHandle.BulkWrite`
+    * :meth:`UsbHandle.Close`
+    * :meth:`UsbHandle.Find`
+    * :meth:`UsbHandle.FindAndOpen`
+    * :meth:`UsbHandle.FindDevices`
+    * :meth:`UsbHandle.FindFirst`
+    * :meth:`UsbHandle.FlushBuffers`
+    * :meth:`UsbHandle.Open`
+    * :meth:`UsbHandle.port_path`
+    * :meth:`UsbHandle.PortPathMatcher`
+    * :meth:`UsbHandle.serial_number`
+    * :meth:`UsbHandle.SerialMatcher`
+    * :meth:`UsbHandle.Timeout`
+    * :meth:`UsbHandle.usb_info`
+
+
 """
 
 import logging
@@ -30,7 +63,7 @@ import usb1
 
 try:
     from libusb1 import LIBUSB_ERROR_NOT_FOUND, LIBUSB_ERROR_TIMEOUT  # pylint: disable=ungrouped-imports
-except ImportError:
+except ImportError:  # pragma: no cover
     LIBUSB_ERROR_NOT_FOUND = 'LIBUSB_ERROR_NOT_FOUND'
     LIBUSB_ERROR_TIMEOUT = 'LIBUSB_ERROR_TIMEOUT'
 

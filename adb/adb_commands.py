@@ -21,6 +21,33 @@ random exit codes, and all the other great benefits from not going through
 subprocess and a network socket.
 
 All timeouts are in milliseconds.
+
+* :class:`AdbCommands`
+
+    * :meth:`AdbCommands.__reset`
+    * :meth:`AdbCommands._Connect`
+    * :meth:`AdbCommands._get_service_connection`
+    * :meth:`AdbCommands.Close`
+    * :meth:`AdbCommands.ConnectDevice`
+    * :meth:`AdbCommands.Devices`
+    * :meth:`AdbCommands.DisableVerity`
+    * :meth:`AdbCommands.EnableVerity`
+    * :meth:`AdbCommands.GetState`
+    * :meth:`AdbCommands.Install`
+    * :meth:`AdbCommands.InteractiveShell`
+    * :meth:`AdbCommands.List`
+    * :meth:`AdbCommands.Logcat`
+    * :meth:`AdbCommands.Pull`
+    * :meth:`AdbCommands.Push`
+    * :meth:`AdbCommands.Reboot`
+    * :meth:`AdbCommands.RebootBootloader`
+    * :meth:`AdbCommands.Remount`
+    * :meth:`AdbCommands.Root`
+    * :meth:`AdbCommands.Shell`
+    * :meth:`AdbCommands.Stat`
+    * :meth:`AdbCommands.StreamingShell`
+    * :meth:`AdbCommands.Uninstall`
+
 """
 
 import io

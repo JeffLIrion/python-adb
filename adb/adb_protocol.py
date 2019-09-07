@@ -16,6 +16,36 @@
 
 Implements the ADB protocol as seen in android's adb/adbd binaries, but only the
 host side.
+
+* :class:`_AdbConnection`
+
+    * :meth:`_AdbConnection.Close`
+    * :meth:`_AdbConnection.Okay`
+    * :meth:`_AdbConnection.ReadUntil`
+    * :meth:`_AdbConnection.ReadUntilClose`
+    * :meth:`_AdbConnection.Write`
+
+* :class:`AdbMessage`
+
+    * :meth:`AdbMessage.CalculateChecksum`
+    * :meth:`AdbMessage.checksum`
+    * :meth:`AdbMessage.Command`
+    * :meth:`AdbMessage.Connect`
+    * :meth:`AdbMessage.InteractiveShellCommand`
+    * :meth:`AdbMessage.Open`
+    * :meth:`AdbMessage.Pack`
+    * :meth:`AdbMessage.Read`
+    * :meth:`AdbMessage.Send`
+    * :meth:`AdbMessage.StreamingCommand`
+    * :meth:`AdbMessage.Unpack`
+
+* :class:`AuthSigner`
+
+    * :meth:`AuthSigner.GetPublicKey`
+    * :meth:`AuthSigner.Sign`
+
+* :func:`find_backspace_runs`
+* :func:`MakeWireIDs`
 """
 
 import struct

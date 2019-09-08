@@ -22,8 +22,8 @@
 - [x] `adb_protocol.py`
 - [ ] `common_cli.py`
 - [ ] `common.py`
-- [ ] `fastboot_debug.py`
-- [ ] `fastboot.py`
+- [x] `fastboot_debug.py`
+- [x] `fastboot.py`
 - [ ] `filesync_protocol.py`
 - [x] `__init__.py`
 - [x] `sign_cryptography.py`

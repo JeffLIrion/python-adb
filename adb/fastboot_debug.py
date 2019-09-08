@@ -45,11 +45,6 @@ def Devices():
 
     .. image:: _static/adb.fastboot_debug.Devices.CALLER_GRAPH.svg
 
-    Parameters
-    ----------
-    args
-        CLI arguments (not used).
-
     Returns
     -------
     int

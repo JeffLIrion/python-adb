@@ -88,20 +88,24 @@ class FastbootProtocol(object):
 
     .. image:: _static/adb.fastboot.FastbootProtocol.__init__.CALLER_GRAPH.svg
 
+    Parameters
+    ----------
+    usb : adb.common.UsbHandle
+        :class:`adb.common.UsbHandle` instance.
+    chunk_kb : int
+        Packet size. For older devices, 4 may be required.
+
+    Attributes
+    ----------
+    chunk_kb : int
+        Packet size. For older devices, 4 may be required.
+    usb : adb.common.UsbHandle
+        :class:`adb.common.UsbHandle` instance.
+
     """
     FINAL_HEADERS = {b'OKAY', b'DATA'}
 
     def __init__(self, usb, chunk_kb=1024):
-        """Constructs a FastbootProtocol instance.
-
-        Parameters
-        ----------
-        usb : TODO
-            UsbHandle instance.
-        chunk_kb : int
-            Packet size. For older devices, 4 may be required.
-
-        """
         self.usb = usb
         self.chunk_kb = chunk_kb
 
@@ -111,8 +115,8 @@ class FastbootProtocol(object):
 
         Returns
         -------
-        self.usb : TODO
-            TODO
+        self.usb : adb.common.UsbHandle
+            :class:`adb.common.UsbHandle` instance.
 
         """
         return self.usb
@@ -204,9 +208,10 @@ class FastbootProtocol(object):
         accepted_size = binascii.unhexlify(accepted_size[:8])
         accepted_size, = struct.unpack(b'>I', accepted_size)
         if accepted_size != source_len:
-            raise FastbootTransferError(
-                'Device refused to download {0} bytes of data (accepts {1} bytes)'.format(source_len, accepted_size))
+            raise FastbootTransferError('Device refused to download {0} bytes of data (accepts {1} bytes)'.format(source_len, accepted_size))
+
         self._Write(source_file, accepted_size, progress_callback)
+
         return self._AcceptResponses(b'OKAY', info_cb, timeout_ms=timeout_ms)
 
     def _AcceptResponses(self, expected_header, info_cb, timeout_ms=None):
@@ -255,8 +260,7 @@ class FastbootProtocol(object):
                 info_cb(FastbootMessage(remaining, header))
                 raise FastbootRemoteFailure('FAIL: {0}'.format(remaining))
             else:
-                raise FastbootInvalidResponse(
-                    'Got unknown header {0} and response {1}'.format(header, remaining))
+                raise FastbootInvalidResponse('Got unknown header {0} and response {1}'.format(header, remaining))
 
     @staticmethod
     def _HandleProgress(total, progress_callback):
@@ -278,8 +282,7 @@ class FastbootProtocol(object):
             try:
                 progress_callback(current, total)
             except Exception:  # pylint: disable=broad-except
-                _LOG.exception('Progress callback raised an exception. %s',
-                               progress_callback)
+                _LOG.exception('Progress callback raised an exception. %s', progress_callback)
                 continue
 
     def _Write(self, data, length, progress_callback=None):
@@ -316,23 +319,15 @@ class FastbootCommands(object):
 
     .. image:: _static/adb.fastboot.FastbootCommands.__init__.CALLER_GRAPH.svg
 
+    Attributes
+    ----------
+    _handle : TODO, None
+        TODO
+    _protocol : TODO, None
+        TODO
+
     """
     def __init__(self):
-        """Constructs a FastbootCommands instance.
-
-        Parameters
-        ----------
-        usb : TODO
-            UsbHandle instance.
-
-        Attributes
-        ----------
-        _handle : TODO, None
-            TODO
-        _protocol : TODO, None
-            TODO
-
-        """
         self._handle = None
         self._protocol = None
 
@@ -350,7 +345,7 @@ class FastbootCommands(object):
 
         Returns
         -------
-        self._handle
+        self._handle : TODO
             TODO
 
         """
@@ -376,7 +371,7 @@ class FastbootCommands(object):
             Amount of data, in kilobytes, to break fastboot packets up into
         **kwargs : dict
             Keyword arguments
-        handle : common.TcpHandle, common.UsbHandle
+        handle : adb.common.TcpHandle, adb.common.UsbHandle
             Device handle to use
         banner : TODO
             Connection banner to pass to the remote device
@@ -482,6 +477,7 @@ class FastbootCommands(object):
             source_file, source_len=source_len, info_cb=info_cb,
             progress_callback=progress_callback)
         flash_response = self.Flash(partition, info_cb=info_cb)
+
         return download_response + flash_response
 
     def Download(self, source_file, source_len=0,
@@ -521,8 +517,8 @@ class FastbootCommands(object):
                 source_len = len(data)
 
             self._protocol.SendCommand(b'download', b'%08x' % source_len)
-            return self._protocol.HandleDataSending(
-                source_file, source_len, info_cb, progress_callback=progress_callback)
+
+            return self._protocol.HandleDataSending(source_file, source_len, info_cb, progress_callback=progress_callback)
 
     def Flash(self, partition, timeout_ms=0, info_cb=DEFAULT_MESSAGE_CALLBACK):
         """Flashes the last downloaded file to the given partition.
@@ -538,15 +534,14 @@ class FastbootCommands(object):
         timeout_ms : int
             Optional timeout in milliseconds to wait for it to finish.
         info_cb : TODO
-            See Download. Usually no messages.
+            See :meth:`FastbootCommands.Download`. Usually no messages.
 
         Returns
         -------
         TODO
             Response to a download request, normally nothing.
         """
-        return self._SimpleCommand(b'flash', arg=partition, info_cb=info_cb,
-                                   timeout_ms=timeout_ms)
+        return self._SimpleCommand(b'flash', arg=partition, info_cb=info_cb, timeout_ms=timeout_ms)
 
     def Erase(self, partition, timeout_ms=None):
         """Erases the given partition.
@@ -573,12 +568,12 @@ class FastbootCommands(object):
         var : TODO
             A variable the bootloader tracks. Use 'all' to get them all.
         info_cb : TODO
-            See Download. Usually no messages.
+            See :meth:`FastbootCommands.Download`. Usually no messages.
 
         Returns
         -------
         TODO
-            Value of var according to the current bootloader.
+            Value of ``var`` according to the current bootloader.
 
         """
         return self._SimpleCommand(b'getvar', arg=var, info_cb=info_cb)
@@ -595,7 +590,7 @@ class FastbootCommands(object):
         timeout_ms : TODO, None
             Optional timeout in milliseconds to wait for a response.
         info_cb : TODO
-            See Download. Messages vary based on command.
+            See :meth:`FastbootCommands.Download`. Messages vary based on command.
 
         Returns
         -------
@@ -603,8 +598,8 @@ class FastbootCommands(object):
         """
         if not isinstance(command, bytes):
             command = command.encode('utf8')
-        return self._SimpleCommand(
-            b'oem %s' % command, timeout_ms=timeout_ms, info_cb=info_cb)
+
+        return self._SimpleCommand(b'oem %s' % command, timeout_ms=timeout_ms, info_cb=info_cb)
 
     def Continue(self):
         """Continues execution past fastboot into the system.
@@ -637,8 +632,7 @@ class FastbootCommands(object):
             Usually the empty string. Depends on the bootloader and the target_mode.
 
         """
-        return self._SimpleCommand(
-            b'reboot', arg=target_mode or None, timeout_ms=timeout_ms)
+        return self._SimpleCommand(b'reboot', arg=target_mode or None, timeout_ms=timeout_ms)
 
     def RebootBootloader(self, timeout_ms=None):
         """Reboots into the bootloader, usually equiv to Reboot('bootloader').

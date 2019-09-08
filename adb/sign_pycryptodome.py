@@ -30,15 +30,15 @@ class PycryptodomeAuthSigner(adb_protocol.AuthSigner):
 
     Parameters
     ----------
-    rsa_key_path : TODO, None
-        TODO
+    rsa_key_path : str, None
+        The path to the private key
 
     Attributes
     ----------
-    public_key : TODO
-        TODO
-    rsa_key : TODO
-        TODO
+    public_key : str
+        The contents of the public key file
+    rsa_key : str
+        The contents of the private key file
 
     """
     def __init__(self, rsa_key_path=None):
@@ -74,7 +74,7 @@ class PycryptodomeAuthSigner(adb_protocol.AuthSigner):
         Returns
         -------
         self.public_key : str
-            The public key
+            The contents of the public key file
 
         """
         return self.public_key

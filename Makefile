@@ -12,4 +12,12 @@ docs:
 
 .PHONY: coverage
 coverage:
-	coverage run --source adb setup.py test && coverage html && coverage report
+	coverage run --source adb setup.py test && coverage html && coverage report -m
+
+.PHONY: lint
+lint:
+	flake8 adb/ && pylint adb/
+
+.PHONY: alltests
+alltests:
+	flake8 adb/ && pylint adb/ && coverage run --source adb setup.py test && coverage report -m

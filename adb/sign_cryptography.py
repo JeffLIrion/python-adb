@@ -38,8 +38,8 @@ class CryptographySigner(adb_protocol.AuthSigner):
 
     Attributes
     ----------
-    public_key : TODO
-        TODO
+    public_key : str
+        The contents of the public key file
     rsa_key : TODO
         TODO
 
@@ -65,8 +65,7 @@ class CryptographySigner(adb_protocol.AuthSigner):
             The signed ``data``
 
         """
-        return self.rsa_key.sign(
-            data, padding.PKCS1v15(), utils.Prehashed(hashes.SHA1()))
+        return self.rsa_key.sign(data, padding.PKCS1v15(), utils.Prehashed(hashes.SHA1()))
 
     def GetPublicKey(self):
         """Returns the public key in PEM format without headers or newlines.
@@ -74,7 +73,7 @@ class CryptographySigner(adb_protocol.AuthSigner):
         Returns
         -------
         self.public_key : str
-            The public key
+            The contents of the public key file
 
         """
         return self.public_key

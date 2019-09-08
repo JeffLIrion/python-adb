@@ -43,7 +43,14 @@ class _Accum(object):
         self._buf = b''
 
     def update(self, msg):
-        """TODO"""
+        """TODO
+
+        Parameters
+        ----------
+        msg : TODO
+            TODO
+
+        """
         self._buf += msg
 
     def digest(self):
@@ -108,7 +115,7 @@ class PythonRSASigner(adb_protocol.AuthSigner):
     ----------
     priv_key : TODO
         TODO
-    pub_key : TODO
+    pub_key : TODO, None
         TODO
 
     """
@@ -118,7 +125,7 @@ class PythonRSASigner(adb_protocol.AuthSigner):
 
     @classmethod
     def FromRSAKeyPath(cls, rsa_key_path):
-        """TODO
+        """Create a :class:`PythonRSASigner` instance using the provided private key.
 
         Parameters
         ----------
@@ -128,7 +135,7 @@ class PythonRSASigner(adb_protocol.AuthSigner):
         Returns
         -------
         PythonRSASigner
-            TODO
+            A :class:`PythonRSASigner` with private key ``rsa_key_path`` and public key ``rsa_key_path + '.pub'``
 
         """
         with open(rsa_key_path + '.pub') as f:

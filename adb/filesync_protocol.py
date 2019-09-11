@@ -74,8 +74,7 @@ class PullFailedError(Exception):
     """
 
 
-DeviceFile = collections.namedtuple('DeviceFile', [
-    'filename', 'mode', 'size', 'mtime'])
+DeviceFile = collections.namedtuple('DeviceFile', ['filename', 'mode', 'size', 'mtime'])
 
 
 class FilesyncProtocol(object):
@@ -102,6 +101,11 @@ class FilesyncProtocol(object):
             TODO
         mtime : TODO
             TODO
+
+        Raises
+        ------
+        adb.adb_protocol.InvalidResponseError
+            Expected STAT response to STAT, got something else
 
         """
         cnxn = FileSyncConnection(connection, b'<4I')
@@ -145,6 +149,22 @@ class FilesyncProtocol(object):
         """Pull a file from the device into the file-like dest_file.
 
         .. image:: _static/adb.filesync_protocol.FilesyncProtocol.Pull.CALL_GRAPH.svg
+
+        Parameters
+        ----------
+        connection : TODO
+            TODO
+        filename : TODO
+            TODO
+        dest_file : TODO
+            TODO
+        progress_callback : TODO
+            TODO
+
+        Raises
+        ------
+        PullFailedError
+            Unable to pull file
 
         """
         if progress_callback:
@@ -198,12 +218,18 @@ class FilesyncProtocol(object):
 
         Parameters
         ----------
-          connection: ADB connection
-          datafile: File-like object for reading from
-          filename: Filename to push to
-          st_mode: stat mode for filename
-          mtime: modification time
-          progress_callback: callback method that accepts filename, bytes_written and total_bytes
+        connection : TODO
+            ADB connection
+        datafile : TODO
+            File-like object for reading from
+        filename : TODO
+            Filename to push to
+        st_mode : TODO
+            Stat mode for filename
+        mtime : TODO
+            Modification time
+        progress_callback : TODO
+            Callback method that accepts ``filename``, ``bytes_written``, and ``total_bytes``
 
         Raises
         ------
@@ -243,7 +269,33 @@ class FilesyncProtocol(object):
 
 
 class FileSyncConnection(object):
-    """Encapsulate a FileSync service connection."""
+    """Encapsulate a FileSync service connection.
+
+    Parameters
+    ----------
+    adb_connection : TODO
+        TODO
+    recv_header_format : TODO
+        TODO
+
+    Attributes
+    ----------
+    adb : TODO
+        TODO
+    send_buffer : TODO
+        TODO
+    send_idx : TODO
+        TODO
+    send_header_len : TODO
+        TODO
+    recv_buffer : TODO
+        TODO
+    recv_header_format : TODO
+        TODO
+    recv_header_len : TODO
+        TODO
+
+    """
 
     ids = [b'STAT', b'LIST', b'SEND', b'RECV', b'DENT', b'DONE', b'DATA', b'OKAY', b'FAIL', b'QUIT']
     id_to_wire, wire_to_id = adb_protocol.MakeWireIDs(ids)
@@ -272,9 +324,13 @@ class FileSyncConnection(object):
 
         Parameters
         ----------
-          command_id: Command to send.
-          data: Optional data to send, must set data or size.
-          size: Optionally override size from len(data).
+        command_id : TODO
+            Command to send.
+        data : TODO
+            Optional data to send, must set data or size.
+        size : TODO
+            Optionally override size from len(data).
+
         """
         if data:
             if not isinstance(data, bytes):
@@ -293,6 +349,22 @@ class FileSyncConnection(object):
         .. image:: _static/adb.filesync_protocol.FileSyncConnection.Read.CALL_GRAPH.svg
 
         .. image:: _static/adb.filesync_protocol.FileSyncConnection.Read.CALLER_GRAPH.svg
+
+        Parameters
+        ----------
+        expected_ids : TODO
+            TODO
+        read_data : bool
+            TODO
+
+        Returns
+        -------
+        command_id : TODO
+            TODO
+        TODO
+            TODO
+        data : TODO
+            TODO
 
         """
         if self.send_idx:
@@ -326,6 +398,22 @@ class FileSyncConnection(object):
 
         .. image:: _static/adb.filesync_protocol.FileSyncConnection.ReadUntil.CALL_GRAPH.svg
 
+        Parameters
+        ----------
+        expected_ids : TODO
+            TODO
+        finish_ids : TODO
+            TODO
+
+        Yields
+        ------
+        cmd_id : TODO
+            TODO
+        header : TODO
+            TODO
+        data : TODO
+            TODO
+
         """
         while True:
             cmd_id, header, data = self.Read(expected_ids + finish_ids)
@@ -338,6 +426,16 @@ class FileSyncConnection(object):
 
         .. image:: _static/adb.filesync_protocol.FileSyncConnection._CanAddToSendBuffer.CALLER_GRAPH.svg
 
+        Parameters
+        ----------
+        data_len : TODO
+            TODO
+
+        Returns
+        -------
+        bool
+            TODO
+
         """
         added_len = self.send_header_len + data_len
         return self.send_idx + added_len < adb_protocol.MAX_ADB_DATA
@@ -346,6 +444,11 @@ class FileSyncConnection(object):
         """TODO
 
         .. image:: _static/adb.filesync_protocol.FileSyncConnection._Flush.CALLER_GRAPH.svg
+
+        Raises
+        ------
+        adb.usb_exceptions.WriteFailedError
+            Could not send data
 
         """
         try:
@@ -358,6 +461,16 @@ class FileSyncConnection(object):
         """TODO
 
         .. image:: _static/adb.filesync_protocol.FileSyncConnection._ReadBuffered.CALLER_GRAPH.svg
+
+        Parameters
+        ----------
+        size : TODO
+            TODO
+
+        Returns
+        -------
+        result : TODO
+            TODO
 
         """
         # Ensure recv buffer has enough data.

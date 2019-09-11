@@ -20,11 +20,11 @@
 - [x] `adb_commands.py`
 - [x] `adb_debug.py`
 - [x] `adb_protocol.py`
-- [ ] `common_cli.py`
-- [ ] `common.py`
+- [x] `common_cli.py`
+- [ ] `common.py` (left off on line 483)
 - [x] `fastboot_debug.py`
 - [x] `fastboot.py`
-- [ ] `filesync_protocol.py`
+- [x] `filesync_protocol.py`
 - [x] `__init__.py`
 - [x] `sign_cryptography.py`
 - [x] `sign_pycryptodome.py`

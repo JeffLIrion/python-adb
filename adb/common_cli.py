@@ -39,9 +39,7 @@ class _PortPathAction(argparse.Action):
 
     """
     def __call__(self, parser, namespace, values, option_string=None):
-        setattr(
-            namespace, self.dest,
-            [int(i) for i in values.replace('/', ',').split(',')])
+        setattr(namespace, self.dest, [int(i) for i in values.replace('/', ',').split(',')])
 
 
 class PositionalArg(argparse.Action):
@@ -137,6 +135,22 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
 
     .. image:: _static/adb.common_cli.MakeSubparser.CALL_GRAPH.svg
 
+    Parameters
+    ----------
+    subparsers : TODO
+        TODO
+    parents : TODO
+        TODO
+    method : TODO
+        TODO
+    arguments : TODO, None
+        TODO
+
+    Returns
+    -------
+    subparser : TODO
+        TODO
+
     """
     name = ('-'.join(re.split(r'([A-Z][a-z]+)', method.__name__)[1:-1:2])).lower()
     help = method.__doc__.splitlines()[0]  # pylint: disable=redefined-builtin
@@ -175,6 +189,20 @@ def _RunMethod(dev, args, extra):
 
     .. image:: _static/adb.common_cli._RunMethod.CALLER_GRAPH.svg
 
+    Parameters
+    ----------
+    dev : TODO
+        TODO
+    args : TODO
+        TODO
+    extra : TODO
+        TODO
+
+    Returns
+    -------
+    int
+        0
+
     """
     logging.info('%s(%s)', args.method.__name__, ', '.join(args.positional))
     result = args.method(dev, *args.positional, **extra)
@@ -200,6 +228,22 @@ def StartCli(args, adb_commands, extra=None, **device_kwargs):
     """Starts a common CLI interface for this usb path and protocol.
 
     .. image:: _static/adb.common_cli.StartCli.CALL_GRAPH.svg
+
+    Parameters
+    ----------
+    args : TODO
+        TODO
+    adb_commands : TODO
+        TODO
+    extra : TODO, None
+        TODO
+    **device_kwargs : TODO
+        TODO
+
+    Returns
+    -------
+    TODO
+        TODO
 
     """
     try:

@@ -82,6 +82,20 @@ def GetInterface(setting):
 
     .. image:: _static/adb.common.GetInterface.CALLER_GRAPH.svg
 
+    Parameters
+    ----------
+    setting : TODO
+        TODO
+
+    Returns
+    -------
+    TODO
+        TODO
+    TODO
+        TODO
+    TODO
+        TODO
+
     """
     return (setting.getClass(), setting.getSubClass(), setting.getProtocol())
 
@@ -90,6 +104,20 @@ def InterfaceMatcher(clazz, subclass, protocol):
     """Returns a matcher that returns the setting with the given interface.
 
     .. image:: _static/adb.common.InterfaceMatcher.CALL_GRAPH.svg
+
+    Parameters
+    ----------
+    clazz : TODO
+        TODO
+    subclass : TODO
+        TODO
+    protocol : TODO
+        TODO
+
+    Returns
+    -------
+    Matcher : function
+        TODO
 
     """
     interface = (clazz, subclass, protocol)
@@ -116,19 +144,44 @@ class UsbHandle(object):
 
     .. image:: _static/adb.common.UsbHandle.__init__.CALLER_GRAPH.svg
 
+    Parameters
+    ----------
+    device : TODO
+        libusb_device to connect to.
+    setting : TODO
+        libusb setting with the correct endpoints to communicate with.
+    usb_info : TODO, None
+        String describing the usb path/serial/device, for debugging.
+    timeout_ms : TODO, None
+        Timeout in milliseconds for all I/O.
+
+    Attributes
+    ----------
+    _device : TODO
+        libusb_device to connect to.
+    _handle : TODO
+        TODO
+    _interface_number : TODO
+        TODO
+    _max_read_packet_len : TODO
+        TODO
+    _read_endpoint : TODO
+        TODO
+    _setting : TODO
+        libusb setting with the correct endpoints to communicate with.
+    _timeout_ms : TODO, None
+        Timeout in milliseconds for all I/O.
+    _usb_info : TODO
+        String describing the usb path/serial/device, for debugging.
+    _write_endpoint : TODO, None
+        TODO
+
     """
     _HANDLE_CACHE = weakref.WeakValueDictionary()
     _HANDLE_CACHE_LOCK = threading.Lock()
 
     def __init__(self, device, setting, usb_info=None, timeout_ms=None):
-        """Initialize USB Handle.
-
-        Arguments:
-          device: libusb_device to connect to.
-          setting: libusb setting with the correct endpoints to communicate with.
-          usb_info: String describing the usb path/serial/device, for debugging.
-          timeout_ms: Timeout in milliseconds for all I/O.
-        """
+        """Initialize USB Handle."""
         self._setting = setting
         self._device = device
         self._handle = None
@@ -148,6 +201,11 @@ class UsbHandle(object):
         .. image:: _static/adb.common.UsbHandle.usb_info.CALL_GRAPH.svg
 
         .. image:: _static/adb.common.UsbHandle.usb_info.CALLER_GRAPH.svg
+
+        Returns
+        -------
+        TODO
+            TODO
 
         """
         try:
@@ -210,6 +268,11 @@ class UsbHandle(object):
 
         .. image:: _static/adb.common.UsbHandle.serial_number.CALLER_GRAPH.svg
 
+        Returns
+        -------
+        TODO
+            TODO
+
         """
         return self._device.getSerialNumber()
 
@@ -218,6 +281,11 @@ class UsbHandle(object):
         """TODO
 
         .. image:: _static/adb.common.UsbHandle.port_path.CALLER_GRAPH.svg
+
+        Returns
+        -------
+        TODO
+            TODO
 
         """
         return [self._device.getBusNumber()] + self._device.getPortNumberList()
@@ -246,6 +314,11 @@ class UsbHandle(object):
 
         .. image:: _static/adb.common.UsbHandle.Timeout.CALLER_GRAPH.svg
 
+        Returns
+        -------
+        TODO
+            TODO
+
         """
         return timeout_ms if timeout_ms is not None else self._timeout_ms
 
@@ -253,6 +326,11 @@ class UsbHandle(object):
         """TODO
 
         .. image:: _static/adb.common.UsbHandle.FlushBuffers.CALL_GRAPH.svg
+
+        Raises
+        ------
+        adb.usb_exceptions.ReadFailedError
+            TODO
 
         """
         while True:
@@ -279,6 +357,13 @@ class UsbHandle(object):
         -------
         TODO
             TODO
+
+        Raises
+        ------
+        adb.usb_exceptions.WriteFailedError
+            This handle has been closed, probably due to another being opened
+        adb.usb_exceptions.WriteFailedError
+            Could not send data
 
         """
         if self._handle is None:
@@ -311,6 +396,11 @@ class UsbHandle(object):
         -------
         bytearray
             TODO
+
+        Raises
+        ------
+        usb_exceptions.ReadFailedError
+            Could not receive data
 
         """
         if self._handle is None:
@@ -355,6 +445,16 @@ class UsbHandle(object):
 
         .. image:: _static/adb.common.UsbHandle.PortPathMatcher.CALLER_GRAPH.svg
 
+        Parameters
+        ----------
+        port_path : TODO
+            TODO
+
+        Returns
+        -------
+        function
+            TODO
+
         """
         if isinstance(port_path, str):
             # Convert from sysfs path to port_path.
@@ -366,6 +466,16 @@ class UsbHandle(object):
         """Returns a device matcher for the given serial.
 
         .. image:: _static/adb.common.UsbHandle.SerialMatcher.CALLER_GRAPH.svg
+
+        Parameters
+        ----------
+        serial : TODO
+            TODO
+
+        Returns
+        -------
+        function
+            TODO
 
         """
         return lambda device: device.serial_number == serial

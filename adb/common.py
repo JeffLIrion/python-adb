@@ -488,10 +488,24 @@ class UsbHandle(object):
 
         .. image:: _static/adb.common.UsbHandle.FindAndOpen.CALLER_GRAPH.svg
 
+        Parameters
+        ----------
+        setting_matcher : TODO
+            TODO
+        port_path : TODO, None
+            TODO
+        serial : TODO, None
+            TODO
+        timeout_ms : TODO, None
+            TODO
+
+        Returns
+        -------
+        dev : TODO
+            TODO
+
         """
-        dev = cls.Find(
-            setting_matcher, port_path=port_path, serial=serial,
-            timeout_ms=timeout_ms)
+        dev = cls.Find(setting_matcher, port_path=port_path, serial=serial, timeout_ms=timeout_ms)
         dev.Open()
         dev.FlushBuffers()
         return dev
@@ -503,6 +517,22 @@ class UsbHandle(object):
         .. image:: _static/adb.common.UsbHandle.Find.CALL_GRAPH.svg
 
         .. image:: _static/adb.common.UsbHandle.Find.CALLER_GRAPH.svg
+
+        Parameters
+        ----------
+        setting_matcher : TODO
+            TODO
+        port_path : TODO, None
+            TODO
+        serial : TODO, None
+            TODO
+        timeout_ms : TODO, None
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
 
         """
         if port_path:
@@ -527,9 +557,12 @@ class UsbHandle(object):
 
         Parameters
         ----------
-          setting_matcher: See cls.FindDevices.
-          device_matcher: See cls.FindDevices.
-          **kwargs: See cls.FindDevices.
+        setting_matcher : TODO
+            See :meth:`UsbHandle.FindDevices`.
+        device_matcher : TODO
+            See :meth:`UsbHandle.FindDevices`.
+        **kwargs : TODO
+            See :meth:`UsbHandle.FindDevices`.
 
         Returns
         -------
@@ -543,11 +576,9 @@ class UsbHandle(object):
 
         """
         try:
-            return next(cls.FindDevices(
-                setting_matcher, device_matcher=device_matcher, **kwargs))
+            return next(cls.FindDevices(setting_matcher, device_matcher=device_matcher, **kwargs))
         except StopIteration:
-            raise usb_exceptions.DeviceNotFoundError(
-                'No device available, or it is in the wrong configuration.')
+            raise usb_exceptions.DeviceNotFoundError('No device available, or it is in the wrong configuration.')
 
     @classmethod
     def FindDevices(cls, setting_matcher, device_matcher=None,
@@ -558,12 +589,16 @@ class UsbHandle(object):
 
         Parameters
         ----------
-          setting_matcher: Function that returns the setting to use given a
-            usb1.USBDevice, or None if the device doesn't have a valid setting.
-          device_matcher: Function that returns True if the given UsbHandle is
-            valid. None to match any device.
-          usb_info: Info string describing device(s).
-          timeout_ms: Default timeout of commands in milliseconds.
+        setting_matcher : TODO
+            Function that returns the setting to use given a ``usb1.USBDevice``, or ``None``
+            if the device doesn't have a valid setting.
+        device_matcher : TODO, None
+            Function that returns ``True`` if the given ``UsbHandle`` is
+            valid. ``None`` to match any device.
+        usb_info : str
+            Info string describing device(s).
+        timeout_ms : TODO, None
+            Default timeout of commands in milliseconds.
 
         Yields
         ------
@@ -594,6 +629,19 @@ class TcpHandle(object):
     serial : str, bytes, bytearray
         Android device serial of the form "host" or "host:port". (Host may be an IP address or a host name.)
     timeout_ms : TODO, None
+        TODO
+
+    Attributes
+    ----------
+    _connection : TODO, None
+        TODO
+    _serial_number : str
+        ``<host>:<port>``
+    _timeout_ms : float, None
+        TODO
+    host : str, TODO
+        TODO
+    port : str, int, TODO
         TODO
 
     """
@@ -632,6 +680,11 @@ class TcpHandle(object):
 
         .. image:: _static/adb.common.TcpHandle.serial_number.CALLER_GRAPH.svg
 
+        Returns
+        -------
+        self._serial_number : str
+            The ``_serial_number`` attribute (``<host>:<port>``)
+
         """
         return self._serial_number
 
@@ -639,6 +692,23 @@ class TcpHandle(object):
         """TODO
 
         .. image:: _static/adb.common.TcpHandle.BulkWrite.CALL_GRAPH.svg
+
+        Parameters
+        ----------
+        data : TODO
+            TODO
+        timeout : TODO, None
+            TODO
+
+        Returns
+        -------
+        TODO
+            TODO
+
+        Raises
+        ------
+        adb.usb_exceptions.TcpTimeoutException
+            Sending data timed out.  No data was sent.
 
         """
         t = self.TimeoutSeconds(timeout)
@@ -656,7 +726,7 @@ class TcpHandle(object):
 
         Parameters
         ----------
-        length : int
+        numbytes : int
             TODO
         timeout_ms : TODO, None
             TODO
@@ -665,6 +735,11 @@ class TcpHandle(object):
         -------
         TODO
             TODO
+
+        Raises
+        ------
+        adb.usb_exceptions.TcpTimeoutException
+            Reading timed out.
 
         """
         t = self.TimeoutSeconds(timeout)
@@ -680,6 +755,16 @@ class TcpHandle(object):
 
         .. image:: _static/adb.common.TcpHandle.Timeout.CALLER_GRAPH.svg
 
+        Parameters
+        ----------
+        timeout_ms : TODO
+            TODO
+
+        Returns
+        -------
+        float
+            TODO
+
         """
         return float(timeout_ms) if timeout_ms is not None else self._timeout_ms
 
@@ -689,6 +774,16 @@ class TcpHandle(object):
         .. image:: _static/adb.common.TcpHandle.TimeoutSeconds.CALL_GRAPH.svg
 
         .. image:: _static/adb.common.TcpHandle.TimeoutSeconds.CALLER_GRAPH.svg
+
+        Parameters
+        ----------
+        timeout_ms : TODO
+            TODO
+
+        Returns
+        -------
+        float
+            TODO
 
         """
         timeout = self.Timeout(timeout_ms)

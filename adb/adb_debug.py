@@ -13,7 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Daemon-less ADB client in python."""
+"""Daemon-less ADB client in python.
+
+* :func:`Devices`
+* :func:`List`
+* :func:`Logcat`
+* :func:`Shell`
+
+"""
 
 import argparse
 import functools

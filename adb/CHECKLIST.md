@@ -34,11 +34,11 @@
 
 # Documentation: Table of Contents
 
-- [ ] `adb_commands.py`
-- [ ] `adb_debug.py`
-- [ ] `adb_protocol.py`
-- [ ] `common_cli.py`
-- [ ] `common.py`
+- [x] `adb_commands.py`
+- [x] `adb_debug.py`
+- [x] `adb_protocol.py`
+- [x] `common_cli.py`
+- [x] `common.py`
 - [ ] `fastboot_debug.py`
 - [ ] `fastboot.py`
 - [ ] `filesync_protocol.py`

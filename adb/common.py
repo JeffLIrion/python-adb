@@ -47,7 +47,6 @@ Common usb browsing, and usb communication.
     * :meth:`UsbHandle.Timeout`
     * :meth:`UsbHandle.usb_info`
 
-
 """
 
 import logging

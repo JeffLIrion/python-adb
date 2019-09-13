@@ -19,6 +19,7 @@ host side.
 
 * :class:`_AdbConnection`
 
+    * :meth:`_AdbConnection._Send`
     * :meth:`_AdbConnection.Close`
     * :meth:`_AdbConnection.Okay`
     * :meth:`_AdbConnection.ReadUntil`
@@ -45,7 +46,12 @@ host side.
     * :meth:`AuthSigner.Sign`
 
 * :func:`find_backspace_runs`
+* :class:`InterleavedDataError`
+* :class:`InvalidChecksumError`
+* :class:`InvalidCommandError`
+* :class:`InvalidResponseError`
 * :func:`MakeWireIDs`
+
 """
 
 import struct

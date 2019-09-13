@@ -16,8 +16,18 @@
 
 Usage introspects the given class for methods, args, and docs to show the user.
 
-StartCli handles connecting to a device, calling the expected method, and
+:func:`StartCli` handles connecting to a device, calling the expected method, and
 outputting the results.
+
+* :func:`_DocToArgs`
+* :class:`_PortPathAction`
+* :func:`_RunMethod`
+* :func:`GetCommonArguments`
+* :func:`GetDeviceArguments`
+* :func:`MakeSubparser`
+* :class:`PositionalArg`
+* :func:`StartCli`
+
 """
 
 from __future__ import print_function

@@ -18,6 +18,11 @@
 Contents
 --------
 
+* :class:`PycryptodomeAuthSigner`
+
+    * :meth:`PycryptodomeAuthSigner.GetPublicKey`
+    * :meth:`PycryptodomeAuthSigner.Sign`
+
 """
 
 from Crypto.Hash import SHA256

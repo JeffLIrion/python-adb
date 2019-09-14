@@ -18,6 +18,18 @@
 Contents
 --------
 
+* :class:`_Accum`
+
+    * :meth:`_Accum.digest`
+    * :meth:`_Accum.update`
+
+* :func:`_load_rsa_private_key`
+* :class:`PythonRSASigner`
+
+    * :meth:`PythonRSASigner.FromRSAKeyPath`
+    * :meth:`PythonRSASigner.GetPublicKey`
+    * :meth:`PythonRSASigner.Sign`
+
 """
 
 
@@ -94,17 +106,20 @@ def _load_rsa_private_key(pem):
     try:
         der = rsa.pem.load_pem(pem, 'PRIVATE KEY')
         keyinfo, _ = decoder.decode(der)
-        if keyinfo[1][0] != univ.ObjectIdentifier(
-                '1.2.840.113549.1.1.1'):  # pragma: no cover
+
+        if keyinfo[1][0] != univ.ObjectIdentifier('1.2.840.113549.1.1.1'):
             raise ValueError('Not a DER-encoded OpenSSL private RSA key')
+
         private_key_der = keyinfo[2].asOctets()
-    except IndexError:  # pragma: no cover
+
+    except IndexError:
         raise ValueError('Not a DER-encoded OpenSSL private RSA key')
+
     return rsa.PrivateKey.load_pkcs1(private_key_der, format='DER')
 
 
 class PythonRSASigner(adb_protocol.AuthSigner):
-    """Implements adb_protocol.AuthSigner using http://stuvel.eu/rsa.
+    """Implements :class:`adb_protocol.AuthSigner` using http://stuvel.eu/rsa.
 
     .. image:: _static/adb.sign_pythonrsa.PythonRSASigner.CALL_GRAPH.svg
 

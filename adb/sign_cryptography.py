@@ -18,6 +18,11 @@
 Contents
 --------
 
+* :class:`CryptographySigner`
+
+    * :meth:`CryptographySigner.GetPublicKey`
+    * :meth:`CryptographySigner.Sign`
+
 """
 
 from cryptography.hazmat.backends import default_backend

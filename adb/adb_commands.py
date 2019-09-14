@@ -68,6 +68,7 @@ try:
 except NameError:
     file_types = (io.IOBase,)
 
+
 #: From adb.h
 CLASS = 0xFF
 

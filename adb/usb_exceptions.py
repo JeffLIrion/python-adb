@@ -18,6 +18,17 @@
 Contents
 --------
 
+* :class:`AdbCommandFailureException`
+* :class:`AdbOperationException`
+* :class:`CommonUsbError`
+* :class:`DeviceAuthError`
+* :class:`DeviceNotFoundError`
+* :class:`FormatMessageWithArgumentsException`
+* :class:`LibusbWrappingError`
+* :class:`ReadFailedError`
+* :class:`TcpTimeoutException`
+* :class:`WriteFailedError`
+
 """
 
 

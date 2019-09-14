@@ -63,6 +63,7 @@ import time
 from io import BytesIO
 from adb import usb_exceptions
 
+
 #: Maximum amount of data in an ADB packet.
 MAX_ADB_DATA = 4096
 

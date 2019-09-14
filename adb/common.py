@@ -72,6 +72,7 @@ except ImportError:  # pragma: no cover
 
 from adb import usb_exceptions
 
+
 #: Default timeout
 DEFAULT_TIMEOUT_MS = 10000
 

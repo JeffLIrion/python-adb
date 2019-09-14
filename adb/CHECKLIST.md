@@ -40,13 +40,13 @@
 - [x] `common_cli.py`
 - [x] `common.py`
 - [x] `fastboot_debug.py`
-- [ ] `fastboot.py`
-- [ ] `filesync_protocol.py`
+- [x] `fastboot.py`
+- [x] `filesync_protocol.py`
 - [x] `__init__.py`
-- [ ] `sign_cryptography.py`
-- [ ] `sign_pycryptodome.py`
-- [ ] `sign_pythonrsa.py`
-- [ ] `usb_exceptions.py`
+- [x] `sign_cryptography.py`
+- [x] `sign_pycryptodome.py`
+- [x] `sign_pythonrsa.py`
+- [x] `usb_exceptions.py`
 
 
 # Documentation Complete

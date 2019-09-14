@@ -21,6 +21,28 @@ host side.
 Contents
 --------
 
+* :class:`FileSyncConnection`
+
+    * :meth:`FileSyncConnection.Read`
+    * :meth:`FileSyncConnection.ReadUntil`
+    * :meth:`FileSyncConnection.Send`
+    * :meth:`FileSyncConnection._CanAddToSendBuffer`
+    * :meth:`FileSyncConnection._Flush`
+    * :meth:`FileSyncConnection._ReadBuffered`
+
+* :class:`FilesyncProtocol`
+
+    * :meth:`FilesyncProtocol._HandleProgress`
+    * :meth:`FilesyncProtocol.List`
+    * :meth:`FilesyncProtocol.Pull`
+    * :meth:`FilesyncProtocol.Push`
+    * :meth:`FilesyncProtocol.Stat`
+
+* :class:`InterleavedDataError`
+* :class:`InvalidChecksumError`
+* :class:`PullFailedError`
+* :class:`PushFailedError`
+
 """
 
 import collections
@@ -34,6 +56,7 @@ import libusb1
 
 from adb import adb_protocol
 from adb import usb_exceptions
+
 
 try:
     file_types = (file, io.IOBase)

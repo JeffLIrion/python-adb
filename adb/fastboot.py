@@ -18,21 +18,38 @@
 Contents
 --------
 
-* :class:`FastbootTransferError`
-* :class:`FastbootRemoteFailure`
-* :class:`FastbootStateMismatch`
+* :class:`FastbootCommands`
+
+    * :meth:`FastbootCommands.__reset`
+    * :meth:`FastbootCommands._SimpleCommand`
+    * :meth:`FastbootCommands.Close`
+    * :meth:`FastbootCommands.ConnectDevice`
+    * :meth:`FastbootCommands.Continue`
+    * :meth:`FastbootCommands.Devices`
+    * :meth:`FastbootCommands.Download`
+    * :meth:`FastbootCommands.Erase`
+    * :meth:`FastbootCommands.Flash`
+    * :meth:`FastbootCommands.FlashFromFile`
+    * :meth:`FastbootCommands.Getvar`
+    * :meth:`FastbootCommands.Oem`
+    * :meth:`FastbootCommands.Reboot`
+    * :meth:`FastbootCommands.RebootBootloader`
+    * :meth:`FastbootCommands.usb_handle`
+
 * :class:`FastbootInvalidResponse`
 * :class:`FastbootProtocol`
 
     * :meth:`FastbootProtocol._AcceptResponses`
     * :meth:`FastbootProtocol._HandleProgress`
     * :meth:`FastbootProtocol._Write`
-    * :meth:`FastbootProtocol.HandleSimpleResponses`
     * :meth:`FastbootProtocol.HandleDataSending`
+    * :meth:`FastbootProtocol.HandleSimpleResponses`
     * :meth:`FastbootProtocol.SendCommand`
     * :meth:`FastbootProtocol.usb_handle`
 
-* :class:`FastbootCommands`
+* :class:`FastbootRemoteFailure`
+* :class:`FastbootStateMismatch`
+* :class:`FastbootTransferError`
 
 """
 

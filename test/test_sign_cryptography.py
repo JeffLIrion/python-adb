@@ -9,7 +9,7 @@ from adb.sign_cryptography import CryptographySigner
 class TestCryptographySigner(unittest.TestCase):
     @unittest.skipIf(sys.version_info[0] == 2, "This exception is only raised in Python3")
     def test_sign_cryptography_fails_python3(self):
-        with self.assertRaises(ValueError):
+        with self.assertRaises(Exception):
             signer = CryptographySigner('test/adbkey')
 
     #@unittest.skipIf(sys.version_info[0] == 3, "sign_cryptography is broken in Python3")

@@ -52,7 +52,7 @@ class _Accum(object):
     Attributes
     ----------
     _buf : bytes
-        A buffer for storing that data before it is signed
+        A buffer for storing data before it is signed
 
     """
     def __init__(self):

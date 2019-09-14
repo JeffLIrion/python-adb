@@ -12,7 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A libusb1-based fastboot implementation."""
+"""A libusb1-based fastboot implementation.
+
+
+Contents
+--------
+
+* :class:`FastbootTransferError`
+* :class:`FastbootRemoteFailure`
+* :class:`FastbootStateMismatch`
+* :class:`FastbootInvalidResponse`
+* :class:`FastbootProtocol`
+
+    * :meth:`FastbootProtocol._AcceptResponses`
+    * :meth:`FastbootProtocol._HandleProgress`
+    * :meth:`FastbootProtocol._Write`
+    * :meth:`FastbootProtocol.HandleSimpleResponses`
+    * :meth:`FastbootProtocol.HandleDataSending`
+    * :meth:`FastbootProtocol.SendCommand`
+    * :meth:`FastbootProtocol.usb_handle`
+
+* :class:`FastbootCommands`
+
+"""
 
 import binascii
 import collections

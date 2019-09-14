@@ -19,6 +19,10 @@ Usage introspects the given class for methods, args, and docs to show the user.
 :func:`StartCli` handles connecting to a device, calling the expected method, and
 outputting the results.
 
+
+Contents
+--------
+
 * :func:`_DocToArgs`
 * :class:`_PortPathAction`
 * :func:`_RunMethod`
@@ -236,6 +240,8 @@ def _RunMethod(dev, args, extra):
 
 def StartCli(args, adb_commands, extra=None, **device_kwargs):
     """Starts a common CLI interface for this usb path and protocol.
+
+    Handles connecting to a device, calling the expected method, and outputting the results.
 
     .. image:: _static/adb.common_cli.StartCli.CALL_GRAPH.svg
 

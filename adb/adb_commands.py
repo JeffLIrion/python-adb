@@ -22,6 +22,10 @@ subprocess and a network socket.
 
 All timeouts are in milliseconds.
 
+
+Contents
+--------
+
 * :class:`AdbCommands`
 
     * :meth:`AdbCommands.__reset`

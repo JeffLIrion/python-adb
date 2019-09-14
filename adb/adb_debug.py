@@ -15,6 +15,10 @@
 
 """Daemon-less ADB client in python.
 
+
+Contents
+--------
+
 * :func:`Devices`
 * :func:`List`
 * :func:`Logcat`

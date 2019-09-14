@@ -15,8 +15,15 @@
 
 """Fastboot in python.
 
-Call it similar to how you call android's fastboot. Call it similar to how you
-call android's fastboot, but this only accepts usb paths and no serials.
+Call it similar to how you call android's fastboot, but this only accepts usb paths and no serials.
+
+
+Contents
+--------
+
+* :func:`_InfoCb`
+* :func:`Devices`
+
 """
 
 import argparse

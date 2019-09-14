@@ -16,6 +16,11 @@
 
 Implements the ADB protocol as seen in android's adb/adbd binaries, but only the
 host side.
+
+
+Contents
+--------
+
 """
 
 import collections

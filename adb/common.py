@@ -14,7 +14,11 @@
 
 """Common code for ADB and Fastboot.
 
-Common usb browsing, and usb communication.
+Common usb browsing and usb communication.
+
+
+Contents
+--------
 
 * :func:`GetInterface`
 * :func:`InterfaceMatcher`

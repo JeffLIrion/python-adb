@@ -12,7 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Common exceptions for ADB and Fastboot."""
+"""Common exceptions for ADB and Fastboot.
+
+
+Contents
+--------
+
+"""
 
 
 class CommonUsbError(Exception):

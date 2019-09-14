@@ -51,10 +51,10 @@ class FormatMessageWithArgumentsException(CommonUsbError):
 
     Parameters
     ----------
-    message : TODO
-        TODO
-    args : TODO
-        TODO
+    message : str
+        The error message
+    args : str
+        Positional arguments for formatting ``message``
 
     """
     def __init__(self, message, *args):
@@ -79,21 +79,21 @@ class DeviceAuthError(FormatMessageWithArgumentsException):
 
 
 class LibusbWrappingError(CommonUsbError):
-    """Wraps libusb1 errors while keeping its original usefulness.
+    """Wraps ``libusb1`` errors while keeping their original usefulness.
 
     .. image:: _static/adb.usb_exceptions.LibusbWrappingError.CALL_GRAPH.svg
 
     Parameters
     ----------
-    msg : TODO
-        TODO
-    usb_error : TODO
-        TODO
+    msg : str
+        The error message
+    usb_error : libusb1.USBError
+        An exception from ``libusb1``
 
     Attributes
     ----------
-    usb_error : TODO
-        Instance of libusb1.USBError
+    usb_error : libusb1.USBError
+        An exception from ``libusb1``
 
     """
     def __init__(self, msg, usb_error):

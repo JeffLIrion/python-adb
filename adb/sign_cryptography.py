@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TODO
+"""ADB authentication using the ``cryptography`` package.
 
 
 .. rubric:: Contents
@@ -37,6 +37,8 @@ from adb import adb_protocol
 class CryptographySigner(adb_protocol.AuthSigner):
     """AuthSigner using cryptography.io.
 
+    .. warning:: This is currently broken!
+
     .. image:: _static/adb.sign_cryptography.CryptographySigner.CALL_GRAPH.svg
 
     Parameters
@@ -48,8 +50,8 @@ class CryptographySigner(adb_protocol.AuthSigner):
     ----------
     public_key : str
         The contents of the public key file
-    rsa_key : TODO
-        TODO
+    rsa_key : cryptography.hazmat.backends.openssl.rsa._RSAPrivateKey
+        The loaded private key
 
     """
     def __init__(self, rsa_key_path):

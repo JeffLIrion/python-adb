@@ -49,6 +49,8 @@ def Devices():
       015DB7591102001A        device
 
 
+    .. seealso:: :meth:`adb.fastboot.FastbootCommands.Devices`
+
     .. image:: _static/adb.fastboot_debug.Devices.CALLER_GRAPH.svg
 
     Returns

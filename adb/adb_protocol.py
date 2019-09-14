@@ -689,35 +689,34 @@ class AdbMessage(object):
         cmd, arg0, arg1, banner = cls.Read(usb, [b'CNXN', b'AUTH'])
         if cmd == b'AUTH':
             if not rsa_keys:
-                raise usb_exceptions.DeviceAuthError(
-                    'Device authentication required, no keys available.')
+                raise usb_exceptions.DeviceAuthError('Device authentication required, no keys available.')
+
             # Loop through our keys, signing the last 'banner' or token.
             for rsa_key in rsa_keys:
                 if arg0 != AUTH_TOKEN:
-                    raise InvalidResponseError(
-                        'Unknown AUTH response: %s %s %s' % (arg0, arg1, banner))
+                    raise InvalidResponseError('Unknown AUTH response: %s %s %s' % (arg0, arg1, banner))
 
                 # Do not mangle the banner property here by converting it to a string
                 signed_token = rsa_key.Sign(banner)
-                msg = cls(
-                    command=b'AUTH', arg0=AUTH_SIGNATURE, arg1=0, data=signed_token)
+                msg = cls(command=b'AUTH', arg0=AUTH_SIGNATURE, arg1=0, data=signed_token)
                 msg.Send(usb)
                 cmd, arg0, unused_arg1, banner = cls.Read(usb, [b'CNXN', b'AUTH'])
                 if cmd == b'CNXN':
                     return banner
+
             # None of the keys worked, so send a public key.
             msg = cls(
                 command=b'AUTH', arg0=AUTH_RSAPUBLICKEY, arg1=0,
                 data=rsa_keys[0].GetPublicKey() + b'\0')
             msg.Send(usb)
             try:
-                cmd, arg0, unused_arg1, banner = cls.Read(
-                    usb, [b'CNXN'], timeout_ms=auth_timeout_ms)
+                cmd, arg0, unused_arg1, banner = cls.Read(usb, [b'CNXN'], timeout_ms=auth_timeout_ms)
             except usb_exceptions.ReadFailedError as e:
                 if e.usb_error.value == -7:  # Timeout.
-                    raise usb_exceptions.DeviceAuthError(
-                        'Accept auth key on device, then retry.')
+                    raise usb_exceptions.DeviceAuthError('Accept auth key on device, then retry.')
+
                 raise
+
             # This didn't time-out, so we got a CNXN response.
             return banner
         return banner

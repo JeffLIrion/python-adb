@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TODO
+"""ADB authentication using ``pycryptodome``.
 
 
 .. rubric:: Contents
@@ -45,8 +45,8 @@ class PycryptodomeAuthSigner(adb_protocol.AuthSigner):
     ----------
     public_key : str
         The contents of the public key file
-    rsa_key : str
-        The contents of the private key file
+    rsa_key : Crypto.PublicKey.RSA.RsaKey
+        The contents of theprivate key
 
     """
     def __init__(self, rsa_key_path=None):
@@ -64,12 +64,12 @@ class PycryptodomeAuthSigner(adb_protocol.AuthSigner):
 
         Parameters
         ----------
-        data : TODO
-            TODO
+        data : bytes, bytearray
+            The data to be signed
 
         Returns
         -------
-        TODO
+        bytes
             The signed ``data``
 
         """

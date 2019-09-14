@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""TODO
+"""ADB authentication using the ``rsa`` package.
 
 
 .. rubric:: Contents
@@ -40,41 +40,42 @@ from rsa import pkcs1
 from adb import adb_protocol
 
 
-# python-rsa lib hashes all messages it signs. ADB does it already, we just
-# need to slap a signature on top of already hashed message. Introduce "fake"
-# hashing algo for this.
 class _Accum(object):
-    """TODO
+    """A fake hashing algorithm.
+
+    The Python ``rsa`` lib hashes all messages it signs. ADB does it already, we just
+    need to slap a signature on top of already hashed message.  Introduce a "fake"
+    hashing algo for this.
 
     .. image:: _static/adb.sign_pythonrsa._Accum.CALL_GRAPH.svg
 
     Attributes
     ----------
-    _buf : TODO
-        TODO
+    _buf : bytes
+        A buffer for storing that data before it is signed
 
     """
     def __init__(self):
         self._buf = b''
 
     def update(self, msg):
-        """TODO
+        """Update this hash object's state with the provided ``msg``.
 
         Parameters
         ----------
-        msg : TODO
-            TODO
+        msg : bytes
+            The message to be appended to ``self._buf``
 
         """
         self._buf += msg
 
     def digest(self):
-        """TODO
+        """Return the digest value as a string of binary data.
 
         Returns
         -------
-        self._buf : TODO
-            TODO
+        self._buf : bytes
+            ``self._buf``
 
         """
         return self._buf
@@ -85,23 +86,28 @@ pkcs1.HASH_ASN1['SHA-1-PREHASHED'] = pkcs1.HASH_ASN1['SHA-1']
 
 
 def _load_rsa_private_key(pem):
-    """PEM encoded PKCS#8 private key -> rsa.PrivateKey.
+    """PEM encoded PKCS#8 private key -> ``rsa.PrivateKey``.
+
+    ADB uses private RSA keys in pkcs#8 format. The ``rsa`` library doesn't
+    support them natively.  Do some ASN unwrapping to extract naked RSA key
+    (in der-encoded form).
+
+    See:
+    
+    * https://www.ietf.org/rfc/rfc2313.txt
+    * http://superuser.com/a/606266
 
     Parameters
     ----------
-    pem : TODO
-        TODO
+    pem : str
+        The private key to be loaded
 
     Returns
     -------
-    TODO
-        TODO
+    rsa.key.PrivateKey
+        The loaded private key
 
     """
-    # ADB uses private RSA keys in pkcs#8 format. 'rsa' library doesn't support
-    # them natively. Do some ASN unwrapping to extract naked RSA key
-    # (in der-encoded form). See https://www.ietf.org/rfc/rfc2313.txt.
-    # Also http://superuser.com/a/606266.
     try:
         der = rsa.pem.load_pem(pem, 'PRIVATE KEY')
         keyinfo, _ = decoder.decode(der)
@@ -125,16 +131,16 @@ class PythonRSASigner(adb_protocol.AuthSigner):
     Parameters
     ----------
     pub : str, None
-        The path to the private key.
-    priv : TODO, None
-        TODO
+        The contents of the public key file
+    priv : str, None
+        The path to the private key
 
     Attributes
     ----------
-    priv_key : TODO
-        TODO
-    pub_key : TODO, None
-        TODO
+    priv_key : rsa.key.PrivateKey
+        The loaded private key
+    pub_key : str, None
+        The contents of the public key file
 
     """
     def __init__(self, pub=None, priv=None):
@@ -167,12 +173,12 @@ class PythonRSASigner(adb_protocol.AuthSigner):
 
         Parameters
         ----------
-        data : TODO
-            TODO
+        data : bytes
+            The data to be signed
 
         Returns
         -------
-        TODO
+        bytes
             The signed ``data``
 
         """
@@ -183,8 +189,8 @@ class PythonRSASigner(adb_protocol.AuthSigner):
 
         Returns
         -------
-        self.pub_key : TODO, None
-            The public key, or ``None`` if it was not provided.
+        self.pub_key : str, None
+            The contents of the public key file, or ``None`` if a public key was not provided.
 
         """
         return self.pub_key

@@ -65,6 +65,8 @@ def Devices(args):
       015DB7591102001A        device        1,2
 
 
+    .. seealso:: :meth:`adb.adb_commands.AdbCommands.Devices`
+
     .. image:: _static/adb.adb_debug.Devices.CALLER_GRAPH.svg
 
     Parameters
@@ -89,16 +91,18 @@ def Devices(args):
 def List(device, device_path):
     """Prints a directory listing.
 
+    .. seealso:: :meth:`adb.adb_commands.AdbCommands.List`
+
     Parameters
     ----------
-    device : TODO
+    device : adb.adb_commands.AdbCommands
         TODO
     device_path : TODO
         Directory to list.
 
     Yields
     ------
-    TODO
+    str
         TODO
 
     """
@@ -129,9 +133,11 @@ def List(device, device_path):
 def Logcat(device, *options):
     """TODO
 
+    .. seealso:: :meth:`adb.adb_commands.AdbCommands.Logcat`
+
     Parameters
     ----------
-    device : TODO
+    device : adb.adb_commands.AdbCommands
         TODO
     options : TODO
         TODO
@@ -148,9 +154,11 @@ def Logcat(device, *options):
 def Shell(device, *command):
     """Runs a command on the device and prints the stdout.
 
+    .. seealso:: :meth:`adb.adb_commands.AdbCommands.StreamingShell`, :meth:`adb.adb_commands.AdbCommands.InteractiveShell`
+
     Parameters
     ----------
-    device : TODO
+    device : adb.adb_commands.AdbCommands
         TODO
     command : list[str]
         Command to run on the target.

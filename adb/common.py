@@ -17,8 +17,7 @@
 Common usb browsing and usb communication.
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :func:`GetInterface`
 * :func:`InterfaceMatcher`

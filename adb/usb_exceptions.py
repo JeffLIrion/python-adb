@@ -15,8 +15,7 @@
 """Common exceptions for ADB and Fastboot.
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :class:`AdbCommandFailureException`
 * :class:`AdbOperationException`

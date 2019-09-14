@@ -15,8 +15,7 @@
 """TODO
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :class:`_Accum`
 

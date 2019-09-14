@@ -23,8 +23,7 @@ subprocess and a network socket.
 All timeouts are in milliseconds.
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :class:`AdbCommands`
 

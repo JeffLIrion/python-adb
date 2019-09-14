@@ -18,8 +18,7 @@ Implements the ADB protocol as seen in android's adb/adbd binaries, but only the
 host side.
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :class:`_AdbConnection`
 
@@ -394,11 +393,7 @@ class _AdbConnection(object):
 class AdbMessage(object):
     """ADB Protocol and message class.
 
-    Notes
-    -----
-
-    local_id/remote_id
-    ******************
+    .. rubric:: local_id/remote_id
 
     Turns out the documentation is host/device ambidextrous, so ``local_id`` is the id for 'the sender' and
     ``remote_id`` is for 'the recipient'. So since we're only on the host, we'll re-document with host_id and device_id:

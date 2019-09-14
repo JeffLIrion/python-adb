@@ -16,8 +16,7 @@
 """Daemon-less ADB client in python.
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :func:`Devices`
 * :func:`List`

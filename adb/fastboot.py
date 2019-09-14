@@ -15,8 +15,7 @@
 """A libusb1-based fastboot implementation.
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :class:`FastbootCommands`
 

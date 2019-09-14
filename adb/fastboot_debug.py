@@ -18,8 +18,7 @@
 Call it similar to how you call android's fastboot, but this only accepts usb paths and no serials.
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :func:`_InfoCb`
 * :func:`Devices`

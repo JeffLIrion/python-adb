@@ -20,8 +20,7 @@ Usage introspects the given class for methods, args, and docs to show the user.
 outputting the results.
 
 
-Contents
---------
+.. rubric:: Contents
 
 * :func:`_DocToArgs`
 * :class:`_PortPathAction`

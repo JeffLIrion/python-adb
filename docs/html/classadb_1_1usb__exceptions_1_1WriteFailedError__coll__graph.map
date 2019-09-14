@@ -1,0 +1,4 @@
+<map id="adb.usb_exceptions.WriteFailedError" name="adb.usb_exceptions.WriteFailedError">
+<area shape="rect" id="node2" href="$classadb_1_1usb__exceptions_1_1LibusbWrappingError.xhtml" title="adb.usb_exceptions.Libusb\lWrappingError" alt="" coords="13,169,193,211"/>
+<area shape="rect" id="node3" href="$classadb_1_1usb__exceptions_1_1CommonUsbError.xhtml" title="adb.usb_exceptions.Common\lUsbError" alt="" coords="5,80,200,121"/>
+</map>

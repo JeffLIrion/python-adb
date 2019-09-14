@@ -1,0 +1,9 @@
+<map id="adb.common.UsbHandle.Timeout" name="adb.common.UsbHandle.Timeout">
+<area shape="rect" id="node2" href="$classadb_1_1common_1_1UsbHandle.xhtml#a94a038e0d680e1b279f4d289b98f6352" title="adb.common.UsbHandle.Bulk\lWrite" alt="" coords="286,5,482,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1common_1_1UsbHandle.xhtml#a35dde138b9f918cf936affe61a44ac6f" title="adb.common.UsbHandle.BulkRead" alt="" coords="271,71,497,98"/>
+<area shape="rect" id="node5" href="$classadb_1_1common_1_1TcpHandle.xhtml#ab9f9d10bfb8c6fb7c0a16d879e85378f" title="adb.common.TcpHandle.Timeout\lSeconds" alt="" coords="277,159,491,200"/>
+<area shape="rect" id="node4" href="$classadb_1_1common_1_1UsbHandle.xhtml#a08cae62ee61ff4fc0f6424caac9d8de6" title="adb.common.UsbHandle.Flush\lBuffers" alt="" coords="557,45,759,87"/>
+<area shape="rect" id="node6" href="$classadb_1_1common_1_1TcpHandle.xhtml#a7daa53e4d419c908a0eddf7d1bf9170b" title="adb.common.TcpHandle.\l_connect" alt="" coords="574,111,742,152"/>
+<area shape="rect" id="node7" href="$classadb_1_1common_1_1TcpHandle.xhtml#a737245feff629b8bb2f4c609768ff81d" title="adb.common.TcpHandle.Bulk\lWrite" alt="" coords="561,176,755,217"/>
+<area shape="rect" id="node8" href="$classadb_1_1common_1_1TcpHandle.xhtml#a767253f525b34a5fe4e629120b03c24e" title="adb.common.TcpHandle.BulkRead" alt="" coords="545,242,771,269"/>
+</map>

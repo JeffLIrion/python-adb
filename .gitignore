@@ -16,5 +16,4 @@ htmlcov/
 
 # Documentation
 docs/build
-docs/html
 docs/source/_static/*.dot

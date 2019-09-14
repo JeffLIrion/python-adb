@@ -1,0 +1,6 @@
+<map id="adb.fastboot.FastbootCommands.Getvar" name="adb.fastboot.FastbootCommands.Getvar">
+<area shape="rect" id="node2" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#a821780b7fa070da3ee3eb982447b38c8" title="adb.fastboot.FastbootCommands.\l_SimpleCommand" alt="" coords="273,41,493,83"/>
+<area shape="rect" id="node3" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#a011e85b1ffc526bcda0808ddffb7f9e3" title="adb.fastboot.FastbootCommands.\lFlashFromFile" alt="" coords="541,12,761,53"/>
+<area shape="rect" id="node4" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#af4086276b55840c8e02c091b8af676c4" title="adb.fastboot.FastbootCommands.\lDownload" alt="" coords="809,5,1029,47"/>
+<area shape="rect" id="node5" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#a621a92ec5fa925375f0a1dd9be48fcaf" title="adb.fastboot.FastbootCommands.\lFlash" alt="" coords="809,71,1029,112"/>
+</map>

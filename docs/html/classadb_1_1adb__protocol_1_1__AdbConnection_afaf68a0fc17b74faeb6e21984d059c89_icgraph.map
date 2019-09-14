@@ -1,0 +1,8 @@
+<map id="adb.adb_protocol._AdbConnection._Send" name="adb.adb_protocol._AdbConnection._Send">
+<area shape="rect" id="node2" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a197bfa968d57d1425fc4aa04b49786b9" title="adb.adb_protocol._AdbConnection.\lWrite" alt="" coords="893,5,1119,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a3f8e837ace6e380c85d5d7867b964f29" title="adb.adb_protocol._AdbConnection.Okay" alt="" coords="316,70,572,97"/>
+<area shape="rect" id="node5" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#adf577dc62167f2593412a226b0fdb9fe" title="adb.adb_protocol._AdbConnection.\lReadUntilClose" alt="" coords="893,75,1119,116"/>
+<area shape="rect" id="node6" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a3bcf4458221c2c30fd7db3171794ed74" title="adb.adb_protocol._AdbConnection.\lClose" alt="" coords="893,149,1119,191"/>
+<area shape="rect" id="node4" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a398196cc2511e4ea2a3581cb2395a0a8" title="adb.adb_protocol._AdbConnection.\lReadUntil" alt="" coords="620,59,845,100"/>
+<area shape="rect" id="node7" href="$classadb_1_1common_1_1UsbHandle.xhtml#a70a5840c62e032635a221637cde99f4d" title="adb.common.UsbHandle.Open" alt="" coords="1167,157,1368,183"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="adb.common.UsbHandle.Find" name="adb.common.UsbHandle.Find">
+<area shape="rect" id="node2" href="$classadb_1_1common_1_1UsbHandle.xhtml#a5ece9b880d91e858f68bb245c2b67062" title="adb.common.UsbHandle.Port\lPathMatcher" alt="" coords="252,5,447,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1common_1_1UsbHandle.xhtml#a6d32add3d17a3af3f8905f3b3fcf4a16" title="adb.common.UsbHandle.Serial\lMatcher" alt="" coords="248,71,451,112"/>
+<area shape="rect" id="node4" href="$classadb_1_1common_1_1UsbHandle.xhtml#adbb1f5a37322ab8165ceb3dbbbf3175f" title="adb.common.UsbHandle.Find\lFirst" alt="" coords="252,136,447,177"/>
+<area shape="rect" id="node5" href="$classadb_1_1common_1_1UsbHandle.xhtml#a01407813410d8d0a5366f50f0d410e44" title="adb.common.UsbHandle.Find\lDevices" alt="" coords="499,136,693,177"/>
+</map>

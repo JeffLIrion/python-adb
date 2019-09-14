@@ -1,0 +1,24 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classadb_1_1adb__protocol_1_1InterleavedDataError.xhtml" title="adb.adb_protocol.Interleaved\lDataError" alt="" coords="151,5,341,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__protocol_1_1InvalidChecksumError.xhtml" title="adb.adb_protocol.Invalid\lChecksumError" alt="" coords="165,71,327,112"/>
+<area shape="rect" id="node4" href="$classadb_1_1adb__protocol_1_1InvalidCommandError.xhtml" title="adb.adb_protocol.Invalid\lCommandError" alt="" coords="165,136,327,177"/>
+<area shape="rect" id="node5" href="$classadb_1_1adb__protocol_1_1InvalidResponseError.xhtml" title="adb.adb_protocol.Invalid\lResponseError" alt="" coords="165,201,327,243"/>
+<area shape="rect" id="node6" href="$classadb_1_1filesync__protocol_1_1InterleavedDataError.xhtml" title="adb.filesync_protocol.Interleaved\lDataError" alt="" coords="139,267,353,308"/>
+<area shape="rect" id="node7" href="$classadb_1_1filesync__protocol_1_1InvalidChecksumError.xhtml" title="adb.filesync_protocol.Invalid\lChecksumError" alt="" coords="153,332,339,373"/>
+<area shape="rect" id="node8" href="$classadb_1_1filesync__protocol_1_1PullFailedError.xhtml" title="adb.filesync_protocol.Pull\lFailedError" alt="" coords="161,397,331,439"/>
+<area shape="rect" id="node9" href="$classadb_1_1filesync__protocol_1_1PushFailedError.xhtml" title="adb.filesync_protocol.Push\lFailedError" alt="" coords="157,463,335,504"/>
+<area shape="rect" id="node10" href="$classadb_1_1usb__exceptions_1_1AdbCommandFailureException.xhtml" title="adb.usb_exceptions.AdbCommand\lFailureException" alt="" coords="133,528,359,569"/>
+<area shape="rect" id="node11" href="$classadb_1_1usb__exceptions_1_1AdbOperationException.xhtml" title="adb.usb_exceptions.AdbOperation\lException" alt="" coords="135,593,357,635"/>
+<area shape="rect" id="node12" href="$classadb_1_1usb__exceptions_1_1CommonUsbError.xhtml" title="adb.usb_exceptions.Common\lUsbError" alt="" coords="149,659,343,700"/>
+<area shape="rect" id="node13" href="$classadb_1_1usb__exceptions_1_1FormatMessageWithArgumentsException.xhtml" title="adb.usb_exceptions.Format\lMessageWithArgumentsException" alt="" coords="407,544,629,585"/>
+<area shape="rect" id="node21" href="$classadb_1_1usb__exceptions_1_1LibusbWrappingError.xhtml" title="adb.usb_exceptions.Libusb\lWrappingError" alt="" coords="428,772,608,813"/>
+<area shape="rect" id="node14" href="$classadb_1_1fastboot_1_1FastbootInvalidResponse.xhtml" title="adb.fastboot.FastbootInvalid\lResponse" alt="" coords="689,315,876,356"/>
+<area shape="rect" id="node15" href="$classadb_1_1fastboot_1_1FastbootRemoteFailure.xhtml" title="adb.fastboot.FastbootRemote\lFailure" alt="" coords="685,380,880,421"/>
+<area shape="rect" id="node16" href="$classadb_1_1fastboot_1_1FastbootStateMismatch.xhtml" title="adb.fastboot.FastbootState\lMismatch" alt="" coords="693,445,873,487"/>
+<area shape="rect" id="node17" href="$classadb_1_1fastboot_1_1FastbootTransferError.xhtml" title="adb.fastboot.FastbootTransfer\lError" alt="" coords="684,511,881,552"/>
+<area shape="rect" id="node18" href="$classadb_1_1usb__exceptions_1_1DeviceAuthError.xhtml" title="adb.usb_exceptions.Device\lAuthError" alt="" coords="691,576,874,617"/>
+<area shape="rect" id="node19" href="$classadb_1_1usb__exceptions_1_1DeviceNotFoundError.xhtml" title="adb.usb_exceptions.Device\lNotFoundError" alt="" coords="691,641,874,683"/>
+<area shape="rect" id="node20" href="$classadb_1_1usb__exceptions_1_1TcpTimeoutException.xhtml" title="adb.usb_exceptions.TcpTimeout\lException" alt="" coords="677,707,888,748"/>
+<area shape="rect" id="node22" href="$classadb_1_1usb__exceptions_1_1ReadFailedError.xhtml" title="adb.usb_exceptions.ReadFailed\lError" alt="" coords="679,772,887,813"/>
+<area shape="rect" id="node23" href="$classadb_1_1usb__exceptions_1_1WriteFailedError.xhtml" title="adb.usb_exceptions.Write\lFailedError" alt="" coords="696,837,869,879"/>
+</map>

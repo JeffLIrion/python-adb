@@ -1,0 +1,5 @@
+<map id="adb.common.TcpHandle.TimeoutSeconds" name="adb.common.TcpHandle.TimeoutSeconds">
+<area shape="rect" id="node2" href="$classadb_1_1common_1_1TcpHandle.xhtml#a7daa53e4d419c908a0eddf7d1bf9170b" title="adb.common.TcpHandle.\l_connect" alt="" coords="297,5,465,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1common_1_1TcpHandle.xhtml#a737245feff629b8bb2f4c609768ff81d" title="adb.common.TcpHandle.Bulk\lWrite" alt="" coords="283,71,478,112"/>
+<area shape="rect" id="node4" href="$classadb_1_1common_1_1TcpHandle.xhtml#a767253f525b34a5fe4e629120b03c24e" title="adb.common.TcpHandle.BulkRead" alt="" coords="268,137,493,163"/>
+</map>

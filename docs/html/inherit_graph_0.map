@@ -1,0 +1,16 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml" title="adb.adb_commands.AdbCommands" alt="" coords="111,5,344,32"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml" title="adb.adb_protocol._AdbConnection" alt="" coords="117,56,338,83"/>
+<area shape="rect" id="node4" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml" title="adb.adb_protocol.AdbMessage" alt="" coords="127,107,328,133"/>
+<area shape="rect" id="node5" href="$classadb_1_1adb__protocol_1_1AuthSigner.xhtml" title="adb.adb_protocol.AuthSigner" alt="" coords="133,157,322,184"/>
+<area shape="rect" id="node9" href="$classadb_1_1common_1_1TcpHandle.xhtml" title="adb.common.TcpHandle" alt="" coords="145,208,309,235"/>
+<area shape="rect" id="node10" href="$classadb_1_1common_1_1UsbHandle.xhtml" title="adb.common.UsbHandle" alt="" coords="144,259,311,285"/>
+<area shape="rect" id="node11" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml" title="adb.fastboot.FastbootCommands" alt="" coords="119,309,335,336"/>
+<area shape="rect" id="node12" href="$classadb_1_1fastboot_1_1FastbootProtocol.xhtml" title="adb.fastboot.FastbootProtocol" alt="" coords="129,360,326,387"/>
+<area shape="rect" id="node13" href="$classadb_1_1filesync__protocol_1_1FileSyncConnection.xhtml" title="adb.filesync_protocol.File\lSyncConnection" alt="" coords="142,411,313,453"/>
+<area shape="rect" id="node14" href="$classadb_1_1filesync__protocol_1_1FilesyncProtocol.xhtml" title="adb.filesync_protocol.Filesync\lProtocol" alt="" coords="128,477,327,518"/>
+<area shape="rect" id="node15" href="$classadb_1_1sign__pythonrsa_1_1__Accum.xhtml" title="adb.sign_pythonrsa.\l_Accum" alt="" coords="158,542,297,583"/>
+<area shape="rect" id="node6" href="$classadb_1_1sign__cryptography_1_1CryptographySigner.xhtml" title="adb.sign_cryptography.Cryptography\lSigner" alt="" coords="399,85,633,126"/>
+<area shape="rect" id="node7" href="$classadb_1_1sign__pycryptodome_1_1PycryptodomeAuthSigner.xhtml" title="adb.sign_pycryptodome.Pycryptodome\lAuthSigner" alt="" coords="392,150,640,191"/>
+<area shape="rect" id="node8" href="$classadb_1_1sign__pythonrsa_1_1PythonRSASigner.xhtml" title="adb.sign_pythonrsa.Python\lRSASigner" alt="" coords="426,215,606,257"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="adb.common.UsbHandle.usb_info" name="adb.common.UsbHandle.usb_info">
+<area shape="rect" id="node2" href="$classadb_1_1common_1_1UsbHandle.xhtml#aa4dcc7335abc4e231eb6a9f7cc5dede6" title="adb.common.UsbHandle.Close" alt="" coords="283,5,487,32"/>
+<area shape="rect" id="node4" href="$classadb_1_1common_1_1UsbHandle.xhtml#a94a038e0d680e1b279f4d289b98f6352" title="adb.common.UsbHandle.Bulk\lWrite" alt="" coords="287,57,483,98"/>
+<area shape="rect" id="node5" href="$classadb_1_1common_1_1UsbHandle.xhtml#a35dde138b9f918cf936affe61a44ac6f" title="adb.common.UsbHandle.BulkRead" alt="" coords="272,123,499,149"/>
+<area shape="rect" id="node3" href="$classadb_1_1common_1_1UsbHandle.xhtml#a70a5840c62e032635a221637cde99f4d" title="adb.common.UsbHandle.Open" alt="" coords="547,5,749,32"/>
+<area shape="rect" id="node6" href="$classadb_1_1common_1_1UsbHandle.xhtml#a08cae62ee61ff4fc0f6424caac9d8de6" title="adb.common.UsbHandle.Flush\lBuffers" alt="" coords="547,115,749,157"/>
+</map>

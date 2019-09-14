@@ -1,0 +1,10 @@
+<map id="adb.usb_exceptions.FormatMessageWithArgumentsException" name="adb.usb_exceptions.FormatMessageWithArgumentsException">
+<area shape="rect" id="node4" href="$classadb_1_1fastboot_1_1FastbootInvalidResponse.xhtml" title="adb.fastboot.FastbootInvalid\lResponse" alt="" coords="659,5,845,47"/>
+<area shape="rect" id="node5" href="$classadb_1_1fastboot_1_1FastbootRemoteFailure.xhtml" title="adb.fastboot.FastbootRemote\lFailure" alt="" coords="655,71,849,112"/>
+<area shape="rect" id="node6" href="$classadb_1_1fastboot_1_1FastbootStateMismatch.xhtml" title="adb.fastboot.FastbootState\lMismatch" alt="" coords="662,136,842,177"/>
+<area shape="rect" id="node7" href="$classadb_1_1fastboot_1_1FastbootTransferError.xhtml" title="adb.fastboot.FastbootTransfer\lError" alt="" coords="653,201,851,243"/>
+<area shape="rect" id="node8" href="$classadb_1_1usb__exceptions_1_1DeviceAuthError.xhtml" title="adb.usb_exceptions.Device\lAuthError" alt="" coords="661,267,843,308"/>
+<area shape="rect" id="node9" href="$classadb_1_1usb__exceptions_1_1DeviceNotFoundError.xhtml" title="adb.usb_exceptions.Device\lNotFoundError" alt="" coords="661,332,843,373"/>
+<area shape="rect" id="node10" href="$classadb_1_1usb__exceptions_1_1TcpTimeoutException.xhtml" title="adb.usb_exceptions.TcpTimeout\lException" alt="" coords="647,397,857,439"/>
+<area shape="rect" id="node2" href="$classadb_1_1usb__exceptions_1_1CommonUsbError.xhtml" title="adb.usb_exceptions.Common\lUsbError" alt="" coords="133,201,328,243"/>
+</map>

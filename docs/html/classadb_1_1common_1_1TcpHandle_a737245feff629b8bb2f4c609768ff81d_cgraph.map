@@ -1,0 +1,7 @@
+<map id="adb.common.TcpHandle.BulkWrite" name="adb.common.TcpHandle.BulkWrite">
+<area shape="rect" id="node2" href="$classadb_1_1common_1_1TcpHandle.xhtml#ab9f9d10bfb8c6fb7c0a16d879e85378f" title="adb.common.TcpHandle.Timeout\lSeconds" alt="" coords="248,23,463,65"/>
+<area shape="rect" id="node5" href="$classadb_1_1common_1_1UsbHandle.xhtml#a182ca356bc1ba1aaccfbed946b4b43a4" title="adb.common.UsbHandle.serial\l_number" alt="" coords="255,89,456,130"/>
+<area shape="rect" id="node6" href="$classadb_1_1common_1_1TcpHandle.xhtml#aa81db3e7746a0a769fb541f2eb9f0fc7" title="adb.common.TcpHandle.serial\l_number" alt="" coords="256,154,455,195"/>
+<area shape="rect" id="node3" href="$classadb_1_1common_1_1UsbHandle.xhtml#ae07d2d4446bdcbbb4766dcbf91451b8a" title="adb.common.UsbHandle.Timeout" alt="" coords="511,5,728,32"/>
+<area shape="rect" id="node4" href="$classadb_1_1common_1_1TcpHandle.xhtml#a42dc961f0383b36b4dc0283bc98d1993" title="adb.common.TcpHandle.Timeout" alt="" coords="512,56,727,83"/>
+</map>

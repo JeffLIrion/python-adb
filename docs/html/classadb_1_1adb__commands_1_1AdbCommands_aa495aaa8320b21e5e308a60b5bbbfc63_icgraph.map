@@ -1,0 +1,6 @@
+<map id="adb.adb_commands.AdbCommands.Shell" name="adb.adb_commands.AdbCommands.Shell">
+<area shape="rect" id="node2" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml#aa7e962039a7fce95ec02bd2ea531a43e" title="adb.adb_commands.AdbCommands.\lInstall" alt="" coords="605,41,843,82"/>
+<area shape="rect" id="node4" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml#a97fca1f43954fbca7d0d9b349fbee52b" title="adb.adb_commands.AdbCommands.\lUninstall" alt="" coords="305,29,543,70"/>
+<area shape="rect" id="node5" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml#ae415c7d42450a1f43115df806432e19d" title="adb.adb_commands.AdbCommands.Push" alt="" coords="291,119,557,145"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml#ab754a751f333f18e5567feddb0f8b0b4" title="adb.adb_commands.AdbCommands.\lGetState" alt="" coords="891,41,1128,82"/>
+</map>

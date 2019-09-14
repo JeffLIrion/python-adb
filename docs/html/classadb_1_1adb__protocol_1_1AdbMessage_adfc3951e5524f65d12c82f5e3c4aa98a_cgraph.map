@@ -1,0 +1,4 @@
+<map id="adb.adb_protocol.AdbMessage.Read" name="adb.adb_protocol.AdbMessage.Read">
+<area shape="rect" id="node2" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml#ac35b31fd714c3c26d07a5cff9e31919f" title="adb.adb_protocol.AdbMessage.\lUnpack" alt="" coords="289,5,495,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml#a94f0f744eab64603e9ee3f313ef0805f" title="adb.adb_protocol.AdbMessage.\lCalculateChecksum" alt="" coords="289,71,495,112"/>
+</map>

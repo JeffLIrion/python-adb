@@ -1,0 +1,5 @@
+<map id="adb.adb_protocol.AuthSigner" name="adb.adb_protocol.AuthSigner">
+<area shape="rect" id="node3" href="$classadb_1_1sign__cryptography_1_1CryptographySigner.xhtml" title="adb.sign_cryptography.Cryptography\lSigner" alt="" coords="355,5,589,47"/>
+<area shape="rect" id="node4" href="$classadb_1_1sign__pycryptodome_1_1PycryptodomeAuthSigner.xhtml" title="adb.sign_pycryptodome.Pycryptodome\lAuthSigner" alt="" coords="348,71,596,112"/>
+<area shape="rect" id="node5" href="$classadb_1_1sign__pythonrsa_1_1PythonRSASigner.xhtml" title="adb.sign_pythonrsa.Python\lRSASigner" alt="" coords="382,136,562,177"/>
+</map>

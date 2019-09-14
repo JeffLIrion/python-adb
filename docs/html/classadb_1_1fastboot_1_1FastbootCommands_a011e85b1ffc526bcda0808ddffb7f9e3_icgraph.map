@@ -1,0 +1,10 @@
+<map id="adb.fastboot.FastbootCommands.FlashFromFile" name="adb.fastboot.FastbootCommands.FlashFromFile">
+<area shape="rect" id="node2" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#a821780b7fa070da3ee3eb982447b38c8" title="adb.fastboot.FastbootCommands.\l_SimpleCommand" alt="" coords="273,165,493,207"/>
+<area shape="rect" id="node3" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#a621a92ec5fa925375f0a1dd9be48fcaf" title="adb.fastboot.FastbootCommands.\lFlash" alt="" coords="555,5,775,47"/>
+<area shape="rect" id="node4" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#ae98daefe59adf63f0b9a45d31fd9aace" title="adb.fastboot.FastbootCommands.\lErase" alt="" coords="555,71,775,112"/>
+<area shape="rect" id="node5" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#abbe9134624a5d38960628017c8b82dbd" title="adb.fastboot.FastbootCommands.\lGetvar" alt="" coords="555,136,775,177"/>
+<area shape="rect" id="node6" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#ad8c8eaeeb56ca2ef483bd67c5f7f9176" title="adb.fastboot.FastbootCommands.Oem" alt="" coords="541,202,789,229"/>
+<area shape="rect" id="node7" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#aaf7cfd47a3a38581b1b2ba258671194a" title="adb.fastboot.FastbootCommands.\lContinue" alt="" coords="555,253,775,295"/>
+<area shape="rect" id="node8" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#a878c0f4df9a02a78eb292c7a59f2e8d9" title="adb.fastboot.FastbootCommands.\lReboot" alt="" coords="555,319,775,360"/>
+<area shape="rect" id="node9" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#a8ca0516e86ee1740e9b5ddce2c65ef9a" title="adb.fastboot.FastbootCommands.\lRebootBootloader" alt="" coords="555,384,775,425"/>
+</map>

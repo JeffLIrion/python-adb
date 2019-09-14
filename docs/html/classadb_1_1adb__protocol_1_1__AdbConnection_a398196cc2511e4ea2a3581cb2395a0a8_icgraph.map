@@ -1,0 +1,6 @@
+<map id="adb.adb_protocol._AdbConnection.ReadUntil" name="adb.adb_protocol._AdbConnection.ReadUntil">
+<area shape="rect" id="node2" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a197bfa968d57d1425fc4aa04b49786b9" title="adb.adb_protocol._AdbConnection.\lWrite" alt="" coords="279,5,504,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#adf577dc62167f2593412a226b0fdb9fe" title="adb.adb_protocol._AdbConnection.\lReadUntilClose" alt="" coords="279,71,504,112"/>
+<area shape="rect" id="node4" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a3bcf4458221c2c30fd7db3171794ed74" title="adb.adb_protocol._AdbConnection.\lClose" alt="" coords="279,136,504,177"/>
+<area shape="rect" id="node5" href="$classadb_1_1common_1_1UsbHandle.xhtml#a70a5840c62e032635a221637cde99f4d" title="adb.common.UsbHandle.Open" alt="" coords="552,143,753,170"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="adb.fastboot.FastbootCommands.__reset" name="adb.fastboot.FastbootCommands.__reset">
+<area shape="rect" id="node2" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml#a703b12c1f82f8260b17043aa97f2424a" title="adb.adb_commands.AdbCommands.\l__init__" alt="" coords="273,5,511,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__protocol_1_1InvalidCommandError.xhtml#a76777f0004f2fd2d8185c026a9575f6e" title="adb.adb_protocol.Invalid\lCommandError.__init__" alt="" coords="311,71,473,112"/>
+<area shape="rect" id="node4" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a4c5210cba9571a7013f83b9588e3d444" title="adb.adb_protocol._AdbConnection.\l__init__" alt="" coords="279,136,505,177"/>
+<area shape="rect" id="node5" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml#a2f0c70de34f01286341fb1d0d241b6ad" title="adb.adb_protocol.AdbMessage.\l__init__" alt="" coords="289,201,495,243"/>
+<area shape="rect" id="node6" href="$classadb_1_1common_1_1UsbHandle.xhtml#acfc32eb90744e2725038d23496f0393a" title="adb.common.UsbHandle.\l__init__" alt="" coords="307,267,477,308"/>
+<area shape="rect" id="node7" href="$classadb_1_1common_1_1TcpHandle.xhtml#a40c3568d6bbedd86cdc588fe31f57d7b" title="adb.common.TcpHandle.\l__init__" alt="" coords="308,332,476,373"/>
+<area shape="rect" id="node8" href="$classadb_1_1fastboot_1_1FastbootProtocol.xhtml#af89f5df48e0ab1a6cb3b682d085b1e90" title="adb.fastboot.FastbootProtocol.\l__init__" alt="" coords="291,397,493,439"/>
+<area shape="rect" id="node9" href="$classadb_1_1fastboot_1_1FastbootCommands.xhtml#af839c07a78d47a33eb09c7e9d4d944ee" title="adb.fastboot.FastbootCommands.\l__init__" alt="" coords="282,463,502,504"/>
+</map>

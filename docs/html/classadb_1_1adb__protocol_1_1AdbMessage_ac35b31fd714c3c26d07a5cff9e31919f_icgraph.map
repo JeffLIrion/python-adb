@@ -1,0 +1,8 @@
+<map id="adb.adb_protocol.AdbMessage.Unpack" name="adb.adb_protocol.AdbMessage.Unpack">
+<area shape="rect" id="node2" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml#adfc3951e5524f65d12c82f5e3c4aa98a" title="adb.adb_protocol.AdbMessage.Read" alt="" coords="259,71,495,98"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml#a5bce6e0f8ae42a5759608798871f2268" title="adb.adb_protocol.AdbMessage.\lConnect" alt="" coords="558,5,763,47"/>
+<area shape="rect" id="node4" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml#a077d593719bdc1220b3c368944c6e724" title="adb.adb_protocol.AdbMessage.Open" alt="" coords="543,71,779,98"/>
+<area shape="rect" id="node7" href="$classadb_1_1filesync__protocol_1_1FileSyncConnection.xhtml#a04b80f6d7f831900ac694a1963dade4e" title="adb.filesync_protocol.File\lSyncConnection.ReadUntil" alt="" coords="571,123,751,164"/>
+<area shape="rect" id="node5" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml#a7dd74c37b5e308f9c01d5f2816cefc2e" title="adb.adb_protocol.AdbMessage.\lStreamingCommand" alt="" coords="827,64,1032,105"/>
+<area shape="rect" id="node6" href="$classadb_1_1adb__protocol_1_1AdbMessage.xhtml#a52daa04faafab1e34428fda0153533b5" title="adb.adb_protocol.AdbMessage.\lCommand" alt="" coords="1080,64,1285,105"/>
+</map>

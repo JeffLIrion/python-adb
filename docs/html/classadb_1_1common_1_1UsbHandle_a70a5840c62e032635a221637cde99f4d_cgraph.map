@@ -1,0 +1,13 @@
+<map id="adb.common.UsbHandle.Open" name="adb.common.UsbHandle.Open">
+<area shape="rect" id="node2" href="$classadb_1_1common_1_1UsbHandle.xhtml#af3dd6044e8742ab4975d750f2819aa2e" title="adb.common.UsbHandle.port_path" alt="" coords="261,5,485,32"/>
+<area shape="rect" id="node3" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml#a4368536c2d9564e579c4fc7714667aa1" title="adb.adb_commands.AdbCommands.\lClose" alt="" coords="255,57,492,98"/>
+<area shape="rect" id="node6" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a3bcf4458221c2c30fd7db3171794ed74" title="adb.adb_protocol._AdbConnection.\lClose" alt="" coords="261,122,486,163"/>
+<area shape="rect" id="node10" href="$classadb_1_1common_1_1UsbHandle.xhtml#aa4dcc7335abc4e231eb6a9f7cc5dede6" title="adb.common.UsbHandle.Close" alt="" coords="271,213,475,240"/>
+<area shape="rect" id="node4" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml#ad6f4ddfcb99529b1345ad2005e8f2be4" title="adb.adb_commands.AdbCommands.\l__reset" alt="" coords="540,43,777,85"/>
+<area shape="rect" id="node5" href="$classadb_1_1adb__commands_1_1AdbCommands.xhtml#a703b12c1f82f8260b17043aa97f2424a" title="adb.adb_commands.AdbCommands.\l__init__" alt="" coords="835,43,1072,85"/>
+<area shape="rect" id="node7" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#afaf68a0fc17b74faeb6e21984d059c89" title="adb.adb_protocol._AdbConnection._Send" alt="" coords="1129,137,1392,164"/>
+<area shape="rect" id="node8" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a398196cc2511e4ea2a3581cb2395a0a8" title="adb.adb_protocol._AdbConnection.\lReadUntil" alt="" coords="546,161,771,202"/>
+<area shape="rect" id="node9" href="$classadb_1_1adb__protocol_1_1__AdbConnection.xhtml#a3f8e837ace6e380c85d5d7867b964f29" title="adb.adb_protocol._AdbConnection.Okay" alt="" coords="825,164,1081,191"/>
+<area shape="rect" id="node11" href="$classadb_1_1common_1_1UsbHandle.xhtml#a8853067620b240c229c1efe8ac04ce88" title="adb.common.UsbHandle.usb_info" alt="" coords="549,227,768,253"/>
+<area shape="rect" id="node12" href="$classadb_1_1common_1_1UsbHandle.xhtml#a182ca356bc1ba1aaccfbed946b4b43a4" title="adb.common.UsbHandle.serial\l_number" alt="" coords="853,219,1054,261"/>
+</map>

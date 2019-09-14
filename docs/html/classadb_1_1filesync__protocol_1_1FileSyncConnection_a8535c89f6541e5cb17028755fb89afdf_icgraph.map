@@ -1,0 +1,5 @@
+<map id="adb.filesync_protocol.FileSyncConnection._Flush" name="adb.filesync_protocol.FileSyncConnection._Flush">
+<area shape="rect" id="node2" href="$classadb_1_1filesync__protocol_1_1FileSyncConnection.xhtml#aed75ba5d0b898cfd8923d1d657eb3f3a" title="adb.filesync_protocol.File\lSyncConnection.Send" alt="" coords="224,5,395,47"/>
+<area shape="rect" id="node3" href="$classadb_1_1filesync__protocol_1_1FileSyncConnection.xhtml#a7d62f3b375a5463d49689ac62636f27f" title="adb.filesync_protocol.File\lSyncConnection.Read" alt="" coords="224,71,395,112"/>
+<area shape="rect" id="node4" href="$classadb_1_1filesync__protocol_1_1FileSyncConnection.xhtml#a04b80f6d7f831900ac694a1963dade4e" title="adb.filesync_protocol.File\lSyncConnection.ReadUntil" alt="" coords="443,71,623,112"/>
+</map>

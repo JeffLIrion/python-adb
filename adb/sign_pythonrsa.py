@@ -93,7 +93,7 @@ def _load_rsa_private_key(pem):
     (in der-encoded form).
 
     See:
-    
+
     * https://www.ietf.org/rfc/rfc2313.txt
     * http://superuser.com/a/606266
 

@@ -13,3 +13,10 @@ class TestPycryptodomeAuthSigner(unittest.TestCase):
         """Test that the ``Sign`` method does not raise an exception."""
         self.signer.Sign(b'notadb')
         self.assertTrue(True)
+
+    def test_get_public_key(self):
+        """Test that the ``GetPublicKey`` method does not raise an exception."""
+        with open('test/adbkey.pub', 'rb') as f:
+            pub = f.read()
+
+        self.assertEqual(pub, self.signer.GetPublicKey())

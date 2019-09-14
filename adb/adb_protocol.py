@@ -682,9 +682,7 @@ class AdbMessage(object):
         if isinstance(banner, str):
             banner = bytearray(banner, 'utf-8')
 
-        msg = cls(
-            command=b'CNXN', arg0=VERSION, arg1=MAX_ADB_DATA,
-            data=b'host::%s\0' % banner)
+        msg = cls(command=b'CNXN', arg0=VERSION, arg1=MAX_ADB_DATA, data=b'host::%s\0' % banner)
         msg.Send(usb)
         cmd, arg0, arg1, banner = cls.Read(usb, [b'CNXN', b'AUTH'])
         if cmd == b'AUTH':
@@ -705,9 +703,7 @@ class AdbMessage(object):
                     return banner
 
             # None of the keys worked, so send a public key.
-            msg = cls(
-                command=b'AUTH', arg0=AUTH_RSAPUBLICKEY, arg1=0,
-                data=rsa_keys[0].GetPublicKey() + b'\0')
+            msg = cls(command=b'AUTH', arg0=AUTH_RSAPUBLICKEY, arg1=0, data=rsa_keys[0].GetPublicKey() + b'\0')
             msg.Send(usb)
             try:
                 cmd, arg0, unused_arg1, banner = cls.Read(usb, [b'CNXN'], timeout_ms=auth_timeout_ms)

@@ -252,8 +252,8 @@ class AdbCommands(object):
         banner : TODO, None
             See protocol_handler.Connect.
         **kwargs : TODO
-            See `adb.adb_protocol.AdbMessage.Connect` and `ConnectDevice` for kwargs. Includes handle, rsa_keys, and
-            auth_timeout_ms.
+            See `adb.adb_protocol.AdbMessage.Connect` and `ConnectDevice` for kwargs. Includes ``handle``, ``rsa_keys``, and
+            ``auth_timeout_ms``.
 
         Returns
         -------

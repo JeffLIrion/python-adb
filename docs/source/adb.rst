@@ -8,6 +8,7 @@ Submodules
 
    adb.adb_commands
    adb.adb_debug
+   adb.adb_keygen
    adb.adb_protocol
    adb.common
    adb.common_cli

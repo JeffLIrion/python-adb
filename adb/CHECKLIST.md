@@ -2,6 +2,7 @@
 
 - [x] `adb_commands.py`
 - [x] `adb_debug.py`
+- [x] `adb_keygen.py`
 - [x] `adb_protocol.py`
 - [x] `common_cli.py`
 - [x] `common.py`
@@ -19,6 +20,7 @@
 
 - [x] `adb_commands.py`
 - [x] `adb_debug.py`
+- [x] `adb_keygen.py`
 - [x] `adb_protocol.py`
 - [x] `common_cli.py`
 - [x] `common.py` (left off on line 483)
@@ -36,6 +38,7 @@
 
 - [x] `adb_commands.py`
 - [x] `adb_debug.py`
+- [x] `adb_keygen.py`
 - [x] `adb_protocol.py`
 - [x] `common_cli.py`
 - [x] `common.py`

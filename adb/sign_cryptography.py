@@ -1,4 +1,4 @@
-import adb_protocol
+from adb import adb_protocol
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes

@@ -23,7 +23,7 @@ def do_file(fname):
     for toktype, ttext, (slineno, scol), (elineno, ecol), ltext in tokgen:
         # Modification: remove the module's docstring
         if not first_import_found:
-            if ttext.startswith('import'):
+            if ttext.startswith('import') or ttext.startswith('from'):
                 first_import_found = True
             else:
                 continue

@@ -1,4 +1,4 @@
-import adb_protocol
+from adb import adb_protocol
 
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA

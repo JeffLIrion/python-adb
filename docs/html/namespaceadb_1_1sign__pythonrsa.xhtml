@@ -128,17 +128,26 @@ Functions</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<pre class="fragment">PEM encoded PKCS#8 private key -&gt; rsa.PrivateKey.
+<pre class="fragment">PEM encoded PKCS#8 private key -&gt; ``rsa.PrivateKey``.
+
+ADB uses private RSA keys in pkcs#8 format. The ``rsa`` library doesn't
+support them natively.  Do some ASN unwrapping to extract naked RSA key
+(in der-encoded form).
+
+See:
+
+* https://www.ietf.org/rfc/rfc2313.txt
+* http://superuser.com/a/606266
 
 Parameters
 ----------
-pem : TODO
-    TODO
+pem : str
+    The private key to be loaded
 
 Returns
 -------
-TODO
-    TODO</pre> 
+rsa.key.PrivateKey
+    The loaded private key</pre> 
 </div>
 </div>
 </div><!-- contents -->

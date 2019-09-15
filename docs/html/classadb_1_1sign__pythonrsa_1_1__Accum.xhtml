@@ -124,14 +124,18 @@ Private Attributes</h2></td></tr>
 <tr class="separator:a02424f208ceae5e3b54831ecd88ca229"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><pre class="fragment">TODO
+<div class="textblock"><pre class="fragment">A fake hashing algorithm.
+
+The Python ``rsa`` lib hashes all messages it signs. ADB does it already, we just
+need to slap a signature on top of already hashed message.  Introduce a "fake"
+hashing algo for this.
 
 .. image:: _static/adb.sign_pythonrsa._Accum.CALL_GRAPH.svg
 
 Attributes
 ----------
-_buf : TODO
-    TODO</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+_buf : bytes
+    A buffer for storing data before it is signed</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ae175a8e9939a3a4af0353c5669b3188c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -162,12 +166,12 @@ _buf : TODO
         </tr>
       </table>
 </div><div class="memdoc">
-<pre class="fragment">TODO
+<pre class="fragment">Return the digest value as a string of binary data.
 
 Returns
 -------
-self._buf : TODO
-    TODO</pre> 
+self._buf : bytes
+    ``self._buf``</pre> 
 </div>
 </div>
 <a class="anchor" id="a1276c94b96010d39f597772f3eab614c"></a>
@@ -193,12 +197,12 @@ self._buf : TODO
         </tr>
       </table>
 </div><div class="memdoc">
-<pre class="fragment">TODO
+<pre class="fragment">Update this hash object's state with the provided ``msg``.
 
 Parameters
 ----------
-msg : TODO
-    TODO</pre> 
+msg : bytes
+    The message to be appended to ``self._buf``</pre> 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>

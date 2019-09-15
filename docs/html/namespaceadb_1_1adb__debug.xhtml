@@ -136,6 +136,8 @@ Mimics ``adb devices`` output:
   015DB7591102001A        device        1,2
 
 
+.. seealso:: :meth:`adb.adb_commands.AdbCommands.Devices`
+
 .. image:: _static/adb.adb_debug.Devices.CALLER_GRAPH.svg
 
 Parameters
@@ -182,16 +184,18 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 <pre class="fragment">Prints a directory listing.
 
+.. seealso:: :meth:`adb.adb_commands.AdbCommands.List`
+
 Parameters
 ----------
-device : TODO
+device : adb.adb_commands.AdbCommands
     TODO
 device_path : TODO
     Directory to list.
 
 Yields
 ------
-TODO
+str
     TODO</pre> 
 </div>
 </div>
@@ -220,9 +224,11 @@ TODO
 </div><div class="memdoc">
 <pre class="fragment">TODO
 
+.. seealso:: :meth:`adb.adb_commands.AdbCommands.Logcat`
+
 Parameters
 ----------
-device : TODO
+device : adb.adb_commands.AdbCommands
     TODO
 options : TODO
     TODO
@@ -281,9 +287,11 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 <pre class="fragment">Runs a command on the device and prints the stdout.
 
+.. seealso:: :meth:`adb.adb_commands.AdbCommands.StreamingShell`, :meth:`adb.adb_commands.AdbCommands.InteractiveShell`
+
 Parameters
 ----------
-device : TODO
+device : adb.adb_commands.AdbCommands
     TODO
 command : list[str]
     Command to run on the target.</pre> 

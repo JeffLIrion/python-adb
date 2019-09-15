@@ -144,8 +144,8 @@ Attributes
 ----------
 public_key : str
     The contents of the public key file
-rsa_key : str
-    The contents of the private key file</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+rsa_key : Crypto.PublicKey.RSA.RsaKey
+    The contents of theprivate key</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ac0e7ee11074af5efd3819f329fd4f58c"></a>
 <div class="memitem">
 <div class="memproto">
@@ -221,12 +221,12 @@ self.public_key : str
 
 Parameters
 ----------
-data : TODO
-    TODO
+data : bytes, bytearray
+    The data to be signed
 
 Returns
 -------
-TODO
+bytes
     The signed ``data``</pre> 
 </div>
 </div>

@@ -133,23 +133,23 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a97fd0028c3b95cbd0f1bd533f1d82852"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><pre class="fragment">Implements adb_protocol.AuthSigner using http://stuvel.eu/rsa.
+<div class="textblock"><pre class="fragment">Implements :class:`adb_protocol.AuthSigner` using http://stuvel.eu/rsa.
 
 .. image:: _static/adb.sign_pythonrsa.PythonRSASigner.CALL_GRAPH.svg
 
 Parameters
 ----------
 pub : str, None
-    The path to the private key.
-priv : TODO, None
-    TODO
+    The contents of the public key file
+priv : str, None
+    The path to the private key
 
 Attributes
 ----------
-priv_key : TODO
-    TODO
-pub_key : TODO, None
-    TODO</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+priv_key : rsa.key.PrivateKey
+    The loaded private key
+pub_key : str, None
+    The contents of the public key file</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a4239f1c086bbdb4061a3aa1f38bc48e5"></a>
 <div class="memitem">
 <div class="memproto">
@@ -236,8 +236,8 @@ PythonRSASigner
 
 Returns
 -------
-self.pub_key : TODO, None
-    The public key, or ``None`` if it was not provided.</pre> 
+self.pub_key : str, None
+    The contents of the public key file, or ``None`` if a public key was not provided.</pre> 
 </div>
 </div>
 <a class="anchor" id="a6e730b69341c9c83df9cbcc1575aa53f"></a>
@@ -267,12 +267,12 @@ self.pub_key : TODO, None
 
 Parameters
 ----------
-data : TODO
-    TODO
+data : bytes
+    The data to be signed
 
 Returns
 -------
-TODO
+bytes
     The signed ``data``</pre> 
 </div>
 </div>

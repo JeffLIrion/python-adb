@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['get_5fuser_5finfo',['get_user_info',['../namespaceadb_1_1adb__keygen.xhtml#a27a05077e217aa9178e79214aa155ede',1,'adb::adb_keygen']]],
   ['getcommonarguments',['GetCommonArguments',['../namespaceadb_1_1common__cli.xhtml#aa460dea8a258cc6e46f7156c65e9d225',1,'adb::common_cli']]],
   ['getdevicearguments',['GetDeviceArguments',['../namespaceadb_1_1common__cli.xhtml#af8793b3dc0d78ec32e035d83c52b76f0',1,'adb::common_cli']]],
   ['getinterface',['GetInterface',['../namespaceadb_1_1common.xhtml#a7edc0713efe100c6aa6990530c5e2604',1,'adb::common']]],

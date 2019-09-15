@@ -133,6 +133,8 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><pre class="fragment">AuthSigner using cryptography.io.
 
+.. warning:: This is currently broken!
+
 .. image:: _static/adb.sign_cryptography.CryptographySigner.CALL_GRAPH.svg
 
 Parameters
@@ -144,8 +146,8 @@ Attributes
 ----------
 public_key : str
     The contents of the public key file
-rsa_key : TODO
-    TODO</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+rsa_key : cryptography.hazmat.backends.openssl.rsa._RSAPrivateKey
+    The loaded private key</pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="aade6af55a857f977e35293ac0c252bbd"></a>
 <div class="memitem">
 <div class="memproto">

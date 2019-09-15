@@ -9,19 +9,16 @@ from adb import fastboot
 try:
     import progressbar
 except ImportError:
-
     progressbar = None
 
 
 def Devices(args):
-
     for device in fastboot.FastbootCommands.Devices():
         print("%s\tdevice" % device.serial_number)
     return 0
 
 
 def _InfoCb(message):
-
     if not message.message:
         return
     sys.stdout.write("%s: %s\n" % (message.header, message.message))
@@ -40,18 +37,15 @@ def main():
         "required to use 4.",
     )
     parents = [common, device]
-
     parser = argparse.ArgumentParser(
         description=sys.modules[__name__].__doc__, parents=[common]
     )
     subparsers = parser.add_subparsers(title="Commands", dest="command_name")
-
     subparser = subparsers.add_parser(name="help", help="Prints the commands available")
     subparser = subparsers.add_parser(
         name="devices", help="Lists the available devices", parents=[common]
     )
     common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Continue)
-
     common_cli.MakeSubparser(
         subparsers,
         parents,
@@ -63,11 +57,9 @@ def main():
     common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Getvar)
     common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Oem)
     common_cli.MakeSubparser(subparsers, parents, fastboot.FastbootCommands.Reboot)
-
     if len(sys.argv) == 1:
         parser.print_help()
         return 2
-
     args = parser.parse_args()
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -76,7 +68,6 @@ def main():
     if args.command_name == "help":
         parser.print_help()
         return 0
-
     kwargs = {}
     argspec = inspect.getargspec(args.method)
     if "info_cb" in argspec.args:
@@ -93,7 +84,6 @@ def main():
                 bar.finish()
 
         kwargs["progress_callback"] = SetProgress
-
     return common_cli.StartCli(
         args, fastboot.FastbootCommands, chunk_kb=args.chunk_kb, extra=kwargs
     )

@@ -104,9 +104,7 @@ class StubUsb(UsbHandle):
 
 class StubTcp(TcpHandle):
     def __init__(self, serial, timeout_ms=None):
-
         self._connect = mock.MagicMock(return_value=None)
-
         super(StubTcp, self).__init__(serial, timeout_ms)
         self.stub_base = StubHandleBase(0, is_tcp=True)
 

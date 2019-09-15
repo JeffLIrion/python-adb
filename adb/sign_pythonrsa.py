@@ -21,7 +21,6 @@ pkcs1.HASH_ASN1["SHA-1-PREHASHED"] = pkcs1.HASH_ASN1["SHA-1"]
 
 
 def _load_rsa_private_key(pem):
-
     try:
         der = rsa.pem.load_pem(pem, "PRIVATE KEY")
         keyinfo, _ = decoder.decode(der)

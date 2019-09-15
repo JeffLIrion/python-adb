@@ -16,12 +16,10 @@ _LOG = logging.getLogger("android_usb")
 
 
 def GetInterface(setting):
-
     return (setting.getClass(), setting.getSubClass(), setting.getProtocol())
 
 
 def InterfaceMatcher(clazz, subclass, protocol):
-
     interface = (clazz, subclass, protocol)
 
     def Matcher(device):
@@ -33,16 +31,13 @@ def InterfaceMatcher(clazz, subclass, protocol):
 
 
 class UsbHandle(object):
-
     _HANDLE_CACHE = weakref.WeakValueDictionary()
     _HANDLE_CACHE_LOCK = threading.Lock()
 
     def __init__(self, device, setting, usb_info=None, timeout_ms=None):
-
         self._setting = setting
         self._device = device
         self._handle = None
-
         self._usb_info = usb_info or ""
         self._timeout_ms = timeout_ms if timeout_ms else DEFAULT_TIMEOUT_MS
         self._max_read_packet_len = 0
@@ -58,16 +53,13 @@ class UsbHandle(object):
         return self._usb_info
 
     def Open(self):
-
         port_path = tuple(self.port_path)
         with self._HANDLE_CACHE_LOCK:
             old_handle = self._HANDLE_CACHE.get(port_path)
             if old_handle is not None:
                 old_handle.Close()
-
         self._read_endpoint = None
         self._write_endpoint = None
-
         for endpoint in self._setting.iterEndpoints():
             address = endpoint.getAddress()
             if address & libusb1.USB_ENDPOINT_DIR_MASK:
@@ -75,10 +67,8 @@ class UsbHandle(object):
                 self._max_read_packet_len = endpoint.getMaxPacketSize()
             else:
                 self._write_endpoint = address
-
         assert self._read_endpoint is not None
         assert self._write_endpoint is not None
-
         handle = self._device.open()
         iface_number = self._setting.getNumber()
         try:
@@ -94,10 +84,8 @@ class UsbHandle(object):
         handle.claimInterface(iface_number)
         self._handle = handle
         self._interface_number = iface_number
-
         with self._HANDLE_CACHE_LOCK:
             self._HANDLE_CACHE[port_path] = self
-
         weakref.ref(self, self.Close)
 
     @property
@@ -157,7 +145,6 @@ class UsbHandle(object):
                 None,
             )
         try:
-
             return bytearray(
                 self._handle.bulkRead(
                     self._read_endpoint, length, timeout=self.Timeout(timeout_ms)
@@ -171,20 +158,16 @@ class UsbHandle(object):
             )
 
     def BulkReadAsync(self, length, timeout_ms=None):
-
         return
 
     @classmethod
     def PortPathMatcher(cls, port_path):
-
         if isinstance(port_path, str):
-
             port_path = [int(part) for part in SYSFS_PORT_SPLIT_RE.split(port_path)]
         return lambda device: device.port_path == port_path
 
     @classmethod
     def SerialMatcher(cls, serial):
-
         return lambda device: device.serial_number == serial
 
     @classmethod
@@ -198,7 +181,6 @@ class UsbHandle(object):
 
     @classmethod
     def Find(cls, setting_matcher, port_path=None, serial=None, timeout_ms=None):
-
         if port_path:
             device_matcher = cls.PortPathMatcher(port_path)
             usb_info = port_path
@@ -214,7 +196,6 @@ class UsbHandle(object):
 
     @classmethod
     def FindFirst(cls, setting_matcher, device_matcher=None, **kwargs):
-
         try:
             return next(
                 cls.FindDevices(
@@ -230,13 +211,11 @@ class UsbHandle(object):
     def FindDevices(
         cls, setting_matcher, device_matcher=None, usb_info="", timeout_ms=None
     ):
-
         ctx = usb1.USBContext()
         for device in ctx.getDeviceList(skip_on_error=True):
             setting = setting_matcher(device)
             if setting is None:
                 continue
-
             handle = cls(device, setting, usb_info=usb_info, timeout_ms=timeout_ms)
             if device_matcher is None or device_matcher(handle):
                 yield handle
@@ -244,20 +223,16 @@ class UsbHandle(object):
 
 class TcpHandle(object):
     def __init__(self, serial, timeout_ms=None):
-
         if isinstance(serial, (bytes, bytearray)):
             serial = serial.decode("utf-8")
-
         if ":" in serial:
             self.host, self.port = serial.split(":")
         else:
             self.host = serial
             self.port = 5555
-
         self._connection = None
         self._serial_number = "%s:%s" % (self.host, self.port)
         self._timeout_ms = float(timeout_ms) if timeout_ms else None
-
         self._connect()
 
     def _connect(self):

@@ -11,7 +11,6 @@ class CryptographySigner(adb_protocol.AuthSigner):
     def __init__(self, rsa_key_path):
         with open(rsa_key_path + ".pub") as rsa_pub_file:
             self.public_key = rsa_pub_file.read()
-
         with open(rsa_key_path) as rsa_prv_file:
             self.rsa_key = serialization.load_pem_private_key(
                 rsa_prv_file.read(), None, default_backend()

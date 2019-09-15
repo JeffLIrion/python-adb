@@ -46,6 +46,7 @@ for pyfile in $(ls adb/*.py); do
     python remove_comments.py $pyfile
     rm $pyfile
     mv "$pyfile,strip" $pyfile
+    python remove_blank_lines.py $pyfile
 
     comment_black_failures $pyfile
     black $pyfile --fast
@@ -59,6 +60,7 @@ for pyfile in $(ls test/*.py); do
     python remove_comments.py $pyfile
     rm $pyfile
     mv "$pyfile,strip" $pyfile
+    python remove_blank_lines.py $pyfile
 
     comment_black_failures $pyfile
     black $pyfile --fast

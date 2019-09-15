@@ -49,7 +49,6 @@ def GetCommonArguments():
 
 
 def _DocToArgs(doc):
-
     m = None
     offset = None
     in_arg = False
@@ -72,7 +71,6 @@ def _DocToArgs(doc):
 
 
 def MakeSubparser(subparsers, parents, method, arguments=None):
-
     name = ("-".join(re.split(r"([A-Z][a-z]+)", method.__name__)[1:-1:2])).lower()
     help = method.__doc__.splitlines()[0]
     subparser = subparsers.add_parser(
@@ -80,7 +78,6 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
     )
     subparser.set_defaults(method=method, positional=[])
     argspec = inspect.getargspec(method)
-
     offset = len(argspec.args) - len(argspec.defaults or []) - 1
     positional = []
     for i in range(1, len(argspec.args)):
@@ -88,7 +85,6 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
             break
         positional.append(argspec.args[i])
     defaults = [None] * offset + list(argspec.defaults or [])
-
     args_help = _DocToArgs(method.__doc__)
     for name, default in zip(positional, defaults):
         if not isinstance(default, (None.__class__, str)):
@@ -110,7 +106,6 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
 
 
 def _RunMethod(dev, args, extra):
-
     logging.info("%s(%s)", args.method.__name__, ", ".join(args.positional))
     result = args.method(dev, *args.positional, **extra)
     if result is not None:
@@ -132,7 +127,6 @@ def _RunMethod(dev, args, extra):
 
 
 def StartCli(args, adb_commands, extra=None, **device_kwargs):
-
     try:
         dev = adb_commands()
         dev.ConnectDevice(

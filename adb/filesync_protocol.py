@@ -9,23 +9,17 @@ import libusb1
 from adb import adb_protocol
 from adb import usb_exceptions
 
-
 DEFAULT_PUSH_MODE = stat.S_IFREG | stat.S_IRWXU | stat.S_IRWXG
 
 MAX_PUSH_DATA = 2 * 1024
 
-
 class InvalidChecksumError(Exception):
-
 
 class InterleavedDataError(Exception):
 
-
 class PushFailedError(Exception):
 
-
 class PullFailedError(Exception):
-
 
 DeviceFile = collections.namedtuple("DeviceFile", ["filename", "mode", "size", "mtime"])
 
@@ -36,7 +30,6 @@ class FilesyncProtocol(object):
         cnxn = FileSyncConnection(connection, b"<4I")
         cnxn.Send(b"STAT", filename)
         command, (mode, size, mtime) = cnxn.Read((b"STAT",), read_data=False)
-
         if command != b"STAT":
             raise adb_protocol.InvalidResponseError(
                 "Expected STAT response to STAT, got %s" % command
@@ -57,14 +50,12 @@ class FilesyncProtocol(object):
 
     @classmethod
     def Pull(cls, connection, filename, dest_file, progress_callback):
-
         if progress_callback:
             total_bytes = cls.Stat(connection, filename)[1]
             progress = cls._HandleProgress(
                 lambda current: progress_callback(filename, current, total_bytes)
             )
             next(progress)
-
         cnxn = FileSyncConnection(connection, b"<2I")
         try:
             cnxn.Send(b"RECV", filename)
@@ -79,7 +70,6 @@ class FilesyncProtocol(object):
 
     @classmethod
     def _HandleProgress(cls, progress_callback):
-
         current = 0
         while True:
             current += yield
@@ -98,12 +88,9 @@ class FilesyncProtocol(object):
         mtime=0,
         progress_callback=None,
     ):
-
         fileinfo = ("{},{}".format(filename, int(st_mode))).encode("utf-8")
-
         cnxn = FileSyncConnection(connection, b"<2I")
         cnxn.Send(b"SEND", fileinfo)
-
         if progress_callback:
             total_bytes = (
                 os.fstat(datafile.fileno()).st_size
@@ -114,20 +101,16 @@ class FilesyncProtocol(object):
                 lambda current: progress_callback(filename, current, total_bytes)
             )
             next(progress)
-
         while True:
             data = datafile.read(MAX_PUSH_DATA)
             if data:
                 cnxn.Send(b"DATA", data)
-
                 if progress_callback:
                     progress.send(len(data))
             else:
                 break
-
         if mtime == 0:
             mtime = int(time.time())
-
         cnxn.Send(b"DONE", size=mtime)
         for cmd_id, _, data in cnxn.ReadUntil((), b"OKAY", b"FAIL"):
             if cmd_id == b"OKAY":
@@ -136,7 +119,6 @@ class FilesyncProtocol(object):
 
 
 class FileSyncConnection(object):
-
     ids = [
         b"STAT",
         b"LIST",
@@ -153,22 +135,18 @@ class FileSyncConnection(object):
 
     def __init__(self, adb_connection, recv_header_format):
         self.adb = adb_connection
-
         self.send_buffer = bytearray(adb_protocol.MAX_ADB_DATA)
         self.send_idx = 0
         self.send_header_len = struct.calcsize(b"<2I")
-
         self.recv_buffer = bytearray()
         self.recv_header_format = recv_header_format
         self.recv_header_len = struct.calcsize(recv_header_format)
 
     def Send(self, command_id, data=b"", size=0):
-
         if data:
             if not isinstance(data, bytes):
                 data = data.encode("utf8")
             size = len(data)
-
         if not self._CanAddToSendBuffer(len(data)):
             self._Flush()
         buf = struct.pack(b"<2I", self.id_to_wire[command_id], size) + data
@@ -176,15 +154,11 @@ class FileSyncConnection(object):
         self.send_idx += len(buf)
 
     def Read(self, expected_ids, read_data=True):
-
         if self.send_idx:
             self._Flush()
-
         header_data = self._ReadBuffered(self.recv_header_len)
         header = struct.unpack(self.recv_header_format, header_data)
-
         command_id = self.wire_to_id[header[0]]
-
         if command_id not in expected_ids:
             if command_id == b"FAIL":
                 reason = ""
@@ -196,16 +170,13 @@ class FileSyncConnection(object):
             raise adb_protocol.InvalidResponseError(
                 "Expected one of %s, got %s" % (expected_ids, command_id)
             )
-
         if not read_data:
             return command_id, header[1:]
-
         size = header[-1]
         data = self._ReadBuffered(size)
         return command_id, header[1:-1], data
 
     def ReadUntil(self, expected_ids, *finish_ids):
-
         while True:
             cmd_id, header, data = self.Read(expected_ids + finish_ids)
             yield cmd_id, header, data
@@ -226,11 +197,9 @@ class FileSyncConnection(object):
         self.send_idx = 0
 
     def _ReadBuffered(self, size):
-
         while len(self.recv_buffer) < size:
             _, data = self.adb.ReadUntil(b"WRTE")
             self.recv_buffer += data
-
         result = self.recv_buffer[:size]
         self.recv_buffer = self.recv_buffer[size:]
         return result

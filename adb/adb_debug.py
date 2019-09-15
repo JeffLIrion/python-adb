@@ -28,7 +28,6 @@ except ImportError:
 
 
 def Devices(args):
-
     for d in adb_commands.AdbCommands.Devices():
         if args.output_port_path:
             print(
@@ -41,7 +40,6 @@ def Devices(args):
 
 
 def List(device, device_path):
-
     files = device.List(device_path)
     files.sort(key=lambda x: x.filename)
     maxname = max(len(f.filename) for f in files)
@@ -81,14 +79,11 @@ def Logcat(device, *options):
 
 
 def Shell(device, *command):
-
     if command:
         return device.StreamingShell(" ".join(command))
     else:
-
         terminal_prompt = device.InteractiveShell()
         print(terminal_prompt.decode("utf-8"))
-
         while True:
             cmd = input("> ")
             if not cmd:
@@ -103,7 +98,6 @@ def Shell(device, *command):
                     if isinstance(stdout, bytes):
                         stdout = stdout.decode("utf-8")
                         print(stdout)
-
         device.Close()
 
 
@@ -126,12 +120,10 @@ def main():
     )
     device = common_cli.GetDeviceArguments()
     parents = [common, device]
-
     parser = argparse.ArgumentParser(
         description=sys.modules[__name__].__doc__, parents=[common]
     )
     subparsers = parser.add_subparsers(title="Commands", dest="command_name")
-
     subparser = subparsers.add_parser(name="help", help="Prints the commands available")
     subparser = subparsers.add_parser(
         name="devices", help="Lists the available devices", parents=[common]
@@ -141,7 +133,6 @@ def main():
         action="store_true",
         help="Outputs the port_path alongside the serial",
     )
-
     common_cli.MakeSubparser(subparsers, parents, adb_commands.AdbCommands.Install)
     common_cli.MakeSubparser(subparsers, parents, adb_commands.AdbCommands.Uninstall)
     common_cli.MakeSubparser(subparsers, parents, List)
@@ -172,11 +163,9 @@ def main():
         subparsers, parents, adb_commands.AdbCommands.DisableVerity
     )
     common_cli.MakeSubparser(subparsers, parents, Shell)
-
     if len(sys.argv) == 1:
         parser.print_help()
         return 2
-
     args = parser.parse_args()
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -186,7 +175,6 @@ def main():
             args.rsa_key_path = [default]
     if args.rsa_key_path and not rsa_signer:
         parser.error("Please install either cryptography, python-rsa, or PycryptoDome")
-
     if args.command_name == "devices":
         return Devices(args)
     if args.command_name == "help":
@@ -196,7 +184,6 @@ def main():
         args.positional = args.options
     elif args.command_name == "shell":
         args.positional = args.command
-
     return common_cli.StartCli(
         args,
         adb_commands.AdbCommands,

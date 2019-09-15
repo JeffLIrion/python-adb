@@ -3,13 +3,11 @@ import struct
 import unittest
 from mock import mock
 
-
 from adb import common
 from adb import adb_commands
 from adb import adb_protocol
 from adb.usb_exceptions import TcpTimeoutException, DeviceNotFoundError
 import common_stub
-
 
 BANNER = b"blazetest"
 LOCAL_ID = 1
@@ -69,7 +67,6 @@ class AdbTest(BaseAdbTest):
         usb = common_stub.StubUsb(device=None, setting=None)
         cls._ExpectConnection(usb)
         cls._ExpectOpen(usb, b"%s:%s\0" % (service, command))
-
         for response in responses:
             cls._ExpectRead(usb, b"WRTE", REMOTE_ID, 0, response)
         cls._ExpectClose(usb)
@@ -78,13 +75,11 @@ class AdbTest(BaseAdbTest):
     def testConnect(self):
         usb = common_stub.StubUsb(device=None, setting=None)
         self._ExpectConnection(usb)
-
         dev = adb_commands.AdbCommands()
         dev.ConnectDevice(handle=usb, banner=BANNER)
 
     def testConnectSerialString(self):
         dev = adb_commands.AdbCommands()
-
         with mock.patch.object(common.UsbHandle, "FindAndOpen", return_value=None):
             with mock.patch.object(
                 adb_commands.AdbCommands, "_Connect", return_value=None
@@ -95,18 +90,14 @@ class AdbTest(BaseAdbTest):
         command = b"keepin it real"
         response = "word."
         usb = self._ExpectCommand(b"shell", command, response)
-
         dev = adb_commands.AdbCommands()
         dev.ConnectDevice(handle=usb, banner=BANNER)
         self.assertEqual(response, dev.Shell(command))
 
     def testBigResponseShell(self):
         command = b"keepin it real big"
-
         responses = [b"other stuff, ", b"and some words."]
-
         usb = self._ExpectCommand(b"shell", command, *responses)
-
         dev = adb_commands.AdbCommands()
         dev.ConnectDevice(handle=usb, banner=BANNER)
         self.assertEqual(b"".join(responses).decode("utf8"), dev.Shell(command))
@@ -114,22 +105,17 @@ class AdbTest(BaseAdbTest):
     def testUninstall(self):
         package_name = "com.test.package"
         response = "Success"
-
         usb = self._ExpectCommand(
             b"shell", ('pm uninstall "%s"' % package_name).encode("utf8"), response
         )
-
         dev = adb_commands.AdbCommands()
         dev.ConnectDevice(handle=usb, banner=BANNER)
         self.assertEqual(response, dev.Uninstall(package_name))
 
     def testStreamingResponseShell(self):
         command = b"keepin it real big"
-
         responses = ["other stuff, ", "and some words."]
-
         usb = self._ExpectCommand(b"shell", command, *responses)
-
         dev = adb_commands.AdbCommands()
         dev.ConnectDevice(handle=usb, banner=BANNER)
         response_count = 0
@@ -192,23 +178,19 @@ class FilesyncAdbTest(BaseAdbTest):
         usb = common_stub.StubUsb(device=None, setting=None)
         cls._ExpectConnection(usb)
         cls._ExpectOpen(usb, b"sync:\0")
-
         while write_commands or read_commands:
             if write_commands:
                 command = write_commands.pop(0)
                 cls._ExpectWrite(usb, b"WRTE", LOCAL_ID, REMOTE_ID, command)
-
             if read_commands:
                 command = read_commands.pop(0)
                 cls._ExpectRead(usb, b"WRTE", REMOTE_ID, LOCAL_ID, command)
-
         cls._ExpectClose(usb)
         return usb
 
     def testPush(self):
         filedata = b"alo there, govnah"
         mtime = 100
-
         send = [
             self._MakeWriteSyncPacket(b"SEND", b"/data,33272"),
             self._MakeWriteSyncPacket(b"DATA", filedata),
@@ -216,14 +198,12 @@ class FilesyncAdbTest(BaseAdbTest):
         ]
         data = b"OKAY\0\0\0\0"
         usb = self._ExpectSyncCommand([b"".join(send)], [data])
-
         dev = adb_commands.AdbCommands()
         dev.ConnectDevice(handle=usb, banner=BANNER)
         dev.Push(BytesIO(filedata), "/data", mtime=mtime)
 
     def testPull(self):
         filedata = b"g'ddayta, govnah"
-
         recv = self._MakeWriteSyncPacket(b"RECV", b"/data")
         data = [
             self._MakeWriteSyncPacket(b"DATA", filedata),
@@ -241,7 +221,6 @@ class TcpTimeoutAdbTest(BaseAdbTest):
         tcp = common_stub.StubTcp("10.0.0.123")
         cls._ExpectConnection(tcp)
         cls._ExpectOpen(tcp, b"%s:%s\0" % (service, command))
-
         for response in responses:
             cls._ExpectRead(tcp, b"WRTE", REMOTE_ID, 0, response)
         cls._ExpectClose(tcp)
@@ -270,25 +249,21 @@ class TcpTimeoutAdbTest(BaseAdbTest):
 class TcpHandleTest(unittest.TestCase):
     def testInitWithHost(self):
         tcp = common_stub.StubTcp("10.11.12.13")
-
         self.assertEqual("10.11.12.13:5555", tcp._serial_number)
         self.assertEqual(None, tcp._timeout_ms)
 
     def testInitWithHostAndPort(self):
         tcp = common_stub.StubTcp("10.11.12.13:5678")
-
         self.assertEqual("10.11.12.13:5678", tcp._serial_number)
         self.assertEqual(None, tcp._timeout_ms)
 
     def testInitWithTimeout(self):
         tcp = common_stub.StubTcp("10.0.0.2", timeout_ms=234.5)
-
         self.assertEqual("10.0.0.2:5555", tcp._serial_number)
         self.assertEqual(234.5, tcp._timeout_ms)
 
     def testInitWithTimeoutInt(self):
         tcp = common_stub.StubTcp("10.0.0.2", timeout_ms=234)
-
         self.assertEqual("10.0.0.2:5555", tcp._serial_number)
         self.assertEqual(234.0, tcp._timeout_ms)
 

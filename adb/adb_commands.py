@@ -7,16 +7,18 @@ from adb import adb_protocol
 from adb import common
 from adb import filesync_protocol
 
+try:
+    file_types = (file, io.IOBase)
+except NameError:
+    file_types = (io.IOBase,)
+
 CLASS = 0xFF
+
 SUBCLASS = 0x42
+
 PROTOCOL = 0x01
 
 DeviceIsAvailable = common.InterfaceMatcher(CLASS, SUBCLASS, PROTOCOL)
-
-try:
-    from adb.sign_cryptography import CryptographySigner
-except ImportError:
-    pass
 
 
 class AdbCommands(object):
@@ -24,13 +26,13 @@ class AdbCommands(object):
     filesync_handler = filesync_protocol.FilesyncProtocol
 
     def __init__(self):
-        self.__reset()
+        self.build_props = None
+        self._device_state = None
+        self._handle = None
+        self._service_connections = {}
 
     def __reset(self):
-        self.build_props = None
-        self._handle = None
-        self._device_state = None
-        self._service_connections = {}
+        self.__init__()
 
     def _get_service_connection(
         self, service, service_command=None, create=True, timeout_ms=None
@@ -124,7 +126,7 @@ class AdbCommands(object):
         cmd.append('"{}"'.format(destination_path))
         ret = self.Shell(" ".join(cmd), timeout_ms=timeout_ms)
         rm_cmd = ["rm", destination_path]
-        rmret = self.Shell(" ".join(rm_cmd), timeout_ms=timeout_ms)
+        self.Shell(" ".join(rm_cmd), timeout_ms=timeout_ms)
         return ret
 
     def Uninstall(self, package_name, keep_data=False, timeout_ms=None):
@@ -178,10 +180,10 @@ class AdbCommands(object):
             dest_file = io.BytesIO()
         elif isinstance(dest_file, str):
             dest_file = open(dest_file, "wb")
-        elif isinstance(dest_file, file):
+        elif isinstance(dest_file, file_types):
             pass
         else:
-            raise ValueError("destfile is of unknown type")
+            raise ValueError("dest_file is of unknown type")
         conn = self.protocol_handler.Open(
             self._handle, destination=b"sync:", timeout_ms=timeout_ms
         )
@@ -189,11 +191,10 @@ class AdbCommands(object):
         conn.Close()
         if isinstance(dest_file, io.BytesIO):
             return dest_file.getvalue()
-        else:
-            dest_file.close()
-            if hasattr(dest_file, "name"):
-                return os.path.exists(dest_file.name)
-            return True
+        dest_file.close()
+        if hasattr(dest_file, "name"):
+            return os.path.exists(dest_file.name)
+        return True
 
     def Stat(self, device_filename):
         connection = self.protocol_handler.Open(self._handle, destination=b"sync:")

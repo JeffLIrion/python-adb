@@ -81,24 +81,23 @@ def Logcat(device, *options):
 def Shell(device, *command):
     if command:
         return device.StreamingShell(" ".join(command))
-    else:
-        terminal_prompt = device.InteractiveShell()
-        print(terminal_prompt.decode("utf-8"))
-        while True:
-            cmd = input("> ")
-            if not cmd:
-                continue
-            elif cmd == "exit":
-                break
-            else:
-                stdout = device.InteractiveShell(
-                    cmd, strip_cmd=True, delim=terminal_prompt, strip_delim=True
-                )
-                if stdout:
-                    if isinstance(stdout, bytes):
-                        stdout = stdout.decode("utf-8")
-                        print(stdout)
-        device.Close()
+    terminal_prompt = device.InteractiveShell()
+    print(terminal_prompt.decode("utf-8"))
+    while True:
+        cmd = input("> ")
+        if not cmd:
+            continue
+        elif cmd == "exit":
+            break
+        else:
+            stdout = device.InteractiveShell(
+                cmd, strip_cmd=True, delim=terminal_prompt, strip_delim=True
+            )
+            if stdout:
+                if isinstance(stdout, bytes):
+                    stdout = stdout.decode("utf-8")
+                    print(stdout)
+    device.Close()
 
 
 def main():
@@ -115,8 +114,7 @@ def main():
         default=60.0,
         metavar="60",
         type=int,
-        help="Seconds to wait for the dialog to be accepted when using "
-        "authenticated ADB.",
+        help="Seconds to wait for the dialog to be accepted when using authenticated ADB.",
     )
     device = common_cli.GetDeviceArguments()
     parents = [common, device]
@@ -148,8 +146,7 @@ def main():
         parents,
         adb_commands.AdbCommands.Pull,
         {
-            "dest_file": "Filename to write to on the host, if not specified, "
-            "prints the content to stdout."
+            "dest_file": "Filename to write to on the host, if not specified, prints the content to stdout."
         },
     )
     common_cli.MakeSubparser(subparsers, parents, adb_commands.AdbCommands.Reboot)

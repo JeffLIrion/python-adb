@@ -1,16 +1,25 @@
 import logging
 import platform
+import re
+import select
 import socket
 import threading
 import weakref
-import select
 
 import libusb1
 import usb1
 
+try:
+    from libusb1 import LIBUSB_ERROR_NOT_FOUND, LIBUSB_ERROR_TIMEOUT
+except ImportError:
+    LIBUSB_ERROR_NOT_FOUND = "LIBUSB_ERROR_NOT_FOUND"
+    LIBUSB_ERROR_TIMEOUT = "LIBUSB_ERROR_TIMEOUT"
+
 from adb import usb_exceptions
 
 DEFAULT_TIMEOUT_MS = 10000
+
+SYSFS_PORT_SPLIT_RE = re.compile("[,/:.-]")
 
 _LOG = logging.getLogger("android_usb")
 
@@ -26,6 +35,7 @@ def InterfaceMatcher(clazz, subclass, protocol):
         for setting in device.iterSettings():
             if GetInterface(setting) == interface:
                 return setting
+        return None
 
     return Matcher
 
@@ -38,6 +48,9 @@ class UsbHandle(object):
         self._setting = setting
         self._device = device
         self._handle = None
+        self._interface_number = None
+        self._read_endpoint = None
+        self._write_endpoint = None
         self._usb_info = usb_info or ""
         self._timeout_ms = timeout_ms if timeout_ms else DEFAULT_TIMEOUT_MS
         self._max_read_packet_len = 0
@@ -77,7 +90,7 @@ class UsbHandle(object):
             ):
                 handle.detachKernelDriver(iface_number)
         except libusb1.USBError as e:
-            if e.value == libusb1.LIBUSB_ERROR_NOT_FOUND:
+            if e.value == LIBUSB_ERROR_NOT_FOUND:
                 _LOG.warning("Kernel driver not found for interface: %s.", iface_number)
             else:
                 raise
@@ -117,7 +130,7 @@ class UsbHandle(object):
             try:
                 self.BulkRead(self._max_read_packet_len, timeout_ms=10)
             except usb_exceptions.ReadFailedError as e:
-                if e.usb_error.value == libusb1.LIBUSB_ERROR_TIMEOUT:
+                if e.usb_error.value == LIBUSB_ERROR_TIMEOUT:
                     break
                 raise
 
@@ -158,7 +171,7 @@ class UsbHandle(object):
             )
 
     def BulkReadAsync(self, length, timeout_ms=None):
-        return
+        raise NotImplementedError
 
     @classmethod
     def PortPathMatcher(cls, port_path):

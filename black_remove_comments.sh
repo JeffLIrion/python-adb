@@ -1,7 +1,7 @@
 #!/bin/bash
 
-REMOTE="upstream"
-BRANCH="master"
+REMOTE="origin"
+BRANCH="documentation"
 
 
 function comment_black_failures()

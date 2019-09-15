@@ -1,8 +1,9 @@
-import rsa
-
 from pyasn1.codec.der import decoder
 from pyasn1.type import univ
+import rsa
 from rsa import pkcs1
+
+from adb import adb_protocol
 
 
 class _Accum(object):
@@ -32,7 +33,11 @@ def _load_rsa_private_key(pem):
     return rsa.PrivateKey.load_pkcs1(private_key_der, format="DER")
 
 
-class PythonRSASigner(object):
+class PythonRSASigner(adb_protocol.AuthSigner):
+    def __init__(self, pub=None, priv=None):
+        self.priv_key = _load_rsa_private_key(priv)
+        self.pub_key = pub
+
     @classmethod
     def FromRSAKeyPath(cls, rsa_key_path):
         with open(rsa_key_path + ".pub") as f:
@@ -40,10 +45,6 @@ class PythonRSASigner(object):
         with open(rsa_key_path) as f:
             priv = f.read()
         return cls(pub, priv)
-
-    def __init__(self, pub=None, priv=None):
-        self.priv_key = _load_rsa_private_key(priv)
-        self.pub_key = pub
 
     def Sign(self, data):
         return rsa.sign(data, self.priv_key, "SHA-1-PREHASHED")

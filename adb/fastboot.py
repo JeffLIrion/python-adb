@@ -11,6 +11,7 @@ from adb import usb_exceptions
 _LOG = logging.getLogger("fastboot")
 
 DEFAULT_MESSAGE_CALLBACK = lambda m: logging.info("Got %s from device", m)
+
 FastbootMessage = collections.namedtuple("FastbootMessage", ["message", "header"])
 
 VENDORS = {
@@ -26,8 +27,11 @@ VENDORS = {
     0x0BB4,
     0x8087,
 }
+
 CLASS = 0xFF
+
 SUBCLASS = 0x42
+
 PROTOCOL = 0x03
 
 DeviceIsAvailable = common.InterfaceMatcher(CLASS, SUBCLASS, PROTOCOL)
@@ -38,8 +42,7 @@ class FastbootRemoteFailure(usb_exceptions.FormatMessageWithArgumentsException):
 
 class FastbootStateMismatch(usb_exceptions.FormatMessageWithArgumentsException):
 
-# class FastbootInvalidResponse(
-    usb_exceptions.FormatMessageWithArgumentsException):
+# class FastbootInvalidResponse(usb_exceptions.FormatMessageWithArgumentsException):
 
 
 class FastbootProtocol(object):
@@ -76,9 +79,9 @@ class FastbootProtocol(object):
         accepted_size, = struct.unpack(b">I", accepted_size)
         if accepted_size != source_len:
             raise FastbootTransferError(
-                "Device refused to download %s bytes of data (accepts %s bytes)",
-                source_len,
-                accepted_size,
+                "Device refused to download {0} bytes of data (accepts {1} bytes)".format(
+                    source_len, accepted_size
+                )
             )
         self._Write(source_file, accepted_size, progress_callback)
         return self._AcceptResponses(b"OKAY", info_cb, timeout_ms=timeout_ms)
@@ -93,20 +96,21 @@ class FastbootProtocol(object):
             elif header in self.FINAL_HEADERS:
                 if header != expected_header:
                     raise FastbootStateMismatch(
-                        "Expected %s, got %s", expected_header, header
+                        "Expected {0}, got {1}".format(expected_header, header)
                     )
                 if header == b"OKAY":
                     info_cb(FastbootMessage(remaining, header))
                 return remaining
             elif header == b"FAIL":
                 info_cb(FastbootMessage(remaining, header))
-                raise FastbootRemoteFailure("FAIL: %s", remaining)
+                raise FastbootRemoteFailure("FAIL: {0}".format(remaining))
             else:
                 raise FastbootInvalidResponse(
-                    "Got unknown header %s and response %s", header, remaining
+                    "Got unknown header {0} and response {1}".format(header, remaining)
                 )
 
-    def _HandleProgress(self, total, progress_callback):
+    @staticmethod
+    def _HandleProgress(total, progress_callback):
         current = 0
         while True:
             current += yield
@@ -132,11 +136,11 @@ class FastbootProtocol(object):
 
 class FastbootCommands(object):
     def __init__(self):
-        self.__reset()
-
-    def __reset(self):
         self._handle = None
         self._protocol = None
+
+    def __reset(self):
+        self.__init__()
 
     @property
     def usb_handle(self):

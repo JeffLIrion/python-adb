@@ -49,24 +49,25 @@ def GetCommonArguments():
 
 
 def _DocToArgs(doc):
-    m = None
     offset = None
-    in_arg = False
+    param = None
     out = {}
     for l in doc.splitlines():
-        if l.strip() == "Args:":
-            in_arg = True
-        elif in_arg:
-            if not l.strip():
+        if l.strip() == "Parameters":
+            offset = len(l.rstrip()) - len(l.strip())
+        elif offset:
+            if l.strip() == "-" * len("Parameters"):
+                continue
+            if l.strip() in ["Returns", "Yields", "Raises"]:
                 break
-            if offset is None:
-                offset = len(l) - len(l.lstrip())
-            l = l[offset:]
-            if l[0] == " " and m:
-                out[m.group(1)] += " " + l.lstrip()
-            else:
-                m = re.match(r"^([a-z_]+): (.+)$", l.strip())
-                out[m.group(1)] = m.group(2)
+            if len(l.rstrip()) - len(l.strip()) == offset:
+                param = l.strip().split()[0]
+                out[param] = ""
+            elif l.strip():
+                if out[param]:
+                    out[param] += " " + l.strip()
+                else:
+                    out[param] = l.strip()
     return out
 
 
@@ -77,7 +78,7 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
         name=name, description=help, help=help.rstrip("."), parents=parents
     )
     subparser.set_defaults(method=method, positional=[])
-    argspec = inspect.getargspec(method)
+    argspec = inspect.getfullargspec(method)
     offset = len(argspec.args) - len(argspec.defaults or []) - 1
     positional = []
     for i in range(1, len(argspec.args)):

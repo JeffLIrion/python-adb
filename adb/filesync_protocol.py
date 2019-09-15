@@ -1,4 +1,5 @@
 import collections
+import io
 import os
 import stat
 import struct
@@ -8,6 +9,11 @@ import libusb1
 
 from adb import adb_protocol
 from adb import usb_exceptions
+
+try:
+    file_types = (file, io.IOBase)
+except NameError:
+    file_types = (io.IOBase,)
 
 DEFAULT_PUSH_MODE = stat.S_IFREG | stat.S_IRWXU | stat.S_IRWXG
 
@@ -94,7 +100,7 @@ class FilesyncProtocol(object):
         if progress_callback:
             total_bytes = (
                 os.fstat(datafile.fileno()).st_size
-                if isinstance(datafile, file)
+                if isinstance(datafile, file_types)
                 else -1
             )
             progress = cls._HandleProgress(
@@ -191,7 +197,7 @@ class FileSyncConnection(object):
         try:
             self.adb.Write(self.send_buffer[: self.send_idx])
         except libusb1.USBError as e:
-            raise adb_protocol.SendFailedError(
+            raise usb_exceptions.WriteFailedError(
                 "Could not send data %s" % self.send_buffer, e
             )
         self.send_idx = 0

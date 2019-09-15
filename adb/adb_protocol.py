@@ -8,22 +8,10 @@ MAX_ADB_DATA = 4096
 VERSION = 0x01000000
 
 AUTH_TOKEN = 1
+
 AUTH_SIGNATURE = 2
+
 AUTH_RSAPUBLICKEY = 3
-
-
-def find_backspace_runs(stdout_bytes, start_pos):
-    first_backspace_pos = stdout_bytes[start_pos:].find(b"\x08")
-    if first_backspace_pos == -1:
-        return -1, 0
-    end_backspace_pos = (start_pos + first_backspace_pos) + 1
-    while True:
-        if chr(stdout_bytes[end_backspace_pos]) == "\b":
-            end_backspace_pos += 1
-        else:
-            break
-    num_backspaces = end_backspace_pos - (start_pos + first_backspace_pos)
-    return (start_pos + first_backspace_pos), num_backspaces
 
 
 class InvalidCommandError(Exception):
@@ -40,6 +28,20 @@ class InvalidResponseError(Exception):
 class InvalidChecksumError(Exception):
 
 class InterleavedDataError(Exception):
+
+
+def find_backspace_runs(stdout_bytes, start_pos):
+    first_backspace_pos = stdout_bytes[start_pos:].find(b"\x08")
+    if first_backspace_pos == -1:
+        return -1, 0
+    end_backspace_pos = (start_pos + first_backspace_pos) + 1
+    while True:
+        if chr(stdout_bytes[end_backspace_pos]) == "\b":
+            end_backspace_pos += 1
+        else:
+            break
+    num_backspaces = end_backspace_pos - (start_pos + first_backspace_pos)
+    return (start_pos + first_backspace_pos), num_backspaces
 
 
 def MakeWireIDs(ids):
@@ -79,7 +81,11 @@ class _AdbConnection(object):
                     "Command failed.", okay_data
                 )
             raise InvalidCommandError(
-                "Expected an OKAY in response to a WRITE, got %s (%s)", cmd, okay_data
+                "Expected an OKAY in response to a WRITE, got {0} ({1})".format(
+                    cmd, okay_data
+                ),
+                cmd,
+                okay_data,
             )
         return len(data)
 
@@ -90,11 +96,13 @@ class _AdbConnection(object):
         cmd, remote_id, local_id, data = AdbMessage.Read(
             self.usb, expected_cmds, self.timeout_ms
         )
-        if local_id != 0 and self.local_id != local_id:
+        if local_id not in (0, self.local_id):
             raise InterleavedDataError("We don't support multiple streams...")
-        if remote_id != 0 and self.remote_id != remote_id:
+        if remote_id not in (0, self.remote_id):
             raise InvalidResponseError(
-                "Incorrect remote id, expected %s got %s" % (self.remote_id, remote_id)
+                "Incorrect remote id, expected {0} got {1}".format(
+                    self.remote_id, remote_id
+                )
             )
         if cmd == b"WRTE":
             self.Okay()
@@ -112,7 +120,9 @@ class _AdbConnection(object):
                         "Command failed.", data
                     )
                 raise InvalidCommandError(
-                    "Expected a WRITE or a CLOSE, got %s (%s)", cmd, data
+                    "Expected a WRITE or a CLOSE, got {0} ({1})".format(cmd, data),
+                    cmd,
+                    data,
                 )
             yield data
 
@@ -123,7 +133,7 @@ class _AdbConnection(object):
             if cmd == b"FAIL":
                 raise usb_exceptions.AdbCommandFailureException("Command failed.", data)
             raise InvalidCommandError(
-                "Expected a CLSE response, got %s (%s)", cmd, data
+                "Expected a CLSE response, got {0} ({1})".format(cmd, data), cmd, data
             )
 
 
@@ -217,7 +227,9 @@ class AdbMessage(object):
             actual_checksum = cls.CalculateChecksum(data)
             if actual_checksum != data_checksum:
                 raise InvalidChecksumError(
-                    "Received checksum %s != %s", (actual_checksum, data_checksum)
+                    "Received checksum {0} != {1}".format(
+                        actual_checksum, data_checksum
+                    )
                 )
         else:
             data = b""
@@ -344,7 +356,7 @@ class AdbMessage(object):
                 original_cmd = str(cmd)
                 cmd += "\r"
                 cmd = cmd.encode("utf8")
-                bytes_written = conn.Write(cmd)
+                conn.Write(cmd)
                 if delim:
                     data = b""
                     while partial_delim not in data:

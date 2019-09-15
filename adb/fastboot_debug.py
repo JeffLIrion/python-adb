@@ -12,7 +12,7 @@ except ImportError:
     progressbar = None
 
 
-def Devices(args):
+def Devices():
     for device in fastboot.FastbootCommands.Devices():
         print("%s\tdevice" % device.serial_number)
     return 0
@@ -33,8 +33,7 @@ def main():
         type=int,
         default=1024,
         metavar="1024",
-        help="Size of packets to write in Kb. For older devices, it may be "
-        "required to use 4.",
+        help="Size of packets to write in Kb. For older devices, it may be required to use 4.",
     )
     parents = [common, device]
     parser = argparse.ArgumentParser(
@@ -64,12 +63,12 @@ def main():
     if args.verbose:
         logging.basicConfig(level=logging.DEBUG)
     if args.command_name == "devices":
-        return Devices(args)
+        return Devices()
     if args.command_name == "help":
         parser.print_help()
         return 0
     kwargs = {}
-    argspec = inspect.getargspec(args.method)
+    argspec = inspect.getfullargspec(args.method)
     if "info_cb" in argspec.args:
         kwargs["info_cb"] = _InfoCb
     if "progress_callback" in argspec.args and progressbar:

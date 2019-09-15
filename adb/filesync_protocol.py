@@ -54,6 +54,7 @@ import time
 import libusb1
 
 from adb import adb_protocol
+from adb.debug import debug_print, FALSE, TRUE  # DEBUGGING, pragma: no cover
 from adb import usb_exceptions
 
 
@@ -179,13 +180,13 @@ class FilesyncProtocol(object):
 
         Parameters
         ----------
-        connection : TODO
+        connection : adb.adb_protocol._AdbConnection
             TODO
-        filename : TODO
+        filename : str
             TODO
-        dest_file : TODO
+        dest_file : _io.BytesIO
             TODO
-        progress_callback : TODO
+        progress_callback : function, None
             TODO
 
         Raises
@@ -194,6 +195,13 @@ class FilesyncProtocol(object):
             Unable to pull file
 
         """
+        if FALSE:  # DEBUGGING, pragma: no cover
+            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
+            debug_print('connection', connection)  # DEBUGGING, pragma: no cover
+            debug_print('filename', filename)  # DEBUGGING, pragma: no cover
+            debug_print('dest_file', dest_file)  # DEBUGGING, pragma: no cover
+            debug_print('progress_callback', progress_callback)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         if progress_callback:
             total_bytes = cls.Stat(connection, filename)[1]
             progress = cls._HandleProgress(lambda current: progress_callback(filename, current, total_bytes))
@@ -245,17 +253,17 @@ class FilesyncProtocol(object):
 
         Parameters
         ----------
-        connection : TODO
+        connection : adb.adb_protocol._AdbConnection
             ADB connection
-        datafile : TODO
+        datafile : _io.BytesIO
             File-like object for reading from
-        filename : TODO
+        filename : str
             Filename to push to
-        st_mode : TODO
+        st_mode : int
             Stat mode for filename
-        mtime : TODO
+        mtime : int
             Modification time
-        progress_callback : TODO
+        progress_callback : function, None
             Callback method that accepts ``filename``, ``bytes_written``, and ``total_bytes``
 
         Raises
@@ -264,6 +272,15 @@ class FilesyncProtocol(object):
             Raised on push failure.
 
         """
+        if FALSE:  # DEBUGGING, pragma: no cover
+            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
+            debug_print('connection', connection)  # DEBUGGING, pragma: no cover
+            debug_print('datafile', datafile)  # DEBUGGING, pragma: no cover
+            debug_print('filename', filename)  # DEBUGGING, pragma: no cover
+            debug_print('st_mode', st_mode)  # DEBUGGING, pragma: no cover
+            debug_print('mtime', mtime)  # DEBUGGING, pragma: no cover
+            debug_print('progress_callback', progress_callback)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         fileinfo = ('{},{}'.format(filename, int(st_mode))).encode('utf-8')
 
         cnxn = FileSyncConnection(connection, b'<2I')
@@ -309,18 +326,18 @@ class FileSyncConnection(object):
     ----------
     adb : TODO
         TODO
-    send_buffer : TODO
+    send_buffer : byte_array
+        ``bytearray(adb_protocol.MAX_ADB_DATA)`` (see :const:`adb.adb_protocol.MAX_ADB_DATA`)
+    send_idx : int
         TODO
-    send_idx : TODO
-        TODO
-    send_header_len : TODO
-        TODO
-    recv_buffer : TODO
+    send_header_len : int
+        ``struct.calcsize(b'<2I')``
+    recv_buffer : bytearray
         TODO
     recv_header_format : TODO
         TODO
-    recv_header_len : TODO
-        TODO
+    recv_header_len : int
+        ``struct.calcsize(recv_header_format)``
 
     """
 
@@ -351,14 +368,20 @@ class FileSyncConnection(object):
 
         Parameters
         ----------
-        command_id : TODO
+        command_id : bytes
             Command to send.
-        data : TODO
+        data : str, bytes
             Optional data to send, must set data or size.
-        size : TODO
+        size : int
             Optionally override size from len(data).
 
         """
+        if FALSE:  # DEBUGGING, pragma: no cover
+            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
+            debug_print('command_id', command_id)  # DEBUGGING, pragma: no cover
+            debug_print('data', data)  # DEBUGGING, pragma: no cover
+            debug_print('size', size)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         if data:
             if not isinstance(data, bytes):
                 data = data.encode('utf8')
@@ -379,21 +402,33 @@ class FileSyncConnection(object):
 
         Parameters
         ----------
-        expected_ids : TODO
-            TODO
+        expected_ids : tuple[bytes]
+            If the received header ID is not in ``expected_ids``, an exception will be raised
         read_data : bool
-            TODO
+            Whether to read the received data
 
         Returns
         -------
-        command_id : TODO
+        command_id : bytes
+            The received header ID
+        tuple
             TODO
-        TODO
-            TODO
-        data : TODO
-            TODO
+        data : bytearray
+            The received data
+
+        Raises
+        ------
+        adb.usb_exceptions.AdbCommandFailureException
+            Command failed
+        adb.adb_protocol.InvalidResponseError
+            Received response was not in ``expected_ids``
 
         """
+        if FALSE:  # DEBUGGING, pragma: no cover
+            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
+            debug_print('expected_ids', expected_ids)  # DEBUGGING, pragma: no cover
+            debug_print('read_data', read_data)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         if self.send_idx:
             self._Flush()
 
@@ -408,9 +443,10 @@ class FileSyncConnection(object):
                 reason = ''
                 if self.recv_buffer:
                     reason = self.recv_buffer.decode('utf-8', errors='ignore')
+
                 raise usb_exceptions.AdbCommandFailureException('Command failed: {}'.format(reason))
-            raise adb_protocol.InvalidResponseError(
-                'Expected one of %s, got %s' % (expected_ids, command_id))
+
+            raise adb_protocol.InvalidResponseError('Expected one of %s, got %s' % (expected_ids, command_id))
 
         if not read_data:
             return command_id, header[1:]
@@ -418,6 +454,13 @@ class FileSyncConnection(object):
         # Header is (ID, ..., size).
         size = header[-1]
         data = self._ReadBuffered(size)
+
+        if FALSE:  # DEBUGGING, pragma: no cover
+            print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
+            debug_print('command_id', command_id)  # DEBUGGING, pragma: no cover
+            debug_print('header[1:-1]', header[1:-1])  # DEBUGGING, pragma: no cover
+            debug_print('data', data)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         return command_id, header[1:-1], data
 
     def ReadUntil(self, expected_ids, *finish_ids):
@@ -427,44 +470,63 @@ class FileSyncConnection(object):
 
         Parameters
         ----------
-        expected_ids : TODO
-            TODO
-        finish_ids : TODO
-            TODO
+        expected_ids : tuple[bytes]
+            If the received header ID is not in ``expected_ids``, an exception will be raised
+        finish_ids : tuple[bytes]
+            We will read until we find a header ID that is in ``finish_ids``
 
         Yields
         ------
-        cmd_id : TODO
+        cmd_id : bytes
+            The received header ID
+        header : tuple
             TODO
-        header : TODO
-            TODO
-        data : TODO
-            TODO
+        data : bytearray
+            The received data
 
         """
+        if FALSE:  # DEBUGGING, pragma: no cover
+            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
+            debug_print('expected_ids', expected_ids)  # DEBUGGING, pragma: no cover
+            debug_print('finish_ids', finish_ids)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         while True:
             cmd_id, header, data = self.Read(expected_ids + finish_ids)
+            if FALSE:  # DEBUGGING, pragma: no cover
+                print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
+                debug_print('cmd_id', cmd_id)  # DEBUGGING, pragma: no cover
+                debug_print('header', header)  # DEBUGGING, pragma: no cover
+                debug_print('data', data)  # DEBUGGING, pragma: no cover
+                print("\n\n")  # DEBUGGING, pragma: no cover
             yield cmd_id, header, data
             if cmd_id in finish_ids:
                 break
 
     def _CanAddToSendBuffer(self, data_len):
-        """TODO
+        """Determine whether ``data_len`` bytes of data can be added to the send buffer without exceeding :const:`adb.adb_protocol.MAX_ADB_DATA`.
 
         .. image:: _static/adb.filesync_protocol.FileSyncConnection._CanAddToSendBuffer.CALLER_GRAPH.svg
 
         Parameters
         ----------
-        data_len : TODO
-            TODO
+        data_len : int
+            The length of the data to be potentially added to the send buffer (not including the length of its header)
 
         Returns
         -------
         bool
-            TODO
+            Whether ``data_len`` bytes of data can be added to the send buffer without exceeding :const:`adb.adb_protocol.MAX_ADB_DATA`
 
         """
+        if FALSE:  # DEBUGGING, pragma: no cover
+            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
+            debug_print('data_len', data_len)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         added_len = self.send_header_len + data_len
+        if FALSE:  # DEBUGGING, pragma: no cover
+            print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
+            debug_print('bool', self.send_idx + added_len < adb_protocol.MAX_ADB_DATA)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         return self.send_idx + added_len < adb_protocol.MAX_ADB_DATA
 
     def _Flush(self):
@@ -485,21 +547,25 @@ class FileSyncConnection(object):
         self.send_idx = 0
 
     def _ReadBuffered(self, size):
-        """TODO
+        """Read ``size`` bytes of data from ``self.recv_buffer``.
 
         .. image:: _static/adb.filesync_protocol.FileSyncConnection._ReadBuffered.CALLER_GRAPH.svg
 
         Parameters
         ----------
-        size : TODO
-            TODO
+        size : int
+            The amount of data to read
 
         Returns
         -------
-        result : TODO
-            TODO
+        result : bytearray
+            The read data
 
         """
+        if TRUE:  # DEBUGGING, pragma: no cover
+            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
+            debug_print('size', size)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         # Ensure recv buffer has enough data.
         while len(self.recv_buffer) < size:
             _, data = self.adb.ReadUntil(b'WRTE')
@@ -507,4 +573,8 @@ class FileSyncConnection(object):
 
         result = self.recv_buffer[:size]
         self.recv_buffer = self.recv_buffer[size:]
+        if TRUE:  # DEBUGGING, pragma: no cover
+            print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
+            debug_print('result', result)  # DEBUGGING, pragma: no cover
+            print("\n\n")  # DEBUGGING, pragma: no cover
         return result

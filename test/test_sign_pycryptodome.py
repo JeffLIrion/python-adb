@@ -25,4 +25,4 @@ class TestPycryptodomeAuthSigner(unittest.TestCase):
             with open('test/adbkey.pub') as f:
                 pub = f.read()
 
-        self.assertEqual(pub, self.signer.GetPublicKey())
+            self.assertEqual(pub, self.signer.GetPublicKey())

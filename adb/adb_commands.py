@@ -98,7 +98,7 @@ class AdbCommands(object):
         TODO
     _device_state : TODO, None
         TODO
-    _handle : TODO, None
+    _handle : adb.common.TcpHandle, adb.common.UsbHandle, None
         TODO
     _service_connections : dict
         [TODO] Connection table tracks each open AdbConnection objects per service type for program functions that
@@ -246,10 +246,10 @@ class AdbCommands(object):
 
         Parameters
         ----------
-        banner : TODO, None
-            See protocol_handler.Connect.
+        banner : bytes, None
+            A string to send as a host identifier.  (See :meth:`adb.adb_protocol.AdbMessage.Connect`.)
         **kwargs : TODO
-            See `adb.adb_protocol.AdbMessage.Connect` and `ConnectDevice` for kwargs. Includes ``handle``, ``rsa_keys``, and
+            See :meth:`adb.adb_protocol.AdbMessage.Connect` and :meth:`AdbCommands.ConnectDevice` for kwargs. Includes ``handle``, ``rsa_keys``, and
             ``auth_timeout_ms``.
 
         Returns

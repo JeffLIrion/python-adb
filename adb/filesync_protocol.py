@@ -122,12 +122,12 @@ class FilesyncProtocol(object):
 
         Returns
         -------
-        mode : TODO
+        mode : int
             The mode of the file
-        size : TODO
+        size : int
             The size of the file
-        mtime : TODO
-            TODO
+        mtime : int
+            The time of last modification for the file
 
         Raises
         ------

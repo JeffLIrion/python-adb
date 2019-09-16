@@ -558,7 +558,7 @@ class AdbMessage(object):
 
         Parameters
         ----------
-        usb : adb.common.UsbHandle
+        usb : adb.common.TcpHandle, adb.common.UsbHandle
             TODO
         timeout_ms : int, None
             Timeout in milliseconds for USB packets.
@@ -577,7 +577,7 @@ class AdbMessage(object):
 
         Parameters
         ----------
-        usb : adb.common.UsbHandle
+        usb : adb.common.TcpHandle, adb.common.UsbHandle
             TODO
         expected_cmds : TODO
             Read until we receive a header ID that is in ``expected_cmds``
@@ -647,8 +647,8 @@ class AdbMessage(object):
 
         Parameters
         ----------
-        usb : TODO
-            A USBHandle with ``BulkRead`` and ``BulkWrite`` methods.
+        usb : adb.common.TcpHandle, adb.common.UsbHandle
+            A :class:`adb.common.TcpHandle` or :class:`adb.common.UsbHandle` instance with ``BulkRead`` and ``BulkWrite`` methods.
         banner : str
             A string to send as a host identifier.
         rsa_keys : list[adb_protocol.AuthSigner]
@@ -732,8 +732,8 @@ class AdbMessage(object):
 
         Parameters
         ----------
-        usb : TODO
-            USB device handle with BulkRead and BulkWrite methods.
+        usb : adb.common.TcpHandle, adb.common.UsbHandle
+            A :class:`adb.common.TcpHandle` or :class:`adb.common.UsbHandle` instance with ``BulkRead`` and ``BulkWrite`` methods.
         destination : TODO
             The service:command string.
         timeout_ms : int, None
@@ -784,8 +784,8 @@ class AdbMessage(object):
 
         Parameters
         ----------
-        usb : TODO
-            USB device handle with BulkRead and BulkWrite methods.
+        usb : adb.common.TcpHandle, adb.common.UsbHandle
+            A :class:`adb.common.TcpHandle` or :class:`adb.common.UsbHandle` instance with ``BulkRead`` and ``BulkWrite`` methods.
         service : TODO
             The service on the device to talk to.
         command : str
@@ -822,8 +822,8 @@ class AdbMessage(object):
 
         Parameters
         ----------
-        usb : TODO
-            USB device handle with BulkRead and BulkWrite methods.
+        usb : adb.common.TcpHandle, adb.common.UsbHandle
+            A :class:`adb.common.TcpHandle` or :class:`adb.common.UsbHandle` instance with ``BulkRead`` and ``BulkWrite`` methods.
         service : TODO
             The service on the device to talk to.
         command : str

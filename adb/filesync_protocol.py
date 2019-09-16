@@ -54,7 +54,6 @@ import time
 import libusb1
 
 from adb import adb_protocol
-from adb.debug import debug_print, FALSE, TRUE  # DEBUGGING, pragma: no cover
 from adb import usb_exceptions
 
 
@@ -198,13 +197,6 @@ class FilesyncProtocol(object):
             Unable to pull file
 
         """
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
-            debug_print('connection', connection)  # DEBUGGING, pragma: no cover
-            debug_print('filename', filename)  # DEBUGGING, pragma: no cover
-            debug_print('dest_file', dest_file)  # DEBUGGING, pragma: no cover
-            debug_print('progress_callback', progress_callback)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         if progress_callback:
             total_bytes = cls.Stat(connection, filename)[1]
             progress = cls._HandleProgress(lambda current: progress_callback(filename, current, total_bytes))
@@ -277,15 +269,6 @@ class FilesyncProtocol(object):
             Raised on push failure.
 
         """
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
-            debug_print('connection', connection)  # DEBUGGING, pragma: no cover
-            debug_print('datafile', datafile)  # DEBUGGING, pragma: no cover
-            debug_print('filename', filename)  # DEBUGGING, pragma: no cover
-            debug_print('st_mode', st_mode)  # DEBUGGING, pragma: no cover
-            debug_print('mtime', mtime)  # DEBUGGING, pragma: no cover
-            debug_print('progress_callback', progress_callback)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         fileinfo = ('{},{}'.format(filename, int(st_mode))).encode('utf-8')
 
         cnxn = FileSyncConnection(connection, b'<2I')
@@ -381,14 +364,6 @@ class FileSyncConnection(object):
             Optionally override size from len(data).
 
         """
-        if TRUE:  # DEBUGGING, pragma: no cover
-            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
-            debug_print('self.adb', self.adb)  # DEBUGGING, pragma: no cover
-            debug_print('self.recv_header_format', self.recv_header_format)  # DEBUGGING, pragma: no cover
-            debug_print('command_id', command_id)  # DEBUGGING, pragma: no cover
-            debug_print('data', data)  # DEBUGGING, pragma: no cover
-            debug_print('size', size)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         if data:
             if not isinstance(data, bytes):
                 data = data.encode('utf8')
@@ -431,11 +406,6 @@ class FileSyncConnection(object):
             Received response was not in ``expected_ids``
 
         """
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
-            debug_print('expected_ids', expected_ids)  # DEBUGGING, pragma: no cover
-            debug_print('read_data', read_data)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         if self.send_idx:
             self._Flush()
 
@@ -462,12 +432,6 @@ class FileSyncConnection(object):
         size = header[-1]
         data = self._ReadBuffered(size)
 
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
-            debug_print('command_id', command_id)  # DEBUGGING, pragma: no cover
-            debug_print('header[1:-1]', header[1:-1])  # DEBUGGING, pragma: no cover
-            debug_print('data', data)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         return command_id, header[1:-1], data
 
     def ReadUntil(self, expected_ids, *finish_ids):
@@ -492,19 +456,8 @@ class FileSyncConnection(object):
             The received data
 
         """
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
-            debug_print('expected_ids', expected_ids)  # DEBUGGING, pragma: no cover
-            debug_print('finish_ids', finish_ids)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         while True:
             cmd_id, header, data = self.Read(expected_ids + finish_ids)
-            if FALSE:  # DEBUGGING, pragma: no cover
-                print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
-                debug_print('cmd_id', cmd_id)  # DEBUGGING, pragma: no cover
-                debug_print('header', header)  # DEBUGGING, pragma: no cover
-                debug_print('data', data)  # DEBUGGING, pragma: no cover
-                print("\n\n")  # DEBUGGING, pragma: no cover
             yield cmd_id, header, data
             if cmd_id in finish_ids:
                 break
@@ -525,15 +478,7 @@ class FileSyncConnection(object):
             Whether ``data_len`` bytes of data can be added to the send buffer without exceeding :const:`adb.adb_protocol.MAX_ADB_DATA`
 
         """
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
-            debug_print('data_len', data_len)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         added_len = self.send_header_len + data_len
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
-            debug_print('bool', self.send_idx + added_len < adb_protocol.MAX_ADB_DATA)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         return self.send_idx + added_len < adb_protocol.MAX_ADB_DATA
 
     def _Flush(self):
@@ -569,10 +514,6 @@ class FileSyncConnection(object):
             The read data
 
         """
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
-            debug_print('size', size)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         # Ensure recv buffer has enough data.
         while len(self.recv_buffer) < size:
             _, data = self.adb.ReadUntil(b'WRTE')
@@ -580,8 +521,4 @@ class FileSyncConnection(object):
 
         result = self.recv_buffer[:size]
         self.recv_buffer = self.recv_buffer[size:]
-        if FALSE:  # DEBUGGING, pragma: no cover
-            print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
-            debug_print('result', result)  # DEBUGGING, pragma: no cover
-            print("\n\n")  # DEBUGGING, pragma: no cover
         return result

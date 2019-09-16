@@ -56,7 +56,7 @@ class _PortPathAction(argparse.Action):
 
 
 class PositionalArg(argparse.Action):
-    """TODO
+    """A positional CLI argument.
 
     .. image:: _static/adb.common_cli.PositionalArg.CALL_GRAPH.svg
 
@@ -198,7 +198,7 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
 
 
 def _RunMethod(dev, args, extra):
-    """Runs a method registered via MakeSubparser.
+    """Runs a method registered via :func:`MakeSubparser`.
 
     .. image:: _static/adb.common_cli._RunMethod.CALLER_GRAPH.svg
 

@@ -110,23 +110,23 @@ class FilesyncProtocol(object):
 
     @staticmethod
     def Stat(connection, filename):
-        """TODO
+        """Get file status (mode, size, and mtime).
 
         .. image:: _static/adb.filesync_protocol.FilesyncProtocol.Stat.CALLER_GRAPH.svg
 
         Parameters
         ----------
-        connection : TODO
-            TODO
-        filename : TODO
-            TODO
+        connection : adb.adb_protocol._AdbConnection
+            ADB connection
+        filename : str, bytes
+            The file for which we are getting info
 
         Returns
         -------
         mode : TODO
-            TODO
+            The mode of the file
         size : TODO
-            TODO
+            The size of the file
         mtime : TODO
             TODO
 
@@ -141,53 +141,56 @@ class FilesyncProtocol(object):
         command, (mode, size, mtime) = cnxn.Read((b'STAT',), read_data=False)
 
         if command != b'STAT':
-            raise adb_protocol.InvalidResponseError(
-                'Expected STAT response to STAT, got %s' % command)
+            raise adb_protocol.InvalidResponseError('Expected STAT response to STAT, got %s' % command)
+
         return mode, size, mtime
 
     @classmethod
     def List(cls, connection, path):
-        """TODO
+        """Get a list of the files in ``path``.
 
         Parameters
         ----------
-        connection : TODO
-            TODO
-        path : TODO
-            TODO
+        connection : adb.adb_protocol._AdbConnection
+            ADB connection
+        path : str, bytes
+            The path for which we are getting a list of files
 
         Returns
         -------
-        files : list
-            TODO
+        files : list[DeviceFile]
+            Information about the files in ``path``
 
         """
         cnxn = FileSyncConnection(connection, b'<5I')
         cnxn.Send(b'LIST', path)
         files = []
+
         for cmd_id, header, filename in cnxn.ReadUntil((b'DENT',), b'DONE'):
             if cmd_id == b'DONE':
                 break
+
             mode, size, mtime = header
             files.append(DeviceFile(filename, mode, size, mtime))
+
         return files
 
     @classmethod
     def Pull(cls, connection, filename, dest_file, progress_callback):
-        """Pull a file from the device into the file-like dest_file.
+        """Pull a file from the device into the file-like ``dest_file``.
 
         .. image:: _static/adb.filesync_protocol.FilesyncProtocol.Pull.CALL_GRAPH.svg
 
         Parameters
         ----------
         connection : adb.adb_protocol._AdbConnection
-            TODO
+            ADB connection
         filename : str
-            TODO
+            The file to be pulled
         dest_file : _io.BytesIO
-            TODO
+            File-like object for writing to
         progress_callback : function, None
-            TODO
+            Callback method that accepts ``filename``, ``bytes_written``, and ``total_bytes``
 
         Raises
         ------
@@ -213,9 +216,11 @@ class FilesyncProtocol(object):
             for cmd_id, _, data in cnxn.ReadUntil((b'DATA',), b'DONE'):
                 if cmd_id == b'DONE':
                     break
+
                 dest_file.write(data)
                 if progress_callback:
                     progress.send(len(data))
+
         except usb_exceptions.CommonUsbError as e:
             raise PullFailedError('Unable to pull file %s due to: %s' % (filename, e))
 
@@ -229,8 +234,8 @@ class FilesyncProtocol(object):
 
         Parameters
         ----------
-        progress_callback : TODO
-            Callback method that accepts filename, bytes_written and total_bytes; total_bytes will be -1 for file-like
+        progress_callback : function
+            Callback method that accepts ``filename``, ``bytes_written``, and ``total_bytes``; total_bytes will be -1 for file-like
             objects.
 
         """
@@ -317,15 +322,15 @@ class FileSyncConnection(object):
 
     Parameters
     ----------
-    adb_connection : TODO
-        TODO
-    recv_header_format : TODO
+    adb_connection : adb.adb_protocol._AdbConnection
+        ADB connection
+    recv_header_format : bytes
         TODO
 
     Attributes
     ----------
-    adb : TODO
-        TODO
+    adb : adb.adb_protocol._AdbConnection
+        ADB connection
     send_buffer : byte_array
         ``bytearray(adb_protocol.MAX_ADB_DATA)`` (see :const:`adb.adb_protocol.MAX_ADB_DATA`)
     send_idx : int
@@ -334,7 +339,7 @@ class FileSyncConnection(object):
         ``struct.calcsize(b'<2I')``
     recv_buffer : bytearray
         TODO
-    recv_header_format : TODO
+    recv_header_format : bytes
         TODO
     recv_header_len : int
         ``struct.calcsize(recv_header_format)``
@@ -376,8 +381,10 @@ class FileSyncConnection(object):
             Optionally override size from len(data).
 
         """
-        if FALSE:  # DEBUGGING, pragma: no cover
+        if TRUE:  # DEBUGGING, pragma: no cover
             print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
+            debug_print('self.adb', self.adb)  # DEBUGGING, pragma: no cover
+            debug_print('self.recv_header_format', self.recv_header_format)  # DEBUGGING, pragma: no cover
             debug_print('command_id', command_id)  # DEBUGGING, pragma: no cover
             debug_print('data', data)  # DEBUGGING, pragma: no cover
             debug_print('size', size)  # DEBUGGING, pragma: no cover
@@ -464,7 +471,7 @@ class FileSyncConnection(object):
         return command_id, header[1:-1], data
 
     def ReadUntil(self, expected_ids, *finish_ids):
-        """Useful wrapper around Read.
+        """Useful wrapper around :meth:`FileSyncConnection.Read`.
 
         .. image:: _static/adb.filesync_protocol.FileSyncConnection.ReadUntil.CALL_GRAPH.svg
 
@@ -562,7 +569,7 @@ class FileSyncConnection(object):
             The read data
 
         """
-        if TRUE:  # DEBUGGING, pragma: no cover
+        if FALSE:  # DEBUGGING, pragma: no cover
             print("\n\nParameters\n----------")  # DEBUGGING, pragma: no cover
             debug_print('size', size)  # DEBUGGING, pragma: no cover
             print("\n\n")  # DEBUGGING, pragma: no cover
@@ -573,7 +580,7 @@ class FileSyncConnection(object):
 
         result = self.recv_buffer[:size]
         self.recv_buffer = self.recv_buffer[size:]
-        if TRUE:  # DEBUGGING, pragma: no cover
+        if FALSE:  # DEBUGGING, pragma: no cover
             print("\n\nReturns\n-------")  # DEBUGGING, pragma: no cover
             debug_print('result', result)  # DEBUGGING, pragma: no cover
             print("\n\n")  # DEBUGGING, pragma: no cover

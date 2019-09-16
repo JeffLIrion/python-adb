@@ -163,9 +163,9 @@ def MakeWireIDs(ids):
 
     Returns
     -------
-    id_to_wire : TODO
+    id_to_wire : dict
         TODO
-    wire_to_id : TODO
+    wire_to_id : dict
         TODO
 
     """
@@ -185,8 +185,8 @@ class AuthSigner(object):
 
         Parameters
         ----------
-        data : TODO
-            TODO
+        data : bytes
+            The data to be signed
 
         Raises
         ------
@@ -215,24 +215,24 @@ class _AdbConnection(object):
 
     Parameters
     ----------
-    usb : TODO
+    usb : adb.common.UsbHandle
         TODO
     local_id : TODO
         TODO
     remote_id : TODO
         TODO
-    timeout_ms : TODO
-        TODO
+    timeout_ms : int
+        Timeout in milliseconds for USB packets.
 
     Attributes
     ----------
     local_id : TODO
-        TODO
+        The ID for the sender
     remote_id : TODO
-        TODO
-    timeout_ms : TODO
-        TODO
-    usb : TODO
+        The ID for the recipient
+    timeout_ms : int
+        Timeout in milliseconds for USB packets.
+    usb : adb.common.UsbHandle
         TODO
 
     """
@@ -286,13 +286,15 @@ class _AdbConnection(object):
 
         """
         self._Send(b'WRTE', arg0=self.local_id, arg1=self.remote_id, data=data)
+
         # Expect an ack in response.
         cmd, okay_data = self.ReadUntil(b'OKAY')
         if cmd != b'OKAY':
             if cmd == b'FAIL':
-                raise usb_exceptions.AdbCommandFailureException(
-                    'Command failed.', okay_data)
+                raise usb_exceptions.AdbCommandFailureException('Command failed.', okay_data)
+
             raise InvalidCommandError('Expected an OKAY in response to a WRITE, got {0} ({1})'.format(cmd, okay_data), cmd, okay_data)
+
         return len(data)
 
     def Okay(self):
@@ -336,16 +338,18 @@ class _AdbConnection(object):
 
         if local_id not in (0, self.local_id):
             raise InterleavedDataError("We don't support multiple streams...")
+
         if remote_id not in (0, self.remote_id):
             raise InvalidResponseError('Incorrect remote id, expected {0} got {1}'.format(self.remote_id, remote_id))
 
         # Ack write packets.
         if cmd == b'WRTE':
             self.Okay()
+
         return cmd, data
 
     def ReadUntilClose(self):
-        """Yield packets until a Close packet is received.
+        """Yield packets until a ``b'CLSE'`` packet is received.
 
         .. image:: _static/adb.adb_protocol._AdbConnection.ReadUntilClose.CALL_GRAPH.svg
 
@@ -357,14 +361,17 @@ class _AdbConnection(object):
         """
         while True:
             cmd, data = self.ReadUntil(b'CLSE', b'WRTE')
+
             if cmd == b'CLSE':
                 self._Send(b'CLSE', arg0=self.local_id, arg1=self.remote_id)
                 break
+
             if cmd != b'WRTE':
                 if cmd == b'FAIL':
-                    raise usb_exceptions.AdbCommandFailureException(
-                        'Command failed.', data)
+                    raise usb_exceptions.AdbCommandFailureException('Command failed.', data)
+
                 raise InvalidCommandError('Expected a WRITE or a CLOSE, got {0} ({1})'.format(cmd, data), cmd, data)
+
             yield data
 
     def Close(self):
@@ -554,10 +561,10 @@ class AdbMessage(object):
 
         Parameters
         ----------
-        usb : TODO
+        usb : adb.common.UsbHandle
             TODO
-        timeout_ms : TODO, None
-            TODO
+        timeout_ms : int, None
+            Timeout in milliseconds for USB packets.
 
         """
         usb.BulkWrite(self.Pack(), timeout_ms)
@@ -573,14 +580,14 @@ class AdbMessage(object):
 
         Parameters
         ----------
-        usb : TODO
+        usb : adb.common.UsbHandle
             TODO
         expected_cmds : TODO
-            TODO
-        timeout_ms : TODO, None
-            TODO
-        total_timeout_ms : TODO, None
-            TODO
+            Read until we receive a header ID that is in ``expected_cmds``
+        timeout_ms : int, None
+            Timeout in milliseconds for USB packets.
+        total_timeout_ms : int, None
+            The total time to wait for a command in ``expected_cmds``
 
         Returns
         -------
@@ -608,23 +615,20 @@ class AdbMessage(object):
             cmd, arg0, arg1, data_length, data_checksum = cls.Unpack(msg)
             command = cls.constants.get(cmd)
             if not command:
-                raise InvalidCommandError(
-                    'Unknown command: %x' % cmd, cmd, (arg0, arg1))
+                raise InvalidCommandError('Unknown command: %x' % cmd, cmd, (arg0, arg1))
+
             if command in expected_cmds:
                 break
 
             if time.time() - start > total_timeout_ms:
-                raise InvalidCommandError(
-                    'Never got one of the expected responses (%s)' % expected_cmds,
-                    cmd, (timeout_ms, total_timeout_ms))
+                raise InvalidCommandError('Never got one of the expected responses (%s)' % expected_cmds, cmd, (timeout_ms, total_timeout_ms))
 
         if data_length > 0:
             data = bytearray()
             while data_length > 0:
                 temp = usb.BulkRead(data_length, timeout_ms)
                 if len(temp) != data_length:
-                    print(
-                        "Data_length {} does not match actual number of bytes read: {}".format(data_length, len(temp)))
+                    print("Data_length {} does not match actual number of bytes read: {}".format(data_length, len(temp)))
                 data += temp
 
                 data_length -= len(temp)
@@ -649,10 +653,10 @@ class AdbMessage(object):
         banner : str
             A string to send as a host identifier.
         rsa_keys : list[adb_protocol.AuthSigner]
-            List of AuthSigner subclass instances to be used for authentication. The device can either accept one of
+            List of :class:`AuthSigner` subclass instances to be used for authentication. The device can either accept one of
             these via the ``Sign`` method, or we will send the result of ``GetPublicKey`` from the first one if the
             device doesn't accept any of them.
-        auth_timeout_ms : TODO
+        auth_timeout_ms : int
             Timeout to wait for when sending a new public key. This
             is only relevant when we send a new public key. The device shows a
             dialog and this timeout is how long to wait for that dialog. If used
@@ -733,7 +737,7 @@ class AdbMessage(object):
             USB device handle with BulkRead and BulkWrite methods.
         destination : TODO
             The service:command string.
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             Timeout in milliseconds for USB packets.
 
         Returns
@@ -789,8 +793,8 @@ class AdbMessage(object):
             The service on the device to talk to.
         command : str
             The command to send to the service.
-        timeout_ms : TODO, None
-            Timeout for USB packets, in milliseconds.
+        timeout_ms : int, None
+            Timeout in milliseconds for USB packets.
 
         Returns
         -------
@@ -827,8 +831,8 @@ class AdbMessage(object):
             The service on the device to talk to.
         command : str
             The command to send to the service.
-        timeout_ms : TODO, None
-            Timeout for USB packets, in milliseconds.
+        timeout_ms : int, None
+            Timeout in milliseconds for USB packets.
 
         Yields
         ------
@@ -845,9 +849,8 @@ class AdbMessage(object):
         """
         if not isinstance(command, bytes):
             command = command.encode('utf8')
-        connection = cls.Open(
-            usb, destination=b'%s:%s' % (service, command),
-            timeout_ms=timeout_ms)
+
+        connection = cls.Open(usb, destination=b'%s:%s' % (service, command), timeout_ms=timeout_ms)
         for data in connection.ReadUntilClose():
             yield data.decode('utf8')
 

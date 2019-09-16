@@ -65,12 +65,12 @@ def Devices():
 
 
 def _InfoCb(message):
-    """TODO
+    """Print a message to stdout.
 
     Parameters
     ----------
-    message : TODO
-        TODO
+    message : adb.fastboot.FastbootMessage
+        A :class:`~adb.fastboot.FastbootMessage` with ``header`` and ``message`` attributes
 
     """
     # Use an unbuffered version of stdout.

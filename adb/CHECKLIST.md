@@ -55,11 +55,11 @@
 # Documentation Complete
 
 - [ ] `adb_commands.py`
-- [ ] `adb_debug.py`
+- [ ] `adb_debug.py` (almost)
 - [ ] `adb_protocol.py`
 - [ ] `common_cli.py`
 - [ ] `common.py`
-- [ ] `fastboot_debug.py`
+- [x] `fastboot_debug.py`
 - [ ] `fastboot.py`
 - [ ] `filesync_protocol.py`
 - [x] `__init__.py`

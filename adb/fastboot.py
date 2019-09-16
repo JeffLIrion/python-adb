@@ -240,8 +240,7 @@ class FastbootProtocol(object):
             Fastboot responded with an unknown packet type.
 
         """
-        accepted_size = self._AcceptResponses(
-            b'DATA', info_cb, timeout_ms=timeout_ms)
+        accepted_size = self._AcceptResponses(b'DATA', info_cb, timeout_ms=timeout_ms)
 
         accepted_size = binascii.unhexlify(accepted_size[:8])
         accepted_size, = struct.unpack(b'>I', accepted_size)
@@ -260,7 +259,7 @@ class FastbootProtocol(object):
         Parameters
         ----------
         expected_header : TODO
-            OKAY or DATA
+            ``OKAY`` or ``DATA``
         info_cb : TODO
             Optional callback for text sent from the bootloader.
         timeout_ms : TODO
@@ -511,9 +510,7 @@ class FastbootCommands(object):
         if source_len == 0:
             # Fall back to stat.
             source_len = os.stat(source_file).st_size
-        download_response = self.Download(
-            source_file, source_len=source_len, info_cb=info_cb,
-            progress_callback=progress_callback)
+        download_response = self.Download(source_file, source_len=source_len, info_cb=info_cb, progress_callback=progress_callback)
         flash_response = self.Flash(partition, info_cb=info_cb)
 
         return download_response + flash_response

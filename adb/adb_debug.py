@@ -97,13 +97,13 @@ def List(device, device_path):
     ----------
     device : adb.adb_commands.AdbCommands
         TODO
-    device_path : TODO
+    device_path : str, bytes
         Directory to list.
 
     Yields
     ------
     str
-        TODO
+        A formatted listing for a file in ``device_path``
 
     """
     files = device.List(device_path)
@@ -131,7 +131,7 @@ def List(device, device_path):
 
 @functools.wraps(adb_commands.AdbCommands.Logcat)
 def Logcat(device, *options):
-    """TODO
+    """Run ``shell logcat`` and stream the output to stdout.
 
     .. seealso:: :meth:`adb.adb_commands.AdbCommands.Logcat`
 
@@ -139,13 +139,13 @@ def Logcat(device, *options):
     ----------
     device : adb.adb_commands.AdbCommands
         TODO
-    options : TODO
-        TODO
+    options : list[str]
+        Arguments to pass to ``logcat``
 
     Returns
     -------
-    TODO
-        TODO
+    generator
+        The responses from the ``logcat`` command
 
     """
     return device.Logcat(device, ' '.join(options), timeout_ms=0)

@@ -611,20 +611,18 @@ class AdbCommands(object):
 
         Parameters
         ----------
-        command : TODO
+        command : bytes
             Command to run on the target.
         timeout_ms : TODO, None
             Maximum time to allow the command to run.
 
         Returns
         -------
-        TODO
+        generator
             The responses from the shell command.
 
         """
-        return self.protocol_handler.StreamingCommand(
-            self._handle, service=b'shell', command=command,
-            timeout_ms=timeout_ms)
+        return self.protocol_handler.StreamingCommand(self._handle, service=b'shell', command=command, timeout_ms=timeout_ms)
 
     def Logcat(self, options, timeout_ms=None):
         """Run ``shell logcat`` and stream the output to stdout.
@@ -640,8 +638,8 @@ class AdbCommands(object):
 
         Returns
         -------
-        TODO
-            TODO
+        generator
+            The responses from the ``logcat`` command
 
         """
         return self.StreamingShell('logcat %s' % options, timeout_ms)

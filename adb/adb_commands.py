@@ -137,7 +137,7 @@ class AdbCommands(object):
             Additional service parameters to append
         create : bool
             If False, don't create a connection if it does not exist
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             TODO
 
         Returns
@@ -159,8 +159,7 @@ class AdbCommands(object):
         else:
             destination_str = service
 
-        connection = self.protocol_handler.Open(
-            self._handle, destination=destination_str, timeout_ms=timeout_ms)
+        connection = self.protocol_handler.Open(self._handle, destination=destination_str, timeout_ms=timeout_ms)
 
         self._service_connections.update({service: connection})
 
@@ -191,7 +190,7 @@ class AdbCommands(object):
             List of AuthSigner subclass instances to be used for authentication. The device can either accept one
             of these via the ``Sign`` method, or we will send the result of ``GetPublicKey`` from the first one if the
             device doesn't accept any of them.
-        auth_timeout_ms : TODO
+        auth_timeout_ms : int
             Timeout to wait for when sending a new public key. This is only relevant when we send a new public key. The
             device shows a dialog and this timeout is how long to wait for that dialog. If used in automation, this
             should be low to catch such a case as a failure quickly; while in interactive settings it should be high to
@@ -214,9 +213,7 @@ class AdbCommands(object):
             if serial and ':' in serial:
                 self._handle = common.TcpHandle(serial, timeout_ms=default_timeout_ms)
             else:
-                self._handle = common.UsbHandle.FindAndOpen(
-                    DeviceIsAvailable, port_path=port_path, serial=serial,
-                    timeout_ms=default_timeout_ms)
+                self._handle = common.UsbHandle.FindAndOpen(DeviceIsAvailable, port_path=port_path, serial=serial, timeout_ms=default_timeout_ms)
 
         self._Connect(**kwargs)
 
@@ -321,7 +318,7 @@ class AdbCommands(object):
             Whether to replace existing application
         grant_permissions : bool
             If ``True``, grant all permissions to the app specified in its manifest
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             Expected timeout for pushing and installing.
         transfer_progress_callback : TODO, None
             callback method that accepts ``filename``, ``bytes_written``, and ``total_bytes`` of APK transfer
@@ -364,7 +361,7 @@ class AdbCommands(object):
             Package name of target package.
         keep_data : bool
             Whether to keep the data and cache directories
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             Expected timeout for pushing and installing.
 
         Returns
@@ -395,7 +392,7 @@ class AdbCommands(object):
             Destination on the device to write to.
         mtime : str
             Modification time to set on the file.
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             Expected timeout for any part of the push.
         progress_callback : TODO, None
             Callback method that accepts filename, bytes_written and total_bytes, total_bytes will be -1 for file-like
@@ -408,19 +405,17 @@ class AdbCommands(object):
             if os.path.isdir(source_file):
                 self.Shell("mkdir " + device_filename)
                 for f in os.listdir(source_file):
-                    self.Push(os.path.join(source_file, f), device_filename + '/' + f,
-                              progress_callback=progress_callback)
+                    self.Push(os.path.join(source_file, f), device_filename + '/' + f, progress_callback=progress_callback)
                 return
+
             source_file = open(source_file, "rb")
 
         with source_file:
-            connection = self.protocol_handler.Open(
-                self._handle, destination=b'sync:', timeout_ms=timeout_ms)
+            connection = self.protocol_handler.Open(self._handle, destination=b'sync:', timeout_ms=timeout_ms)
             kwargs = {}
             if st_mode is not None:
                 kwargs['st_mode'] = st_mode
-            self.filesync_handler.Push(connection, source_file, device_filename,
-                                       mtime=int(mtime), progress_callback=progress_callback, **kwargs)
+            self.filesync_handler.Push(connection, source_file, device_filename, mtime=int(mtime), progress_callback=progress_callback, **kwargs)
         connection.Close()
 
     def Pull(self, device_filename, dest_file=None, timeout_ms=None, progress_callback=None):
@@ -432,7 +427,7 @@ class AdbCommands(object):
             Filename on the device to pull.
         dest_file : str, file, io.IOBase, None
             If set, a filename or writable file-like object.
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             Expected timeout for any part of the pull.
         progress_callback : TODO, None
             Callback method that accepts filename, bytes_written and total_bytes, total_bytes will be -1 for file-like
@@ -495,8 +490,7 @@ class AdbCommands(object):
 
         """
         connection = self.protocol_handler.Open(self._handle, destination=b'sync:')
-        mode, size, mtime = self.filesync_handler.Stat(
-            connection, device_filename)
+        mode, size, mtime = self.filesync_handler.Stat(connection, device_filename)
         connection.Close()
         return mode, size, mtime
 
@@ -593,7 +587,7 @@ class AdbCommands(object):
         ----------
         command : TODO
             Shell command to run
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             Maximum time to allow the command to run.
 
         Returns
@@ -613,7 +607,7 @@ class AdbCommands(object):
         ----------
         command : bytes
             Command to run on the target.
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             Maximum time to allow the command to run.
 
         Returns
@@ -633,7 +627,7 @@ class AdbCommands(object):
         ----------
         options : str
             Arguments to pass to ``logcat``
-        timeout_ms : TODO, None
+        timeout_ms : int, None
             Maximum time to allow the command to run.
 
         Returns
@@ -669,6 +663,4 @@ class AdbCommands(object):
         """
         conn = self._get_service_connection(b'shell:')
 
-        return self.protocol_handler.InteractiveShellCommand(
-            conn, cmd=cmd, strip_cmd=strip_cmd,
-            delim=delim, strip_delim=strip_delim)
+        return self.protocol_handler.InteractiveShellCommand(conn, cmd=cmd, strip_cmd=strip_cmd, delim=delim, strip_delim=strip_delim)

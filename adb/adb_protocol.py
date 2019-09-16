@@ -169,10 +169,7 @@ def MakeWireIDs(ids):
         TODO
 
     """
-    id_to_wire = {
-        cmd_id: sum(c << (i * 8) for i, c in enumerate(bytearray(cmd_id)))
-        for cmd_id in ids
-    }
+    id_to_wire = {cmd_id: sum(c << (i * 8) for i, c in enumerate(bytearray(cmd_id))) for cmd_id in ids}
     wire_to_id = {wire: cmd_id for cmd_id, wire in id_to_wire.items()}
     return id_to_wire, wire_to_id
 
@@ -513,8 +510,7 @@ class AdbMessage(object):
             TODO
 
         """
-        return struct.pack(self.format, self.command, self.arg0, self.arg1,
-                           len(self.data), self.checksum, self.magic)
+        return struct.pack(self.format, self.command, self.arg0, self.arg1, len(self.data), self.checksum, self.magic)
 
     @classmethod
     def Unpack(cls, message):
@@ -552,6 +548,7 @@ class AdbMessage(object):
             cmd, arg0, arg1, data_length, data_checksum, unused_magic = struct.unpack(cls.format, message)
         except struct.error as e:
             raise ValueError('Unable to unpack ADB command.', cls.format, message, e)
+
         return cmd, arg0, arg1, data_length, data_checksum
 
     def Send(self, usb, timeout_ms=None):
@@ -610,6 +607,7 @@ class AdbMessage(object):
         """
         total_timeout_ms = usb.Timeout(total_timeout_ms)
         start = time.time()
+
         while True:
             msg = usb.BulkRead(24, timeout_ms)
             cmd, arg0, arg1, data_length, data_checksum = cls.Unpack(msg)
@@ -638,6 +636,7 @@ class AdbMessage(object):
                 raise InvalidChecksumError('Received checksum {0} != {1}'.format(actual_checksum, data_checksum))
         else:
             data = b''
+
         return command, arg0, arg1, bytes(data)
 
     @classmethod
@@ -754,9 +753,7 @@ class AdbMessage(object):
 
         """
         local_id = 1
-        msg = cls(
-            command=b'OPEN', arg0=local_id, arg1=0,
-            data=destination + b'\0')
+        msg = cls(command=b'OPEN', arg0=local_id, arg1=0, data=destination + b'\0')
         msg.Send(usb, timeout_ms)
         cmd, remote_id, their_local_id, _ = cls.Read(usb, [b'CLSE', b'OKAY'], timeout_ms=timeout_ms)
 
@@ -771,8 +768,8 @@ class AdbMessage(object):
                 return None
 
         if cmd != b'OKAY':
-            raise InvalidCommandError('Expected a ready response, got {}'.format(cmd),
-                                      cmd, (remote_id, their_local_id))
+            raise InvalidCommandError('Expected a ready response, got {}'.format(cmd), cmd, (remote_id, their_local_id))
+
         return _AdbConnection(usb, local_id, remote_id, timeout_ms)
 
     @classmethod

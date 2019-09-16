@@ -112,8 +112,7 @@ def decode_pubkey(public_key):
 
     """
     binary_key_data = base64.b64decode(public_key)
-    modulus_size_words, n0inv, modulus_bytes, rr_bytes, exponent = \
-        struct.unpack(ANDROID_RSAPUBLICKEY_STRUCT, binary_key_data)
+    modulus_size_words, n0inv, modulus_bytes, rr_bytes, exponent = struct.unpack(ANDROID_RSAPUBLICKEY_STRUCT, binary_key_data)
     assert modulus_size_words == ANDROID_PUBKEY_MODULUS_SIZE_WORDS
     modulus = reversed(modulus_bytes)
     rr = reversed(rr_bytes)

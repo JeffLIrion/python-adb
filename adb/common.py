@@ -370,16 +370,12 @@ class UsbHandle(object):
 
         """
         if self._handle is None:
-            raise usb_exceptions.WriteFailedError(
-                'This handle has been closed, probably due to another being opened.',
-                None)
+            raise usb_exceptions.WriteFailedError('This handle has been closed, probably due to another being opened.', None)
         try:
             return self._handle.bulkWrite(
                 self._write_endpoint, data, timeout=self.Timeout(timeout_ms))
         except libusb1.USBError as e:
-            raise usb_exceptions.WriteFailedError(
-                'Could not send data to %s (timeout %sms)' % (
-                    self.usb_info, self.Timeout(timeout_ms)), e)
+            raise usb_exceptions.WriteFailedError('Could not send data to %s (timeout %sms)' % (self.usb_info, self.Timeout(timeout_ms)), e)
 
     def BulkRead(self, length, timeout_ms=None):
         """TODO
@@ -407,19 +403,14 @@ class UsbHandle(object):
 
         """
         if self._handle is None:
-            raise usb_exceptions.ReadFailedError(
-                'This handle has been closed, probably due to another being opened.',
-                None)
+            raise usb_exceptions.ReadFailedError('This handle has been closed, probably due to another being opened.', None)
         try:
             # python-libusb1 > 1.6 exposes bytearray()s now instead of bytes/str.
             # To support older and newer versions, we ensure everything's bytearray()
             # from here on out.
-            return bytearray(self._handle.bulkRead(
-                self._read_endpoint, length, timeout=self.Timeout(timeout_ms)))
+            return bytearray(self._handle.bulkRead(self._read_endpoint, length, timeout=self.Timeout(timeout_ms)))
         except libusb1.USBError as e:
-            raise usb_exceptions.ReadFailedError(
-                'Could not receive data from %s (timeout %sms)' % (
-                    self.usb_info, self.Timeout(timeout_ms)), e)
+            raise usb_exceptions.ReadFailedError('Could not receive data from %s (timeout %sms)' % (self.usb_info, self.Timeout(timeout_ms)), e)
 
     def BulkReadAsync(self, length, timeout_ms=None):
         """TODO
@@ -547,8 +538,7 @@ class UsbHandle(object):
         else:
             device_matcher = None
             usb_info = 'first'
-        return cls.FindFirst(setting_matcher, device_matcher,
-                             usb_info=usb_info, timeout_ms=timeout_ms)
+        return cls.FindFirst(setting_matcher, device_matcher, usb_info=usb_info, timeout_ms=timeout_ms)
 
     @classmethod
     def FindFirst(cls, setting_matcher, device_matcher=None, **kwargs):
@@ -672,8 +662,7 @@ class TcpHandle(object):
 
         """
         timeout = self.TimeoutSeconds(self._timeout_ms)
-        self._connection = socket.create_connection((self.host, self.port),
-                                                    timeout=timeout)
+        self._connection = socket.create_connection((self.host, self.port), timeout=timeout)
         if timeout:
             self._connection.setblocking(0)
 
@@ -718,8 +707,7 @@ class TcpHandle(object):
         _, writeable, _ = select.select([], [self._connection], [], t)
         if writeable:
             return self._connection.send(data)
-        msg = 'Sending data to {} timed out after {}s. No data was sent.'.format(
-            self.serial_number, t)
+        msg = 'Sending data to {} timed out after {}s. No data was sent.'.format(self.serial_number, t)
         raise usb_exceptions.TcpTimeoutException(msg)
 
     def BulkRead(self, numbytes, timeout=None):
@@ -749,8 +737,7 @@ class TcpHandle(object):
         readable, _, _ = select.select([self._connection], [], [], t)
         if readable:
             return self._connection.recv(numbytes)
-        msg = 'Reading from {} timed out (Timeout {}s)'.format(
-            self._serial_number, t)
+        msg = 'Reading from {} timed out (Timeout {}s)'.format(self._serial_number, t)
         raise usb_exceptions.TcpTimeoutException(msg)
 
     def Timeout(self, timeout_ms):

@@ -433,9 +433,7 @@ class FastbootCommands(object):
             self._handle = kwargs['handle']
 
         else:
-            self._handle = common.UsbHandle.FindAndOpen(
-                DeviceIsAvailable, port_path=port_path, serial=serial,
-                timeout_ms=default_timeout_ms)
+            self._handle = common.UsbHandle.FindAndOpen(DeviceIsAvailable, port_path=port_path, serial=serial, timeout_ms=default_timeout_ms)
 
         self._protocol = FastbootProtocol(self._handle, chunk_kb)
 

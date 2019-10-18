@@ -371,9 +371,10 @@ class UsbHandle(object):
         """
         if self._handle is None:
             raise usb_exceptions.WriteFailedError('This handle has been closed, probably due to another being opened.', None)
+
         try:
-            return self._handle.bulkWrite(
-                self._write_endpoint, data, timeout=self.Timeout(timeout_ms))
+            return self._handle.bulkWrite(self._write_endpoint, data, timeout=self.Timeout(timeout_ms))
+
         except libusb1.USBError as e:
             raise usb_exceptions.WriteFailedError('Could not send data to %s (timeout %sms)' % (self.usb_info, self.Timeout(timeout_ms)), e)
 

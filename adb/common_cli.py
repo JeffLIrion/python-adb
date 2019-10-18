@@ -11,12 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 """Common code for ADB and Fastboot CLI.
 
 Usage introspects the given class for methods, args, and docs to show the user.
 
-StartCli handles connecting to a device, calling the expected method, and
+:func:`StartCli` handles connecting to a device, calling the expected method, and
 outputting the results.
+
+
+.. rubric:: Contents
+
+* :func:`_DocToArgs`
+* :class:`_PortPathAction`
+* :func:`_RunMethod`
+* :func:`GetCommonArguments`
+* :func:`GetDeviceArguments`
+* :func:`MakeSubparser`
+* :class:`PositionalArg`
+* :func:`StartCli`
+
 """
 
 from __future__ import print_function
@@ -32,68 +46,130 @@ from adb import usb_exceptions
 
 
 class _PortPathAction(argparse.Action):
+    """TODO
+
+    .. image:: _static/adb.common_cli._PortPathAction.CALL_GRAPH.svg
+
+    """
     def __call__(self, parser, namespace, values, option_string=None):
-        setattr(
-            namespace, self.dest,
-            [int(i) for i in values.replace('/', ',').split(',')])
+        setattr(namespace, self.dest, [int(i) for i in values.replace('/', ',').split(',')])
 
 
 class PositionalArg(argparse.Action):
+    """A positional CLI argument.
+
+    .. image:: _static/adb.common_cli.PositionalArg.CALL_GRAPH.svg
+
+    """
     def __call__(self, parser, namespace, values, option_string=None):
         namespace.positional.append(values)
 
 
 def GetDeviceArguments():
+    """Return a parser for device-related CLI commands.
+
+    Returns
+    -------
+    group : argparse.ArgumentParser
+        A parser for device-related CLI commands.
+
+    """
     group = argparse.ArgumentParser('Device', add_help=False)
-    group.add_argument(
-        '--timeout_ms', default=10000, type=int, metavar='10000',
-        help='Timeout in milliseconds.')
-    group.add_argument(
-        '--port_path', action=_PortPathAction,
-        help='USB port path integers (eg 1,2 or 2,1,1)')
-    group.add_argument(
-        '-s', '--serial',
-        help='Device serial to look for (host:port or USB serial)')
+    group.add_argument('--timeout_ms', default=10000, type=int, metavar='10000', help='Timeout in milliseconds.')
+    group.add_argument('--port_path', action=_PortPathAction, help='USB port path integers (eg 1,2 or 2,1,1)')
+    group.add_argument('-s', '--serial', help='Device serial to look for (host:port or USB serial)')
+
     return group
 
 
 def GetCommonArguments():
+    """Return a parser for common CLI commands.
+
+    Returns
+    -------
+    group : argparse.ArgumentParser
+        A parser for common CLI commands.
+
+    """
     group = argparse.ArgumentParser('Common', add_help=False)
     group.add_argument('--verbose', action='store_true', help='Enable logging')
     return group
 
 
 def _DocToArgs(doc):
-    """Converts a docstring documenting arguments into a dict."""
-    m = None
+    """Converts a docstring documenting arguments into a dict.
+
+    .. image:: _static/adb.common_cli._DocToArgs.CALLER_GRAPH.svg
+
+    Parameters
+    ----------
+    doc : str
+        The docstring for a method; see `MakeSubparser`.
+
+    Returns
+    -------
+    out : dict
+        A dictionary of arguments and their descriptions from the docstring ``doc``.
+
+    """
     offset = None
-    in_arg = False
+    param = None
     out = {}
+
     for l in doc.splitlines():
-        if l.strip() == 'Args:':
-            in_arg = True
-        elif in_arg:
-            if not l.strip():
+        if l.strip() == 'Parameters':
+            offset = len(l.rstrip()) - len(l.strip())
+
+        elif offset:
+            # The "----------" line
+            if l.strip() == '-' * len('Parameters'):
+                continue
+
+            if l.strip() in ['Returns', 'Yields', 'Raises']:
                 break
-            if offset is None:
-                offset = len(l) - len(l.lstrip())
-            l = l[offset:]
-            if l[0] == ' ' and m:
-                out[m.group(1)] += ' ' + l.lstrip()
-            else:
-                m = re.match(r'^([a-z_]+): (.+)$', l.strip())
-                out[m.group(1)] = m.group(2)
+
+            # start of a parameter
+            if len(l.rstrip()) - len(l.strip()) == offset:
+                param = l.strip().split()[0]
+                out[param] = ''
+
+            # add to a parameter
+            elif l.strip():
+                if out[param]:
+                    out[param] += ' ' + l.strip()
+                else:
+                    out[param] = l.strip()
+
     return out
 
 
 def MakeSubparser(subparsers, parents, method, arguments=None):
-    """Returns an argparse subparser to create a 'subcommand' to adb."""
+    """Returns an argparse subparser to create a 'subcommand' to adb.
+
+    .. image:: _static/adb.common_cli.MakeSubparser.CALL_GRAPH.svg
+
+    Parameters
+    ----------
+    subparsers : TODO
+        TODO
+    parents : TODO
+        TODO
+    method : TODO
+        TODO
+    arguments : TODO, None
+        TODO
+
+    Returns
+    -------
+    subparser : TODO
+        TODO
+
+    """
     name = ('-'.join(re.split(r'([A-Z][a-z]+)', method.__name__)[1:-1:2])).lower()
-    help = method.__doc__.splitlines()[0]
-    subparser = subparsers.add_parser(
-        name=name, description=help, help=help.rstrip('.'), parents=parents)
+    help = method.__doc__.splitlines()[0]  # pylint: disable=redefined-builtin
+    subparser = subparsers.add_parser(name=name, description=help, help=help.rstrip('.'), parents=parents)
     subparser.set_defaults(method=method, positional=[])
-    argspec = inspect.getargspec(method)
+    argspec = inspect.getfullargspec(method)
 
     # Figure out positionals and default argument, if any. Explicitly includes
     # arguments that default to '' but excludes arguments that default to None.
@@ -122,7 +198,25 @@ def MakeSubparser(subparsers, parents, method, arguments=None):
 
 
 def _RunMethod(dev, args, extra):
-    """Runs a method registered via MakeSubparser."""
+    """Runs a method registered via :func:`MakeSubparser`.
+
+    .. image:: _static/adb.common_cli._RunMethod.CALLER_GRAPH.svg
+
+    Parameters
+    ----------
+    dev : TODO
+        TODO
+    args : TODO
+        TODO
+    extra : TODO
+        TODO
+
+    Returns
+    -------
+    int
+        0
+
+    """
     logging.info('%s(%s)', args.method.__name__, ', '.join(args.positional))
     result = args.method(dev, *args.positional, **extra)
     if result is not None:
@@ -144,7 +238,29 @@ def _RunMethod(dev, args, extra):
 
 
 def StartCli(args, adb_commands, extra=None, **device_kwargs):
-    """Starts a common CLI interface for this usb path and protocol."""
+    """Starts a common CLI interface for this usb path and protocol.
+
+    Handles connecting to a device, calling the expected method, and outputting the results.
+
+    .. image:: _static/adb.common_cli.StartCli.CALL_GRAPH.svg
+
+    Parameters
+    ----------
+    args : TODO
+        TODO
+    adb_commands : TODO
+        TODO
+    extra : TODO, None
+        TODO
+    **device_kwargs : TODO
+        TODO
+
+    Returns
+    -------
+    TODO
+        TODO
+
+    """
     try:
         dev = adb_commands()
         dev.ConnectDevice(port_path=args.port_path, serial=args.serial, default_timeout_ms=args.timeout_ms,

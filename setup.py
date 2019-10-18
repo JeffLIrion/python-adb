@@ -65,9 +65,11 @@ Android project's ADB.
         rsa_signer_library
     ],
 
-    extra_requires = {
+    extras_require = {
         'fastboot': 'progressbar>=2.3'
     },
+
+    tests_require = ['cryptography', 'pycryptodome', 'rsa'],
 
 ## classifier list https://pypi.python.org/pypi?:action=list_classifiers
     classifiers = [

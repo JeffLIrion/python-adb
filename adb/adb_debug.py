@@ -87,16 +87,15 @@ def Shell(device, *command):
         cmd = input("> ")
         if not cmd:
             continue
-        elif cmd == "exit":
+        if cmd == "exit":
             break
-        else:
-            stdout = device.InteractiveShell(
-                cmd, strip_cmd=True, delim=terminal_prompt, strip_delim=True
-            )
-            if stdout:
-                if isinstance(stdout, bytes):
-                    stdout = stdout.decode("utf-8")
-                    print(stdout)
+        stdout = device.InteractiveShell(
+            cmd, strip_cmd=True, delim=terminal_prompt, strip_delim=True
+        )
+        if stdout:
+            if isinstance(stdout, bytes):
+                stdout = stdout.decode("utf-8")
+                print(stdout)
     device.Close()
 
 
